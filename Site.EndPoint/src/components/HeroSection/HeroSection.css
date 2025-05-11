@@ -1,0 +1,155 @@
+/* Pattern Dots */
+.pattern-dots {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.1;
+}
+
+/* Floating Elements */
+.floating-element {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+/* Desktop Floating Elements */
+@media (min-width: 768px) {
+  .floating-element {
+    animation: float 15s infinite ease-in-out;
+  }
+}
+
+/* Mobile Floating Elements */
+@media (max-width: 767px) {
+  .floating-element {
+    animation: float-mobile 8s infinite ease-in-out;
+  }
+}
+
+.element-1 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.element-2 {
+  width: 150px;
+  height: 150px;
+  top: 60%;
+  right: 15%;
+  animation-delay: -2s;
+}
+
+/* Hide elements 3 and 4 on all devices */
+.element-3, .element-4 {
+  display: none;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(20px) rotate(-5deg);
+  }
+}
+
+/* Simpler animation for mobile */
+@keyframes float-mobile {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+}
+
+@keyframes border-flow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-border-flow {
+  animation: border-flow 3s linear infinite;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 767px) {
+  .animate-pulse-slow {
+    animation: none;
+  }
+
+  .animate-border-flow {
+    animation: none;
+  }
+
+  .pattern-dots {
+    opacity: 0.05;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 500ms;
+  }
+
+  /* Adjust floating elements for mobile */
+  .floating-element {
+    opacity: 0.15;
+  }
+} 

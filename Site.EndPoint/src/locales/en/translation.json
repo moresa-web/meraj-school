@@ -1,0 +1,14 @@
+{
+  "error": {
+    "network": {
+      "title": "Network Error",
+      "message": "Sorry, there was a problem connecting to the server. Please check your internet connection and try again.",
+      "retry": "Try Again"
+    },
+    "page": {
+      "title": "Page Error",
+      "message": "Sorry, there was a problem loading the page. Please try again.",
+      "retry": "Try Again"
+    }
+  }
+} 

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2018",          // نسخه JavaScript خروجی
+    "module": "commonjs",        // سیستم ماژول‌ها
+    "outDir": "./dist",          // پوشه خروجی فایل‌های کامپایل شده
+    "rootDir": "./src",          // پوشه اصلی کدها
+    "strict": true,              // فعال کردن تمام قوانین سختگیرانه TypeScript
+    "esModuleInterop": true,     // پشتیبانی از import/export
+    "skipLibCheck": true,        // چک نکردن فایل‌های node_modules
+    "forceConsistentCasingInFileNames": true,  // حساس به حروف بزرگ و کوچک
+    "moduleResolution": "node",  // روش حل ماژول‌ها
+    "resolveJsonModule": true,   // پشتیبانی از import فایل‌های JSON
+    "baseUrl": ".",             // مسیر پایه برای import‌ها
+    "paths": {                   // تعریف مسیرهای کوتاه برای import
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],      // فایل‌هایی که باید کامپایل شوند
+  "exclude": ["node_modules", "dist", "tests"]  // فایل‌هایی که نباید کامپایل شوند
+} 
