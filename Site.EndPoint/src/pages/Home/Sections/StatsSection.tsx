@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
 import CountUp from 'react-countup';
@@ -18,6 +18,8 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const StatsSection: React.FC = () => {
   const { user } = useAuth();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
   const [content, setContent] = useState<StatsContent>({
     stats: [
       { number: '۲۰+', text: 'سال تجربه آموزشی' },
@@ -80,13 +82,36 @@ export const StatsSection: React.FC = () => {
     fetchContent();
   }, []);
 
+  // استفاده از Intersection Observer برای تشخیص زمانی که کاربر به این بخش می‌رسد
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   const handleSave = async (field: 'title' | 'description' | 'stats', value: string | StatItem[], index?: number, statField?: 'number' | 'text') => {
     try {
       let updatedContent = { ...content };
 
       if (field === 'stats' && typeof index === 'number' && statField) {
         const updatedStats = [...content.stats];
-        updatedStats[index] = { ...updatedStats[index], [statField]: value };
+        updatedStats[index] = { ...updatedStats[index], [statField]: value as string };
         updatedContent.stats = updatedStats;
       } else {
         (updatedContent as any)[field] = value;
@@ -113,7 +138,7 @@ export const StatsSection: React.FC = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-emerald-50 to-white relative overflow-hidden">
+    <section ref={sectionRef} className="py-20 bg-gradient-to-b from-emerald-50 to-white relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-100 rounded-full opacity-50 animate-blob"></div>
@@ -142,10 +167,10 @@ export const StatsSection: React.FC = () => {
           {content.stats.map((stat, index) => {
             const number = extractNumber(stat.number);
             const suffix = extractSuffix(stat.number);
-            
+
             return (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="text-center transform hover:scale-105 transition-all duration-500 animate-fade-in-up group"
                 style={{ animationDelay: `${index * 200}ms` }}
               >
@@ -159,12 +184,13 @@ export const StatsSection: React.FC = () => {
                         isAdmin={true}
                         onSave={(newValue) => handleSave('stats', newValue, index, 'number')}
                       />
-                    ) : (
+                    ) : inView ? (
                       <CountUp
                         start={0}
                         end={number}
                         duration={5}
                         useEasing={true}
+                        enableScrollSpy={false}
                         easingFn={(t, b, c, d) => {
                           // تابع easing برای حرکت نرم‌تر
                           t /= d;
@@ -172,12 +198,9 @@ export const StatsSection: React.FC = () => {
                         }}
                         separator=","
                         suffix={suffix}
-                        enableScrollSpy
-                        scrollSpyOnce
-                        scrollSpyDelay={300}
                         formattingFn={(value) => englishToPersian(value.toString())}
                       />
-                    )}
+                    ) : englishToPersian(number.toString()) + suffix}
                   </div>
                 </div>
                 <div className="text-gray-600 text-lg group-hover:text-gray-800 transition-colors duration-300">
@@ -198,4 +221,3 @@ export const StatsSection: React.FC = () => {
 };
 
 export default StatsSection;
-

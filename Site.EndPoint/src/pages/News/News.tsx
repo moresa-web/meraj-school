@@ -23,7 +23,6 @@ interface NewsItem {
 }
 
 const News: React.FC = () => {
-  const navigate = useNavigate();
   const { handleAxiosError } = useErrorHandler();
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);

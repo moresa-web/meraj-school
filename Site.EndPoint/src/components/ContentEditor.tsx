@@ -71,7 +71,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ pageId }) => {
     }
   };
 
-  if (!user?.isAdmin) {
+  if (user?.role !== 'admin') {
     return null;
   }
 

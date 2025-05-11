@@ -1,6 +1,6 @@
 import React from 'react';
-import axios, { AxiosError } from 'axios';
-import { ErrorType, AppError, ValidationError, NetworkError, ServerError, AuthError, UnknownError } from './errorTypes';
+import { AxiosError } from 'axios';
+import { ErrorType, AppError } from './errorTypes';
 import { ERROR_MESSAGES } from './errorConstants';
 
 export { ErrorType };
