@@ -87,6 +87,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddNews, onAddClass }) => {
             </div>
           )}
         </div>
+        <div className="menu-item">
+          <Link
+            to="/dashboard/contacts"
+            className={`submenu-button ${path === 'contacts' ? 'active' : ''}`}
+          >
+            <span className="nav-icon">📞</span>
+            <span className="nav-text">لیست پیام‌ها</span>
+          </Link>
+        </div>
       </nav>
     </aside>
   );

@@ -213,13 +213,13 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
 
   return (
     <>
-      <div 
+      <span 
         className="editable-content"
         onMouseEnter={() => setShowEditIcon(true)}
         onMouseLeave={() => setShowEditIcon(false)}
       >
         {type === 'image' ? (
-          <div className="image-container">
+          <span className="image-container">
             <img src={getFullImageUrl(value)} alt="Content" className="editable-image" />
             {showEditIcon && (
               <button onClick={handleEdit} className="edit-icon">
@@ -229,9 +229,9 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
                 </svg>
               </button>
             )}
-          </div>
+          </span>
         ) : (
-          <div className="text-container">
+          <span className="text-container">
             <span className="editable-text">{value}</span>
             {showEditIcon && (
               <button onClick={handleEdit} className="edit-icon">
@@ -241,9 +241,9 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
                 </svg>
               </button>
             )}
-          </div>
+          </span>
         )}
-      </div>
+      </span>
       {isEditing && ReactDOM.createPortal(modal, document.body)}
     </>
   );

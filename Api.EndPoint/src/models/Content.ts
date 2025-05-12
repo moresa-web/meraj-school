@@ -25,13 +25,13 @@ const defaultContent: Record<string, Record<string, any>> = {
   home: {
     hero: {
       logo: '/images/logo.png',
-      title: 'مدرسه معراج',
-      description: 'به مدرسه معراج خوش آمدید. اینجا جایی است که دانش‌آموزان می‌توانند در محیطی امن و پویا به یادگیری بپردازند.',
+      title: 'دبیرستان معراج',
+      description: 'به دبیرستان معراج خوش آمدید. اینجا جایی است که دانش‌آموزان می‌توانند در محیطی امن و پویا به یادگیری بپردازند.',
       heroImage: '/images/hero-bg.jpg'
     },
     features: {
       title: 'ویژگی‌های مدرسه',
-      description: 'مدرسه معراج با امکانات و ویژگی‌های منحصر به فرد',
+      description: 'دبیرستان معراج با امکانات و ویژگی‌های منحصر به فرد',
       features: [
         {
           title: 'آموزش با کیفیت',
@@ -91,13 +91,13 @@ const defaultContent: Record<string, Record<string, any>> = {
     },
     testimonials: {
       title: 'نظرات والدین',
-      description: 'آنچه والدین درباره مدرسه معراج می‌گویند',
+      description: 'آنچه والدین درباره دبیرستان معراج می‌گویند',
       testimonials: [
         {
           _id: '1',
           name: 'علی محمدی',
           role: 'والد دانش‌آموز کلاس سوم',
-          text: 'از زمانی که فرزندم به مدرسه معراج آمده، پیشرفت قابل توجهی در یادگیری داشته است.',
+          text: 'از زمانی که فرزندم به دبیرستان معراج آمده، پیشرفت قابل توجهی در یادگیری داشته است.',
           image: '/images/testimonials/parent1.jpg'
         },
         {
@@ -111,7 +111,7 @@ const defaultContent: Record<string, Record<string, any>> = {
           _id: '3',
           name: 'رضا کریمی',
           role: 'والد دانش‌آموز کلاس دوم',
-          text: 'معلمان دلسوز و محیط آموزشی مناسب، مدرسه معراج را به یکی از بهترین مدارس تبدیل کرده است.',
+          text: 'معلمان دلسوز و محیط آموزشی مناسب، دبیرستان معراج را به یکی از بهترین مدارس تبدیل کرده است.',
           image: '/images/testimonials/parent3.jpg'
         }
       ]
@@ -130,7 +130,7 @@ const defaultContent: Record<string, Record<string, any>> = {
     },
     stats: {
       title: 'آمار مدرسه',
-      description: 'آمار و ارقام مدرسه معراج',
+      description: 'آمار و ارقام دبیرستان معراج',
       stats: [
         { number: '۲۰+', text: 'سال تجربه آموزشی' },
         { number: '۵۰+', text: 'معلم مجرب' },

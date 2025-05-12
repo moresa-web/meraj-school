@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import EditableContent from '../../../components/EditableContent/EditableContent';
 import { Link } from 'react-router-dom';
 import './HeroSection.css';
+
+const EditableContent = React.lazy(() => import('../../../components/EditableContent/EditableContent'));
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -14,7 +15,12 @@ interface HeroContent {
 
 const HeroSection: React.FC = () => {
   const { user } = useAuth();
-  const [content, setContent] = useState<HeroContent | null>(null);
+  const defaultContent: HeroContent = {
+    logo: '/images/logo.png',
+    title: 'دبیرستان معراج',
+    description: process.env.REACT_APP_DEFAULT_DESCRIPTION || 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی'
+  };
+  const [content, setContent] = useState<HeroContent>(defaultContent);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,10 +67,10 @@ const HeroSection: React.FC = () => {
         },
         body: JSON.stringify({ [field]: newValue })
       });
-      
+
       if (!response.ok) throw new Error('خطا در ذخیره تغییرات');
-      
-      setContent(prev => prev ? { ...prev, [field]: newValue } : null);
+
+      setContent(prev => prev ? { ...prev, [field]: newValue } : prev);
     } catch (err) {
       console.error(`Error saving ${field}:`, err);
     }
@@ -74,28 +80,42 @@ const HeroSection: React.FC = () => {
     <section className="hero-section">
       <div className="hero-content">
         <div className="hero-logo">
-          <EditableContent
-            type="image"
-            value={content.logo}
-            isAdmin={user?.role === 'admin'}
-            onSave={(newValue) => handleSave('logo', newValue)}
-          />
+          <Suspense fallback={<img src={content.logo} alt="لوگو" className="w-full h-full object-contain" />}>
+            <EditableContent
+              type="image"
+              value={content.logo}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('logo', newValue)}
+            />
+          </Suspense>
         </div>
         <div className="hero-title">
-          <EditableContent
-            type="text"
-            value={content.title}
-            isAdmin={user?.role === 'admin'}
-            onSave={(newValue) => handleSave('title', newValue)}
-          />
+          <Suspense fallback={
+            <div className="editable-fallback text-fallback">
+              <h1 className="hero-title-text">{content.title}</h1>
+            </div>
+          }>
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
+          </Suspense>
         </div>
         <div className="hero-description">
-          <EditableContent
-            type="text"
-            value={content.description}
-            isAdmin={user?.role === 'admin'}
-            onSave={(newValue) => handleSave('description', newValue)}
-          />
+          <Suspense fallback={
+            <div className="editable-fallback text-fallback">
+              <p className="hero-description-text">{content.description}</p>
+            </div>
+          }>
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
+          </Suspense>
         </div>
         <div className="hero-cta">
           <Link to="/register" className="hero-cta-button primary-button">
@@ -106,7 +126,7 @@ const HeroSection: React.FC = () => {
           </Link>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

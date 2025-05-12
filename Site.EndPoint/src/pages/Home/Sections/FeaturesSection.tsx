@@ -19,19 +19,19 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const defaultFeatures: Feature[] = [
   {
     icon: 'book',
-                            title: 'آموزش با کیفیت',
-                            description: 'استفاده از روش‌های نوین آموزشی و اساتید مجرب برای یادگیری بهتر دانش‌آموزان'
-                        },
-                        {
+    title: 'آموزش با کیفیت',
+    description: 'استفاده از روش‌های نوین آموزشی و اساتید مجرب برای یادگیری بهتر دانش‌آموزان'
+  },
+  {
     icon: 'building',
-                            title: 'امکانات مدرن',
-                            description: 'دسترسی به آزمایشگاه‌های مجهز، کتابخانه و سالن ورزشی استاندارد'
-                        },
-                        {
+    title: 'امکانات مدرن',
+    description: 'دسترسی به آزمایشگاه‌های مجهز، کتابخانه و سالن ورزشی استاندارد'
+  },
+  {
     icon: 'users',
-                            title: 'مشاوره تحصیلی',
-                            description: 'مشاوره تخصصی برای انتخاب رشته و برنامه‌ریزی تحصیلی دانش‌آموزان'
-                        }
+    title: 'مشاوره تحصیلی',
+    description: 'مشاوره تخصصی برای انتخاب رشته و برنامه‌ریزی تحصیلی دانش‌آموزان'
+  }
 ];
 
 const defaultContent: FeaturesContent = {
@@ -151,8 +151,8 @@ export const FeaturesSection: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {content.features.map((feature, index) => (
-                        <div key={index} className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-200 transition-colors duration-300">
+            <div key={index} className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-200 transition-colors duration-300">
                 {getIcon(feature.icon)}
               </div>
               <h3 className="text-xl font-semibold mb-4 text-gray-800">
@@ -170,12 +170,12 @@ export const FeaturesSection: React.FC = () => {
                   isAdmin={user?.role === 'admin'}
                   onSave={(newValue) => handleSave('feature', { description: newValue }, index)}
                 />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+              </div>
             </div>
-        </section>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 

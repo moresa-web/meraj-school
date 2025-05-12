@@ -11,7 +11,7 @@ import pageContentRoutes from './routes/pageContent.routes';
 import path from 'path';
 import { upload, uploadImage } from './controllers/upload.controller';
 import contentRoutes from './routes/content';
-
+import contactRoutes from './routes/contact';
 // لود کردن متغیرهای محیطی
 dotenv.config();
 
@@ -35,10 +35,10 @@ app.use('/api/news', newsRoutes);    // مسیرهای اخبار
 app.use('/api/user', userRoutes);    // مسیرهای کاربران
 app.use('/api/page-content', pageContentRoutes);
 app.use('/api/content', contentRoutes);
-
+app.use('/api/contact', contactRoutes);
 // مسیر اصلی
 app.get('/', (req, res) => {
-  res.json({ message: 'خوش آمدید به API مدرسه معراج' });
+  res.json({ message: 'خوش آمدید به API دبیرستان معراج' });
 });
 
 app.post('/api/upload', upload.single('image'), uploadImage);

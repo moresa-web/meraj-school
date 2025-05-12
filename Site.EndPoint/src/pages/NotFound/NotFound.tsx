@@ -1,7 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const NotFound: React.FC = () => {
+  // این هوک فقط یک بار هنگام نمایش کامپوننت اجرا می‌شود
+  useEffect(() => {
+    // تنظیم status code به 404
+    document.title = "404 - صفحه یافت نشد";
+    
+    // این روش برای برنامه‌های SPA بهینه است
+    const originalStatus = document.querySelector('meta[name="status"]');
+    if (originalStatus) {
+      originalStatus.setAttribute('content', '404');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'status';
+      meta.content = '404';
+      document.head.appendChild(meta);
+    }
+
+    return () => {
+      // پاکسازی در هنگام unmount کامپوننت
+      const statusMeta = document.querySelector('meta[name="status"]');
+      if (statusMeta) {
+        statusMeta.setAttribute('content', '200');
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full text-center">
@@ -64,4 +89,4 @@ const NotFound: React.FC = () => {
   );
 };
 
-export default NotFound; 
+export default NotFound;

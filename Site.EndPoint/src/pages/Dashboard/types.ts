@@ -57,6 +57,15 @@ export interface ClassFormData {
   image?: File;
 }
 
+export interface Contact {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  isRead: boolean;
+}
+
 export interface SidebarProps {
   onAddNews: () => void;
   onAddClass: () => void;

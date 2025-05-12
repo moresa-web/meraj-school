@@ -1,7 +1,7 @@
 {
   "name": "meraj-school-backend",
   "version": "1.0.0",
-  "description": "بک‌اند مدرسه معراج",
+  "description": "بک‌اند دبیرستان معراج",
   "main": "dist/app.js",
   "scripts": {
     "start": "node dist/app.js",

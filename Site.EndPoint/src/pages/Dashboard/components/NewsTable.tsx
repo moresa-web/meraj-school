@@ -17,8 +17,10 @@ const NewsTable: React.FC<NewsTableProps> = ({ news, onView, onEdit, onDelete })
           <tr>
             <th>تصویر</th>
             <th>عنوان</th>
+            <th>لایک</th>
+            <th>بازدید</th>
+            <th>تاریخ</th>
             <th>دسته‌بندی</th>
-            <th>وضعیت</th>
             <th>عملیات</th>
           </tr>
         </thead>
@@ -35,12 +37,10 @@ const NewsTable: React.FC<NewsTableProps> = ({ news, onView, onEdit, onDelete })
                 )}
               </td>
               <td>{item.title}</td>
+              <td>{item.likes}</td>
+              <td>{item.views}</td>
+              <td>{item.date}</td>
               <td>{item.category}</td>
-              <td>
-                <span className={`status-badge ${item.isPublished ? 'active' : 'inactive'}`}>
-                  {item.isPublished ? 'منتشر شده' : 'پیش‌نویس'}
-                </span>
-              </td>
               <td>
                 <div className="table-actions">
                   <button

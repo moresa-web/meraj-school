@@ -183,7 +183,7 @@ export const LatestNewsSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-emerald-50">
+    <section className="py-24 bg-gradient-to-b from-emerald-50 to-emerald-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 text-emerald-600">

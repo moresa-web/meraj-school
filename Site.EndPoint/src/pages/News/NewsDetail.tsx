@@ -4,6 +4,7 @@ import './News.css';
 import axios from 'axios';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import ShareModal from '../../components/ShareModal/ShareModal';
+import { Helmet } from 'react-helmet-async';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -11,6 +12,7 @@ interface NewsItem {
   _id: string;
   title: string;
   description: string;
+  createdAt: string;
   date: string;
   image: string;
   category: string;
@@ -39,7 +41,7 @@ const NewsDetail: React.FC = () => {
         setError(null);
         const response = await axios.get(`${API_URL}/news/${id}`);
         setNews(response.data);
-        
+
         // بررسی وضعیت لایک از سرور
         const userIP = await axios.get(`${API_URL}/user/ip`);
         setIsLiked(response.data.likedBy.includes(userIP.data));
@@ -58,7 +60,7 @@ const NewsDetail: React.FC = () => {
     try {
       const response = await axios.post(`${API_URL}/news/${id}/like`);
       setNews(response.data);
-      
+
       // بررسی وضعیت لایک از سرور
       const userIP = await axios.get(`${API_URL}/user/ip`);
       setIsLiked(response.data.likedBy.includes(userIP.data));
@@ -96,141 +98,194 @@ const NewsDetail: React.FC = () => {
     );
   }
 
+  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
+  const pageUrl = `${siteUrl}/news/${news._id}`;
+  const ogImage = `${siteUrl}${news.image}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": pageUrl
+    },
+    "headline": news.title,
+    "image": [ogImage],
+    "datePublished": new Date(news.createdAt).toISOString().split('T')[0],
+    "author": {
+      "@type": "Person",
+      "name": news.author
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteUrl}/logo.png`
+      }
+    },
+    "description": news.description,
+    "articleSection": news.category,
+    "keywords": news.tags.join(', ')
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section with Parallax Effect */}
-      <div className="relative h-[70vh] overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
-          style={{ 
-            backgroundImage: `url(${API_URL.replace('/api', '')}${news.image})`,
-            backgroundAttachment: 'fixed'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
-        </div>
-        
-        {/* Content Overlay */}
-        <div className="relative h-full flex items-end">
-          <div className="max-w-7xl mx-auto px-4 w-full pb-16">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="px-4 py-2 bg-emerald-500 text-white rounded-full text-sm font-medium">
-                  {news.category}
-                </span>
-                <span className="text-white/80 text-sm">{news.date}</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                {news.title}
-              </h1>
-              <p className="text-white/90 text-lg mb-8 max-w-2xl">
-                {news.description}
-              </p>
-              <div className="flex items-center gap-8">
-                <div className="flex items-center text-white/80">
-                  <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span>{news.author}</span>
-                </div>
-                <div className="flex items-center text-white/80">
-                  <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>{news.views} بازدید</span>
-                </div>
-                <button
-                  onClick={handleLike}
-                  className={`flex items-center transition-colors ${
-                    isLiked ? 'text-emerald-400' : 'text-white/80 hover:text-emerald-400'
-                  }`}
-                >
-                  <svg 
-                    className={`w-5 h-5 ml-2 ${isLiked ? 'fill-current' : 'fill-none'}`} 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-                    />
-                  </svg>
-                  <span>{news.likes} لایک</span>
-                </button>
-              </div>
-            </div>
+    <>
+      <Helmet>
+        <title>{news.title} - دبیرستان پسرانه معراج</title>
+        <meta name="description" content={news.description} />
+        <link rel="canonical" href={pageUrl} />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={news.title} />
+        <meta property="og:description" content={news.description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:image" content={ogImage} />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={news.title} />
+        <meta name="twitter:description" content={news.description} />
+        <meta name="twitter:image" content={ogImage} />
+
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Section with Parallax Effect */}
+        <div className="relative h-[70vh] overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
+            style={{
+              backgroundImage: `url(${API_URL.replace('/api', '')}${news.image})`,
+              backgroundAttachment: 'fixed'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
           </div>
-        </div>
-      </div>
 
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="p-8 md:p-12">
-              {/* Content */}
-              <div className="prose prose-lg max-w-none">
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                  {news.content}
+          {/* Content Overlay */}
+          <div className="relative h-full flex items-end">
+            <div className="max-w-7xl mx-auto px-4 w-full pb-16">
+              <div className="max-w-3xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="px-4 py-2 bg-emerald-500 text-white rounded-full text-sm font-medium">
+                    {news.category}
+                  </span>
+                  <span className="text-white/80 text-sm">{news.date}</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                  {news.title}
+                </h1>
+                <p className="text-white/90 text-lg mb-8 max-w-2xl">
+                  {news.description}
                 </p>
-              </div>
-
-              {/* Share and Tags Section */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex flex-wrap items-center justify-between gap-6 mb-8">
-                  <h3 className="text-lg font-semibold text-gray-800">برچسب‌ها</h3>
-                  <button
-                    onClick={handleShare}
-                    className="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
-                  >
+                <div className="flex items-center gap-8">
+                  <div className="flex items-center text-white/80">
                     <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    اشتراک‌گذاری
+                    <span>{news.author}</span>
+                  </div>
+                  <div className="flex items-center text-white/80">
+                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{news.views} بازدید</span>
+                  </div>
+                  <button
+                    onClick={handleLike}
+                    className={`flex items-center transition-colors ${isLiked ? 'text-emerald-400' : 'text-white/80 hover:text-emerald-400'
+                      }`}
+                  >
+                    <svg
+                      className={`w-5 h-5 ml-2 ${isLiked ? 'fill-current' : 'fill-none'}`}
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    <span>{news.likes} لایک</span>
                   </button>
                 </div>
-
-                <div className="flex flex-wrap gap-3">
-                  {news.tags.map((tag, index) => (
-                    <Link
-                      key={tag}
-                      to={`/news?tag=${encodeURIComponent(tag)}`}
-                      className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors cursor-pointer"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Back Button */}
-              <div className="mt-12 flex justify-center">
-                <button
-                  onClick={() => navigate('/news')}
-                  className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                >
-                  <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  بازگشت به لیست اخبار
-                </button>
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Share Modal */}
-      <ShareModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        newsItem={news}
-      />
-    </div>
+        {/* Content Section */}
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="p-8 md:p-12">
+                {/* Content */}
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                    {news.content}
+                  </p>
+                </div>
+
+                {/* Share and Tags Section */}
+                <div className="mt-12 pt-8 border-t border-gray-200">
+                  <div className="flex flex-wrap items-center justify-between gap-6 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-800">برچسب‌ها</h3>
+                    <button
+                      onClick={handleShare}
+                      className="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                      اشتراک‌گذاری
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    {news.tags.map((tag, index) => (
+                      <Link
+                        key={tag}
+                        to={`/news?tag=${encodeURIComponent(tag)}`}
+                        className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors cursor-pointer"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Back Button */}
+                <div className="mt-12 flex justify-center">
+                  <button
+                    onClick={() => navigate('/news')}
+                    className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    بازگشت به لیست اخبار
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Share Modal */}
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          newsItem={news}
+        />
+      </div>
+    </>
   );
 };
 

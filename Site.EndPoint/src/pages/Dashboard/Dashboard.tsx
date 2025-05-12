@@ -3,22 +3,24 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Outlet, useLocation, useParams } from 'react-router-dom';
 import { useNews } from './hooks/useNews';
 import { useClasses } from './hooks/useClasses';
-import { News, Class, NewsFormData, ClassFormData } from './types';
+import { News, Class, NewsFormData, ClassFormData, Contact } from './types';
 import Sidebar from './components/Sidebar';
 import NewsTable from './components/NewsTable';
 import NewsForm from './components/NewsForm';
 import ClassTable from './components/ClassTable';
 import ClassForm from './components/ClassForm';
+import ContactTable from './components/ContactTable';
 import Modal from './components/Modal';
 import LoadingState from './components/LoadingState';
 import './Dashboard.css';
+import { useContacts } from './hooks/useContacts';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const [selectedItem, setSelectedItem] = useState<News | Class | null>(null);
+  const [selectedItem, setSelectedItem] = useState<News | Class | Contact | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingNews, setIsAddingNews] = useState(false);
   const [isAddingClass, setIsAddingClass] = useState(false);
@@ -45,11 +47,17 @@ const Dashboard: React.FC = () => {
     deleteClass
   } = useClasses();
 
+  const {
+    contacts,
+    loading: contactsLoading,
+    error: contactsError,
+  } = useContacts();
+
   useEffect(() => {
     console.log('Location changed:', location.pathname);
     console.log('Current ID:', id);
     console.log('Current news:', news);
-    
+
     if (location.pathname.includes('/news/edit/') && id) {
       const newsToEdit = news.find(item => item._id === id);
       console.log('Found news to edit:', newsToEdit);
@@ -65,7 +73,7 @@ const Dashboard: React.FC = () => {
     return null;
   }
 
-  const handleViewItem = (item: News | Class) => {
+  const handleViewItem = (item: News | Class | Contact) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
@@ -133,12 +141,12 @@ const Dashboard: React.FC = () => {
     console.log('Is adding news:', isAddingNews);
     console.log('Editing news:', editingNews);
 
-    if (newsLoading || classesLoading) {
+    if (newsLoading || classesLoading || contactsLoading) {
       return <LoadingState loading={true} error={null} />;
     }
 
-    if (newsError || classesError) {
-      return <LoadingState loading={false} error={newsError || classesError} />;
+    if (newsError || classesError || contactsError) {
+      return <LoadingState loading={false} error={newsError || classesError || contactsError} />;
     }
 
     // Check for edit path first
@@ -226,6 +234,15 @@ const Dashboard: React.FC = () => {
       );
     }
 
+    if (location.pathname.includes('/contacts')) {
+      return (
+        <ContactTable
+          contacts={contacts}
+          onView={handleViewItem}
+        />
+      );
+    }
+
     return <Outlet />;
   };
 
@@ -240,7 +257,7 @@ const Dashboard: React.FC = () => {
           setIsAddingClass(true);
           navigate('/dashboard/classes/add');
         }}
-            />
+      />
       <main className="dashboard-content">
         {renderContent()}
       </main>
@@ -250,7 +267,7 @@ const Dashboard: React.FC = () => {
           onClose={() => {
             setIsModalOpen(false);
             setSelectedItem(null);
-                  }}
+          }}
         />
       )}
     </div>

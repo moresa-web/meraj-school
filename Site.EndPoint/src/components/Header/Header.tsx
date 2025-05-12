@@ -46,9 +46,9 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group" onClick={() => handleNavigation('/')}>
-            <img src="/images/logo.png" alt="مدرسه معراج" className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" />
+            <img src="/images/logo.png" alt="دبیرستان معراج" className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" />
             <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
-              مدرسه معراج
+              دبیرستان معراج
             </span>
           </Link>
 

@@ -10,6 +10,7 @@ interface ClassTableProps {
 }
 
 const ClassTable: React.FC<ClassTableProps> = ({ classes, onView, onEdit, onDelete }) => {
+  console.log(classes);
   return (
     <div className="table-container">
       <table className="admin-table">
