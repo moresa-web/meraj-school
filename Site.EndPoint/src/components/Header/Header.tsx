@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
 const Header: React.FC = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -40,9 +40,8 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white shadow-lg' : 'bg-gradient-to-r from-emerald-50 to-white'
-    }`}>
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-gradient-to-r from-emerald-50 to-white'
+      }`}>
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -55,56 +54,60 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => handleNavigation('/')}
-              className={`text-lg font-medium transition-all duration-200 ${
-                isActive('/') 
-                  ? 'text-emerald-600 font-semibold' 
-                  : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
-              }`}
+            <Link
+              to="/"
+              className={`text-lg font-medium transition-all duration-200 ${isActive('/')
+                ? 'text-emerald-600 font-semibold'
+                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                }`}
             >
               خانه
-            </button>
-            <button
-              onClick={() => handleNavigation('/about')}
-              className={`text-lg font-medium transition-all duration-200 ${
-                isActive('/about') 
-                  ? 'text-emerald-600 font-semibold' 
-                  : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
-              }`}
+            </Link>
+            <Link
+              to="/about"
+              className={`text-lg font-medium transition-all duration-200 ${isActive('/about')
+                ? 'text-emerald-600 font-semibold'
+                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                }`}
             >
               درباره ما
-            </button>
-            <button
-              onClick={() => handleNavigation('/classes')}
-              className={`text-lg font-medium transition-all duration-200 ${
-                isActive('/classes') 
-                  ? 'text-emerald-600 font-semibold' 
-                  : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
-              }`}
+            </Link>
+            <Link
+              to="/classes"
+              className={`text-lg font-medium transition-all duration-200 ${isActive('/classes')
+                ? 'text-emerald-600 font-semibold'
+                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                }`}
             >
               کلاس‌ها
-            </button>
-            <button
-              onClick={() => handleNavigation('/news')}
-              className={`text-lg font-medium transition-all duration-200 ${
-                isActive('/news') 
-                  ? 'text-emerald-600 font-semibold' 
-                  : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
-              }`}
+            </Link>
+            <Link
+              to="/news"
+              className={`text-lg font-medium transition-all duration-200 ${isActive('/news')
+                ? 'text-emerald-600 font-semibold'
+                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                }`}
             >
               اخبار
-            </button>
-            <button
-              onClick={() => handleNavigation('/contact')}
-              className={`text-lg font-medium transition-all duration-200 ${
-                isActive('/contact') 
-                  ? 'text-emerald-600 font-semibold' 
-                  : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
-              }`}
+            </Link>
+            <Link
+              to="/contact"
+              className={`text-lg font-medium transition-all duration-200 ${isActive('/contact')
+                ? 'text-emerald-600 font-semibold'
+                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                }`}
             >
               تماس با ما
-            </button>
+            </Link>
+            {user?.role === 'admin' ? (
+              <Link
+                to="/dashboard/news"
+                onClick={() => handleNavigation('/dashboard/news')}
+                className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+              >
+                داشبورد
+              </Link>
+            ) : (<></>)}
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
@@ -148,16 +151,14 @@ const Header: React.FC = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300 ${
-            isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-          }`}
+          className={`md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+            }`}
           onClick={() => setIsMobileMenuOpen(false)}
           style={{ zIndex: 1000 }}
         >
           <div
-            className={`fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform transition-transform duration-300 ${
-              isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
+            className={`fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
             onClick={(e) => e.stopPropagation()}
             style={{ zIndex: 1001 }}
           >
@@ -182,63 +183,48 @@ const Header: React.FC = () => {
                 </button>
                 <span className="text-xl font-semibold text-gray-800">منو</span>
               </div>
-              
+
               <div className="flex-1 flex flex-col justify-center space-y-8">
-                <button
-                  onClick={() => {
-                    handleNavigation('/');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${
-                    isActive('/') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                  }`}
+                <Link
+                  to="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                    }`}
                 >
                   خانه
-                </button>
-                <button
-                  onClick={() => {
-                    handleNavigation('/about');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${
-                    isActive('/about') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                  }`}
+                </Link>
+                <Link
+                  to="/about"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/about') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                    }`}
                 >
                   درباره ما
-                </button>
-                <button
-                  onClick={() => {
-                    handleNavigation('/classes');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${
-                    isActive('/classes') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                  }`}
+                </Link>
+                <Link
+                  to="/classes"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/classes') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                    }`}
                 >
                   کلاس‌ها
-                </button>
-                <button
-                  onClick={() => {
-                    handleNavigation('/news');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${
-                    isActive('/news') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                  }`}
+                </Link>
+                <Link
+                  to="/news"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/news') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                    }`}
                 >
                   اخبار
-                </button>
-                <button
-                  onClick={() => {
-                    handleNavigation('/contact');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${
-                    isActive('/contact') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                  }`}
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/contact') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                    }`}
                 >
                   تماس با ما
-                </button>
+                </Link>
               </div>
 
               <div className="mt-auto pt-8">
@@ -261,6 +247,15 @@ const Header: React.FC = () => {
                     ورود / ثبت‌نام
                   </Link>
                 )}
+                {user?.role === 'admin' ? (
+                  <Link
+                    to="/dashboard/news"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
+                  >
+                    داشبورد
+                  </Link>
+                ) : (<></>)}
               </div>
             </div>
           </div>

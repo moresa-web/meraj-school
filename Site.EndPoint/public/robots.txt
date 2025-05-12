@@ -1,4 +1,5 @@
 User-agent: *
-Allow: /
 
-Sitemap: %REACT_APP_SITE_URL%/sitemap.xml
+Disallow: /dashboard
+
+Sitemap: https://merajschool.ir/sitemap.xml
