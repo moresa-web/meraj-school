@@ -11,8 +11,8 @@ import CTASection from './Sections/CTASection';
 const Home: React.FC = () => {
   // In Create React App, environment variables are accessed through process.env
   // They must be prefixed with REACT_APP_ to be exposed to the client
-  const title = process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان دولتی معراج';
-  const description = process.env.REACT_APP_DEFAULT_DESCRIPTION || 'دبیرستان دولتی معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی';
+  const title = process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج';
+  const description = process.env.REACT_APP_DEFAULT_DESCRIPTION || 'دبیرستان پسرانه معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی';
   const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
   const ogImagePath = process.env.REACT_APP_OG_IMAGE_PATH || '/images/logo.png';
   const ogImage = `${siteUrl}${ogImagePath}`;
@@ -39,7 +39,7 @@ const Home: React.FC = () => {
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="وب‌سایت رسمی دبیرستان دولتی معراج" />
+        <meta property="og:image:alt" content="وب‌سایت رسمی دبیرستان پسرانه معراج" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />

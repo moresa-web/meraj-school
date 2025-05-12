@@ -1,1 +1,4 @@
- 
+User-agent: *
+Allow: /
+
+Sitemap: %REACT_APP_SITE_URL%/sitemap.xml

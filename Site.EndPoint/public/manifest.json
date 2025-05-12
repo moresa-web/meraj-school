@@ -1,25 +1,97 @@
 {
   "short_name": "دبیرستان معراج",
-  "name": "دبیرستان دولتی معراج",
+  "name": "دبیرستان پسرانه معراج",
+  "description": "دبیرستان دولتی پسرانه معراج",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     },
     {
-      "src": "logo192.png",
+      "src": "/icons/icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "96x96"
+    },
+    {
+      "src": "/icons/icon-72x72.png",
+      "type": "image/png",
+      "sizes": "72x72"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
-} 
+  "url": "/",
+  "start_url": "/",
+  "display": "fullscreen",
+  "theme_color": "#059669",
+  "background_color": "#ffffff",
+  "categories": [
+    "education",
+    "school"
+  ],
+  "lang": "fa",
+  "orientation": "portrait",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "درباره ما",
+      "url": "/about",
+      "description": "درباره ما",
+      "icon": "/icons/icon-72x72.png",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "تماس با ما",
+      "url": "/contact",
+      "description": "تماس با ما",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "اخبار و اطلاع رسانی",
+      "url": "/news",
+      "description": "اخبار و اطلاع رسانی",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "کلاس ها",
+      "url": "/classes",
+      "description": "کلاس ها",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": true,
+  "dir": "rtl"
+}
