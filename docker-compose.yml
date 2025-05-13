@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./Api.EndPoint
+      dockerfile: Dockerfile.backend
+      target: dev # برای توسعه از مرحله‌ی dev استفاده می‌کنیم
+    volumes:
+      - ./Api.EndPoint:/usr/src/app
+      - /usr/src/app/node_modules # تا node_modules کانتینر مختل نشود
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=development
+
+  site:
+    build:
+      context: ./Site.EndPoint
+      dockerfile: Dockerfile.frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+    command: [ "nginx", "-g", "daemon off;" ]

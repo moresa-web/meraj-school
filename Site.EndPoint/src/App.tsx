@@ -13,13 +13,31 @@ import Auth from './pages/Auth/Auth';
 import NotFound from './pages/NotFound/NotFound';
 import Dashboard from './pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
+import { motion, useScroll } from "motion/react"
 import './App.css';
 
 const App: React.FC = () => {
+  const { scrollYProgress } = useScroll()
   return (
     <AuthProvider>
       <div className="app">
+        <motion.div
+          id="scroll-indicator"
+          style={{
+            scaleX: scrollYProgress,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            originX: 0,
+            backgroundColor: "#10b981",
+            zIndex: 1100,
+          }}
+        />
         <Header />
+        <ScrollToTop />
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />

@@ -118,8 +118,8 @@ const HeroSection: React.FC = () => {
           </Suspense>
         </div>
         <div className="hero-cta">
-          <Link to="/register" className="hero-cta-button primary-button">
-            ثبت نام
+          <Link to="/contact" className="hero-cta-button primary-button">
+            تماس با ما
           </Link>
           <Link to="/about" className="hero-cta-button secondary-button">
             درباره ما

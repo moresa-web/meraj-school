@@ -1,0 +1,26 @@
+# === مرحله‌ی توسعه ===
+FROM node:18-alpine AS dev
+
+WORKDIR /usr/src/app
+
+# 1) نصب وابستگی‌ها
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps
+
+# 2) کپی کد و اجرای dev server
+COPY . .
+ENV NODE_ENV=development
+EXPOSE 3001
+CMD ["npm", "run", "dev"]
+
+# === مرحله‌ی تولید (اختیاری) ===
+FROM node:18-alpine AS prod
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY . .
+ENV NODE_ENV=production
+EXPOSE 3001
+CMD ["node", "dist/index.js"]

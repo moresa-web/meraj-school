@@ -1,0 +1,30 @@
+# === مرحله‌ی Build ===
+FROM node:18-alpine AS builder
+
+WORKDIR /usr/src/app
+
+# ۱) کپی پکیج‌ها و نصب (با --legacy-peer-deps)
+COPY package*.json tsconfig.json ./
+RUN npm ci --legacy-peer-deps
+
+# ۲) کپی تنظیمات Tailwind و PostCSS
+COPY tailwind.config.js postcss.config.js ./
+
+# ۳) کپی اسکریپت‌ها (برای generate-sitemap)
+COPY scripts ./scripts
+
+# ۴) کپی public و src
+COPY public ./public
+COPY src ./src
+
+# ۵) تولید sitemap و build نهایی
+RUN npm run build
+
+# === مرحله‌ی Serve با Nginx ===
+FROM nginx:stable-alpine
+
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
