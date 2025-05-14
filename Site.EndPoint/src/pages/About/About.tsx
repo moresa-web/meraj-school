@@ -17,7 +17,7 @@ interface AboutContent {
   }[];
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 const About: React.FC = () => {
   const title = process.env.REACT_APP_ABOUT_TITLE || 'درباره ما - دبیرستان پسرانه معراج';

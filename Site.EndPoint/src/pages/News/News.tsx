@@ -8,7 +8,7 @@ import ShareModal from '../../components/ShareModal/ShareModal';
 import NoResults from '../../components/NoResults/NoResults';
 import { Helmet } from 'react-helmet-async';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 interface NewsItem {
   _id: string;
@@ -107,7 +107,7 @@ const News: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get('http://localhost:5000/api/news', {
+        const response = await axios.get('http://mohammadrezasardashti.ir/api/news', {
           params: {
             category: selectedCategory !== 'همه اخبار' ? selectedCategory : undefined,
             sortBy,
@@ -117,7 +117,7 @@ const News: React.FC = () => {
         setNewsItems(response.data);
 
         // دریافت IP کاربر و بررسی لایک‌ها
-        const userIP = await axios.get('http://localhost:5000/api/user/ip');
+        const userIP = await axios.get('http://mohammadrezasardashti.ir/api/user/ip');
         const liked = new Set<string>(
           response.data
             .filter((news: NewsItem) => news.likedBy.includes(userIP.data))
@@ -159,7 +159,7 @@ const News: React.FC = () => {
   // Handle like
   const handleLike = async (id: string) => {
     try {
-      const response = await axios.post(`http://localhost:5000/api/news/${id}/like`);
+      const response = await axios.post(`http://mohammadrezasardashti.ir/api/news/${id}/like`);
       setNewsItems(prevNews =>
         prevNews.map(news =>
           news._id === id ? response.data : news
@@ -167,7 +167,7 @@ const News: React.FC = () => {
       );
 
       // دریافت IP کاربر و به‌روزرسانی وضعیت لایک
-      const userIP = await axios.get('http://localhost:5000/api/user/ip');
+      const userIP = await axios.get('http://mohammadrezasardashti.ir/api/user/ip');
       setLikedNews(prev => {
         const newSet = new Set(prev);
         if (response.data.likedBy.includes(userIP.data)) {

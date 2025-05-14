@@ -29,7 +29,7 @@ const defaultContent: CTAContent = {
   }
 };
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 export const CTASection: React.FC = () => {
   const { user } = useAuth();

@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 
 // تعریف API URL با مقدار پیش‌فرض
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://mohammadrezasardashti.ir/api';
 
 interface User {
   _id: string;

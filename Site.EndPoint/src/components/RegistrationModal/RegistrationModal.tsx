@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldError } from '../FieldError/FieldError';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 interface ClassInfo {
   _id: string;

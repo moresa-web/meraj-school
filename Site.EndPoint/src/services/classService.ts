@@ -19,7 +19,7 @@ export interface Class {
   isActive: boolean;
 }
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://mohammadrezasardashti.ir/api';
 
 export const classService = {
   // دریافت لیست کلاس‌ها

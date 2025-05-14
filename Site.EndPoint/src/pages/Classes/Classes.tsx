@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import NoResults from '../../components/NoResults/NoResults';
 import { Helmet } from 'react-helmet-async';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 interface ClassInfo {
   _id: string;

@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -42,20 +42,20 @@ router.get('/:page/:section', async (req, res) => {
   try {
     const { page, section } = req.params;
     console.log('GET /content/:page/:section - Request params:', { page, section });
-    
+
     const content = await Content.getContentWithDefaults(page, section);
     console.log('GET /content/:page/:section - Content found:', content);
-    
+
     if (!content) {
       console.log('GET /content/:page/:section - No content found');
       return res.status(404).json({ message: 'محتوا یافت نشد' });
     }
-    
+
     res.json(content.data);
   } catch (error) {
     console.error('GET /content/:page/:section - Error:', error);
-    res.status(500).json({ 
-      message: 'خطا در دریافت محتوا', 
+    res.status(500).json({
+      message: 'خطا در دریافت محتوا',
       error: error instanceof Error ? error.message : 'خطای ناشناخته',
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -71,10 +71,10 @@ router.put('/:page/:section', authMiddleware, isAdmin, async (req, res) => {
 
     let content = await Content.findOne({ page, section });
     if (!content) {
-      content = new Content({ 
-        page, 
-        section, 
-        data: updateData 
+      content = new Content({
+        page,
+        section,
+        data: updateData
       });
     } else {
       content.data = { ...content.data, ...updateData };
@@ -85,8 +85,8 @@ router.put('/:page/:section', authMiddleware, isAdmin, async (req, res) => {
     res.json(content.data);
   } catch (error) {
     console.error('PUT /content/:page/:section - Error:', error);
-    res.status(500).json({ 
-      message: 'خطا در به‌روزرسانی محتوا', 
+    res.status(500).json({
+      message: 'خطا در به‌روزرسانی محتوا',
       error: error instanceof Error ? error.message : 'خطای ناشناخته',
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -122,7 +122,7 @@ router.delete('/image', authMiddleware, isAdmin, async (req, res) => {
     res.json({ message: 'تصویر با موفقیت حذف شد' });
   } catch (error) {
     console.error('Error deleting image:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'خطا در حذف تصویر',
       error: error instanceof Error ? error.message : 'خطای ناشناخته'
     });
@@ -140,8 +140,8 @@ router.post('/upload', authMiddleware, isAdmin, upload.single('image'), (req, re
     res.json({ url: imageUrl });
   } catch (error) {
     console.error('POST /content/upload - Error:', error);
-    res.status(500).json({ 
-      message: 'خطا در آپلود تصویر', 
+    res.status(500).json({
+      message: 'خطا در آپلود تصویر',
       error: error instanceof Error ? error.message : 'خطای ناشناخته',
       stack: error instanceof Error ? error.stack : undefined
     });

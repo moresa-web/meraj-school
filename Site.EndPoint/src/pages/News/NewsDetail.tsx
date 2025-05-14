@@ -6,7 +6,7 @@ import { useErrorHandler } from '../../hooks/useErrorHandler';
 import ShareModal from '../../components/ShareModal/ShareModal';
 import { Helmet } from 'react-helmet-async';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
 
 interface NewsItem {
   _id: string;

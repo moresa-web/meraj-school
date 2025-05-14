@@ -44,7 +44,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
 
   const deleteImage = async (imageUrl: string): Promise<void> => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/content/image`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api'}/content/image`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/content/upload`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api'}/content/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -88,7 +88,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
     // تبدیل مسیر نسبی به مسیر کامل
     const imageUrl = data.url.startsWith('http') 
       ? data.url 
-      : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/${data.url.replace(/^\/+/, '')}`;
+      : `${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir'}/${data.url.replace(/^\/+/, '')}`;
 
     return imageUrl;
   };
@@ -134,7 +134,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
   const getFullImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/${url.replace(/^\/+/, '')}`;
+    return `${process.env.REACT_APP_API_URL?.replace("/api", "") || 'http://mohammadrezasardashti.ir'}/${url.replace(/^\/+/, '')}`;
   };
 
   if (!isAdmin) {

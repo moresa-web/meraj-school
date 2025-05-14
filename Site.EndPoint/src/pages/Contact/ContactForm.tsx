@@ -19,7 +19,7 @@ export default function ContactForm() {
         setSending(true)
 
         try {
-            const res = await fetch("http://localhost:5000/api/contact", {
+            const res = await fetch("http://mohammadrezasardashti.ir/api/contact", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
