@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { useSiteInfo } from '../../hooks/useSiteInfo';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import {
+  Menu,
+  X,
+  User,
+  LogOut,
+  ChevronDown,
+  Globe
+} from 'lucide-react';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -9,10 +20,13 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { siteInfo, loading } = useSiteInfo();
+  const { t, i18n } = useTranslation();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 0);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -22,6 +36,7 @@ const Header: React.FC = () => {
   const handleLogout = () => {
     logout();
     toast.success('خروج با موفقیت انجام شد');
+    setIsUserMenuOpen(false);
   };
 
   const isActive = (path: string) => {
@@ -39,14 +54,32 @@ const Header: React.FC = () => {
     }
   };
 
+  const toggleMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
+
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-gradient-to-r from-emerald-50 to-white'
-      }`}>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-20">
+    <header className={cn(
+      'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+      isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+    )}>
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group" onClick={() => handleNavigation('/')}>
-            <img src="/images/logo.png" alt="دبیرستان معراج" className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" />
+            <img
+              src={loading ? '/images/logo.png' : siteInfo?.image || '/images/logo.png'}
+              alt={loading ? 'لوگو مدرسه' : siteInfo?.schoolName || 'دبیرستان معراج'}
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
             <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
               دبیرستان معراج
             </span>
@@ -57,55 +90,65 @@ const Header: React.FC = () => {
             <Link
               to="/"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/')
-                ? 'text-emerald-600 font-semibold'
-                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
+                : isScrolled 
+                  ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
+                  : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
             >
-              خانه
+              {t('nav.home')}
             </Link>
             <Link
               to="/about"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/about')
-                ? 'text-emerald-600 font-semibold'
-                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
+                : isScrolled 
+                  ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
+                  : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
             >
-              درباره ما
+              {t('nav.about')}
             </Link>
             <Link
               to="/classes"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/classes')
-                ? 'text-emerald-600 font-semibold'
-                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
+                : isScrolled 
+                  ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
+                  : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
             >
-              کلاس‌ها
+              {t('nav.classes')}
             </Link>
             <Link
               to="/news"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/news')
-                ? 'text-emerald-600 font-semibold'
-                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
+                : isScrolled 
+                  ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
+                  : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
             >
-              اخبار
+              {t('nav.news')}
             </Link>
             <Link
               to="/contact"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/contact')
-                ? 'text-emerald-600 font-semibold'
-                : 'text-gray-600 hover:text-emerald-600 hover:scale-105'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
+                : isScrolled 
+                  ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
+                  : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
             >
-              تماس با ما
+              {t('nav.contact')}
             </Link>
             {user?.role === 'admin' ? (
               <Link
-                to="/dashboard/news"
-                onClick={() => handleNavigation('/dashboard/news')}
+                to="/dashboard"
+                onClick={() => handleNavigation('/dashboard')}
                 className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
               >
-                داشبورد
+                {t('nav.dashboard')}
               </Link>
             ) : (<></>)}
             {isAuthenticated ? (
@@ -113,7 +156,7 @@ const Header: React.FC = () => {
                 onClick={handleLogout}
                 className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
               >
-                خروج
+                {t('nav.logout')}
               </button>
             ) : (
               <Link
@@ -128,7 +171,7 @@ const Header: React.FC = () => {
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={toggleMenu}
             aria-label="Toggle menu"
           >
             <svg
@@ -150,22 +193,13 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile Menu */}
-        <div
-          className={`md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-            }`}
-          onClick={() => setIsMobileMenuOpen(false)}
-          style={{ zIndex: 1000 }}
-        >
-          <div
-            className={`fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
-            onClick={(e) => e.stopPropagation()}
-            style={{ zIndex: 1001 }}
-          >
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300">
+            <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform transition-transform duration-300">
             <div className="p-6 h-full flex flex-col bg-white">
               <div className="flex justify-between items-center mb-8">
                 <button
-                  onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={toggleMenu}
                   className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
                   aria-label="بستن منو"
                 >
@@ -207,7 +241,7 @@ const Header: React.FC = () => {
                   className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/classes') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
                     }`}
                 >
-                  کلاس‌ها
+                    کلاس‌های تقویتی
                 </Link>
                 <Link
                   to="/news"
@@ -249,7 +283,7 @@ const Header: React.FC = () => {
                 )}
                 {user?.role === 'admin' ? (
                   <Link
-                    to="/dashboard/news"
+                    to="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
                   >
@@ -260,6 +294,7 @@ const Header: React.FC = () => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </header>
   );

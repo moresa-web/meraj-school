@@ -29,7 +29,7 @@ const defaultContent: CTAContent = {
   }
 };
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const CTASection: React.FC = () => {
   const { user } = useAuth();
@@ -38,7 +38,7 @@ export const CTASection: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/content/home/cta`);
+        const response = await fetch(`${API_URL}/api/content/home/cta`);
         if (response.ok) {
           const data = await response.json();
           // Ensure all required fields are present

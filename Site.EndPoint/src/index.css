@@ -1,16 +1,79 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import './styles/animations.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+ 
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
   html {
     direction: rtl;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-background text-foreground;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -24,11 +87,11 @@
   }
 
   .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
   }
 
   .container {
@@ -93,11 +156,11 @@
 
 /* Custom styles for cards */
 .card {
-  @apply bg-white rounded-lg shadow-lg overflow-hidden;
+  @apply bg-card rounded-lg shadow-lg overflow-hidden;
 }
 
 .card-header {
-  @apply p-6 border-b border-gray-200;
+  @apply p-6 border-b border-border;
 }
 
 .card-body {
@@ -105,25 +168,25 @@
 }
 
 .card-footer {
-  @apply p-6 bg-gray-50 border-t border-gray-200;
+  @apply p-6 bg-card border-t border-border;
 }
 
 /* Custom styles for forms */
 .form-input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  @apply w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-ring focus:border-transparent;
 }
 
 .form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
+  @apply block text-sm font-medium text-foreground mb-1;
 }
 
 /* Custom styles for navigation */
 .nav-link {
-  @apply text-gray-300 hover:text-white transition-colors duration-200;
+  @apply text-foreground hover:text-primary transition-colors duration-200;
 }
 
 .nav-link.active {
-  @apply text-white font-semibold;
+  @apply text-primary font-semibold;
 }
 
 /* Custom styles for sections */
@@ -137,7 +200,7 @@
 
 /* Custom styles for testimonials */
 .testimonial {
-  @apply bg-white rounded-lg shadow-lg p-6;
+  @apply bg-card rounded-lg shadow-lg p-6;
 }
 
 .testimonial-author {
@@ -145,21 +208,21 @@
 }
 
 .testimonial-avatar {
-  @apply w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold;
+  @apply w-12 h-12 rounded-full bg-muted flex items-center justify-center text-xl font-bold;
 }
 
 /* Custom styles for features */
 .feature {
-  @apply bg-white rounded-lg shadow-lg p-6;
+  @apply bg-card rounded-lg shadow-lg p-6;
 }
 
 .feature-icon {
-  @apply w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600;
+  @apply w-12 h-12 rounded-lg bg-accent flex items-center justify-center text-accent-foreground;
 }
 
 /* Custom styles for footer */
 .footer {
-  @apply bg-gray-900 text-white py-12;
+  @apply bg-card text-foreground py-12;
 }
 
 .footer-title {
@@ -167,7 +230,7 @@
 }
 
 .footer-link {
-  @apply text-gray-400 hover:text-white transition-colors duration-200;
+  @apply text-muted hover:text-foreground transition-colors duration-200;
 }
 
 /* Custom styles for responsive design */

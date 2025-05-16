@@ -1,22 +1,41 @@
 // scripts/generate-sitemap.js
 const { SitemapStream, streamToPromise } = require('sitemap');
 const { createWriteStream } = require('fs');
+const { resolve } = require('path');
 
-async function generate() {
-    const urls = [
-        { url: '/', changefreq: 'daily', priority: 1.0 },
-        { url: '/about', changefreq: 'weekly', priority: 0.8 },
-        { url: '/contact', changefreq: 'weekly', priority: 0.8 },
-        { url: '/news', changefreq: 'weekly', priority: 0.8 },
-        { url: '/classes', changefreq: 'weekly', priority: 0.8 },
-        { url: '/auth', changefreq: 'weekly', priority: 0.8 }
-    ];
+// آدرس‌های سایت
+const urls = [
+  { url: '/', changefreq: 'daily', priority: 1.0 },
+  { url: '/classes', changefreq: 'daily', priority: 0.9 },
+  { url: '/news', changefreq: 'daily', priority: 0.8 },
+  { url: '/about', changefreq: 'monthly', priority: 0.7 },
+  { url: '/contact', changefreq: 'monthly', priority: 0.7 }
+];
 
-    const stream = new SitemapStream({ hostname: 'https://merajschool.ir' });
-    const writeStream = createWriteStream('./public/sitemap.xml');
-    streamToPromise(stream).then(data => writeStream.write(data));
-    urls.forEach(u => stream.write(u));
-    stream.end();
-}
+// تنظیمات sitemap
+const sitemap = new SitemapStream({
+  hostname: 'https://mohammadrezasardashti.ir',
+  xmlns: {
+    news: true,
+    xhtml: true,
+    image: true,
+    video: true
+  }
+});
 
-generate();
+// اضافه کردن آدرس‌ها به sitemap
+urls.forEach(url => {
+  sitemap.write({
+    ...url,
+    lastmod: new Date().toISOString()
+  });
+});
+
+sitemap.end();
+
+// ذخیره sitemap.xml
+streamToPromise(sitemap).then(sm => {
+  const sitemapPath = resolve(__dirname, '../public/sitemap.xml');
+  createWriteStream(sitemapPath).write(sm.toString());
+  console.log('Sitemap generated successfully!');
+}).catch(console.error);

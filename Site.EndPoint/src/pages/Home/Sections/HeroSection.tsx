@@ -5,7 +5,7 @@ import './HeroSection.css';
 
 const EditableContent = React.lazy(() => import('../../../components/EditableContent/EditableContent'));
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface HeroContent {
   logo: string;
@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => {
   const defaultContent: HeroContent = {
     logo: '/images/logo.png',
     title: 'دبیرستان معراج',
-    description: process.env.REACT_APP_DEFAULT_DESCRIPTION || 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی'
+    description: import.meta.env.VITE_DEFAULT_DESCRIPTION || 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی'
   };
   const [content, setContent] = useState<HeroContent>(defaultContent);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const HeroSection: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/content/home/hero`);
+        const response = await fetch(`${API_URL}/api/content/home/hero`);
         if (!response.ok) {
           throw new Error('خطا در دریافت اطلاعات');
         }
@@ -59,7 +59,31 @@ const HeroSection: React.FC = () => {
 
   const handleSave = async (field: keyof HeroContent, newValue: string) => {
     try {
-      const response = await fetch(`${API_URL}/content/home/hero`, {
+      // If it's an image field, handle the upload first
+      if (field === 'logo' && newValue.startsWith('data:')) {
+        const formData = new FormData();
+        formData.append('image', newValue);
+        if (content.logo) {
+          formData.append('oldImage', content.logo);
+        }
+
+        const uploadResponse = await fetch(`${API_URL}/api/content/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('خطا در آپلود تصویر');
+        }
+
+        const { url } = await uploadResponse.json();
+        newValue = url;
+      }
+
+      const response = await fetch(`${API_URL}/api/content/home/hero`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -70,9 +94,11 @@ const HeroSection: React.FC = () => {
 
       if (!response.ok) throw new Error('خطا در ذخیره تغییرات');
 
+      const updatedData = await response.json();
       setContent(prev => prev ? { ...prev, [field]: newValue } : prev);
     } catch (err) {
       console.error(`Error saving ${field}:`, err);
+      throw err;
     }
   };
 

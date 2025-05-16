@@ -7,33 +7,51 @@ import fs from 'fs';
 
 const router = express.Router();
 
+// تنظیم مسیر آپلود
+const uploadPath = process.env.NODE_ENV === 'production'
+  ? 'C:\\inetpub\\wwwroot\\moresa\\mohammadrezasardashti\\site\\uploads'
+  : path.join(__dirname, '../uploads');
+
+// اطمینان از وجود پوشه آپلود
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// اضافه کردن لاگ برای بررسی مسیر
+console.log('Content route upload path:', uploadPath);
+console.log('Content route upload path exists:', fs.existsSync(uploadPath));
+console.log('Content route upload path is directory:', fs.statSync(uploadPath).isDirectory());
+
 // تنظیمات آپلود فایل
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // اطمینان از وجود پوشه آپلود
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
-    cb(null, uploadDir);
+    console.log('Saving file to:', uploadPath);
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const filename = uniqueSuffix + path.extname(file.originalname);
+    console.log('Generated filename:', filename);
+    cb(null, filename);
   }
 });
 
 const upload = multer({
   storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('فرمت فایل نامعتبر است. فقط تصاویر JPEG، PNG و GIF مجاز هستند.'));
+      cb(new Error('فرمت فایل مجاز نیست. فقط JPEG، PNG و GIF مجاز هستند.'));
     }
-  },
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
   }
 });
 
@@ -51,13 +69,22 @@ router.get('/:page/:section', async (req, res) => {
       return res.status(404).json({ message: 'محتوا یافت نشد' });
     }
 
-    res.json(content.data);
+    // برای hero section، اگر فیلدهای title و description وجود نداشتند، مقادیر پیش‌فرض را اضافه می‌کنیم
+    if (page === 'home' && section === 'hero') {
+      const defaultContent = {
+        logo: '/images/logo.png',
+        title: 'دبیرستان معراج',
+        description: 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت و استانداردهای جهانی'
+      };
+      res.json({ ...defaultContent, ...content.data });
+    } else {
+      res.json(content.data);
+    }
   } catch (error) {
     console.error('GET /content/:page/:section - Error:', error);
     res.status(500).json({
       message: 'خطا در دریافت محتوا',
-      error: error instanceof Error ? error.message : 'خطای ناشناخته',
-      stack: error instanceof Error ? error.stack : undefined
+      error: error instanceof Error ? error.message : 'خطای ناشناخته'
     });
   }
 });
@@ -66,30 +93,33 @@ router.get('/:page/:section', async (req, res) => {
 router.put('/:page/:section', authMiddleware, isAdmin, async (req, res) => {
   try {
     const { page, section } = req.params;
-    const updateData = req.body;
-    console.log('PUT /content/:page/:section - Request params:', { page, section, updateData });
+    const updates = req.body;
 
-    let content = await Content.findOne({ page, section });
-    if (!content) {
-      content = new Content({
+    // بررسی وجود محتوا
+    let existingContent = await Content.findOne({ page, section });
+    if (existingContent) {
+      // بروزرسانی محتوا
+      const updatedContent = await Content.findOneAndUpdate(
+        { page, section },
+        { $set: { data: { ...existingContent.data, ...updates } } },
+        { new: true }
+      );
+      if (!updatedContent) {
+        return res.status(404).json({ message: 'محتوا یافت نشد' });
+      }
+      return res.json(updatedContent.data);
+    } else {
+      // ایجاد محتوای جدید
+      const newContent = await Content.create({
         page,
         section,
-        data: updateData
+        data: updates
       });
-    } else {
-      content.data = { ...content.data, ...updateData };
+      return res.json(newContent.data);
     }
-
-    await content.save();
-    console.log('PUT /content/:page/:section - Content updated:', content);
-    res.json(content.data);
   } catch (error) {
-    console.error('PUT /content/:page/:section - Error:', error);
-    res.status(500).json({
-      message: 'خطا در به‌روزرسانی محتوا',
-      error: error instanceof Error ? error.message : 'خطای ناشناخته',
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    console.error('Error updating content:', error);
+    res.status(500).json({ message: 'خطا در بروزرسانی محتوا' });
   }
 });
 
@@ -101,50 +131,46 @@ router.delete('/image', authMiddleware, isAdmin, async (req, res) => {
       return res.status(400).json({ message: 'آدرس تصویر الزامی است' });
     }
 
-    // استخراج نام فایل از URL
-    const filename = imageUrl.split('/').pop();
-    if (!filename) {
-      return res.status(400).json({ message: 'نام فایل نامعتبر است' });
+    // حذف فایل از سرور
+    const imagePath = path.join(uploadPath, path.basename(imageUrl));
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
     }
-
-    // مسیر کامل فایل
-    const filePath = path.join(__dirname, '../../uploads', filename);
-
-    // بررسی وجود فایل
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'فایل یافت نشد' });
-    }
-
-    // حذف فایل
-    fs.unlinkSync(filePath);
-    console.log('File deleted:', filePath);
 
     res.json({ message: 'تصویر با موفقیت حذف شد' });
   } catch (error) {
     console.error('Error deleting image:', error);
-    res.status(500).json({
-      message: 'خطا در حذف تصویر',
-      error: error instanceof Error ? error.message : 'خطای ناشناخته'
-    });
+    res.status(500).json({ message: 'خطا در حذف تصویر' });
   }
 });
 
 // آپلود تصویر
-router.post('/upload', authMiddleware, isAdmin, upload.single('image'), (req, res) => {
+router.post('/upload', authMiddleware, isAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'هیچ فایلی آپلود نشده است' });
+      return res.status(400).json({ message: 'فایل آپلود نشده است' });
     }
+
+    // حذف فایل قبلی اگر وجود داشته باشد
+    if (req.body.oldImage) {
+      const oldImagePath = path.join(uploadPath, path.basename(req.body.oldImage));
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+
+    // ذخیره مسیر فایل در دیتابیس
     const imageUrl = `/uploads/${req.file.filename}`;
-    console.log('POST /content/upload - Image uploaded:', imageUrl);
+    console.log('File uploaded:', {
+      originalName: req.file.originalname,
+      filename: req.file.filename,
+      path: req.file.path,
+      url: imageUrl
+    });
     res.json({ url: imageUrl });
   } catch (error) {
-    console.error('POST /content/upload - Error:', error);
-    res.status(500).json({
-      message: 'خطا در آپلود تصویر',
-      error: error instanceof Error ? error.message : 'خطای ناشناخته',
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    console.error('Error uploading image:', error);
+    res.status(500).json({ message: 'خطا در آپلود تصویر' });
   }
 });
 

@@ -25,7 +25,7 @@
   text-align: center;
 }
 
-.sidebar-header h2 {
+.sidebar-header h1 {
   color: #fff;
   font-size: 1.5rem;
   font-weight: 600;
@@ -36,15 +36,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
-.menu-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.menu-button {
+.sidebar-nav-item {
   display: flex;
   align-items: center;
   padding: 1rem 1.25rem;
@@ -60,84 +55,52 @@
   width: 100%;
 }
 
-.menu-button:hover {
+.sidebar-nav-item:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.menu-button.active {
+.sidebar-nav-item.active {
   background: #3498db;
   color: #fff;
   box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
-.menu-arrow {
-  margin-right: auto;
-  font-size: 0.875rem;
-  transition: transform 0.3s ease;
+.sidebar-nav-item .material-icons {
+  margin-left: 0.75rem;
+  font-size: 1.25rem;
 }
 
-.submenu {
+.sidebar-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-right: 1rem;
-  margin-top: 0.25rem;
+  gap: 0.5rem;
 }
 
-.submenu-button {
+.sidebar-action-button {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.8);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: right;
   width: 100%;
-  text-decoration: none;
 }
 
-.submenu-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  transform: translateX(-5px);
-}
-
-.submenu-button.active {
-  background: #3498db;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.submenu-button.add-button {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.submenu-button.add-button:hover {
+.sidebar-action-button:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.submenu-button.add-button.active {
-  background: #3498db;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.nav-icon {
+.sidebar-action-button .material-icons {
   margin-left: 0.75rem;
   font-size: 1.25rem;
-}
-
-.nav-text {
-  font-size: 0.875rem;
 }
 
 .dashboard-content {
@@ -511,23 +474,14 @@
     margin-bottom: 1rem;
   }
 
-  .menu-button {
+  .sidebar-nav-item {
     padding: 0.75rem;
     font-size: 0.875rem;
   }
 
-  .submenu {
-    padding-right: 0.5rem;
-  }
-
-  .submenu-button {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-  }
-
   .dashboard-content {
     margin-right: 0;
-  padding: 1rem;
+    padding: 1rem;
   }
 
   .admin-table {

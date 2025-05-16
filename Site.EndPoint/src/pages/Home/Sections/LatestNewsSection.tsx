@@ -23,7 +23,7 @@ interface NewsContent {
   news: NewsItem[];
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const LatestNewsSection: React.FC = () => {
   const { user } = useAuth();
@@ -46,7 +46,7 @@ export const LatestNewsSection: React.FC = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch(`${API_URL}/news?sortBy=newest&limit=3`);
+        const response = await fetch(`${API_URL}/api/news?sortBy=newest&limit=3`);
         if (response.ok) {
           const news = await response.json();
           setContent(prev => ({
@@ -55,7 +55,7 @@ export const LatestNewsSection: React.FC = () => {
           }));
 
           // دریافت IP کاربر و بررسی لایک‌ها
-          const userIP = await fetch(`${API_URL}/user/ip`).then(res => res.json());
+          const userIP = await fetch(`${API_URL}/api/user/ip`).then(res => res.json());
           const liked = new Set<string>(
             news
               .filter((item: NewsItem) => item.likedBy.includes(userIP))

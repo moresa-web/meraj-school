@@ -42,9 +42,31 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
     reader.readAsDataURL(file);
   };
 
-  const deleteImage = async (imageUrl: string): Promise<void> => {
+  const updateContent = async (section: string, content: any) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api'}/content/image`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/content/${section}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(content)
+      });
+
+      if (!response.ok) {
+        throw new Error('خطا در بروزرسانی محتوا');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating content:', error);
+      throw error;
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/content/image`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -54,9 +76,10 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در حذف تصویر');
+        throw new Error('خطا در حذف تصویر');
       }
+
+      return await response.json();
     } catch (error) {
       console.error('Error deleting image:', error);
       throw error;
@@ -67,7 +90,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api'}/content/upload`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/content/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -85,12 +108,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
       throw new Error('آدرس تصویر در پاسخ سرور یافت نشد');
     }
 
-    // تبدیل مسیر نسبی به مسیر کامل
-    const imageUrl = data.url.startsWith('http') 
-      ? data.url 
-      : `${process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir'}/${data.url.replace(/^\/+/, '')}`;
-
-    return imageUrl;
+    return data.url;
   };
 
   const handleSave = async () => {
@@ -134,7 +152,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
   const getFullImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    return `${process.env.REACT_APP_API_URL?.replace("/api", "") || 'http://mohammadrezasardashti.ir'}/${url.replace(/^\/+/, '')}`;
+    return `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
   };
 
   if (!isAdmin) {

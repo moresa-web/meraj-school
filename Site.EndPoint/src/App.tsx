@@ -1,6 +1,6 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
@@ -12,62 +12,82 @@ import Contact from './pages/Contact/Contact';
 import Auth from './pages/Auth/Auth';
 import NotFound from './pages/NotFound/NotFound';
 import Dashboard from './pages/Dashboard/Dashboard';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import ScrollToTop from './components/ScrollToTop';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import { motion, useScroll } from "motion/react"
 import './App.css';
+import { HelmetProvider } from 'react-helmet-async';
+import AppRoutes from './routes';
+import SEO from './pages/Dashboard/SEO';
+import i18n from './i18n';
+import { I18nextProvider } from 'react-i18next';
+import { Toaster } from 'react-hot-toast';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
-const App: React.FC = () => {
-  const { scrollYProgress } = useScroll()
+// کامپوننت اصلی برنامه که از useAuth استفاده می‌کند
+const AppContent: React.FC = () => {
+  const { scrollYProgress } = useScroll();
+  const { isAuthenticated } = useAuth();
+
   return (
-    <AuthProvider>
-      <div className="app">
-        <motion.div
-          id="scroll-indicator"
-          style={{
-            scaleX: scrollYProgress,
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 4,
-            originX: 0,
-            backgroundColor: "#10b981",
-            zIndex: 1100,
-          }}
-        />
-        <Header />
-        <ScrollToTop />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/classes" element={<Classes />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="news" element={<Dashboard />} />
-              <Route path="news/add" element={<Dashboard />} />
-              <Route path="news/edit/:id" element={<Dashboard />} />
-              <Route path="classes" element={<Dashboard />} />
-              <Route path="classes/add" element={<Dashboard />} />
-              <Route path="classes/edit/:id" element={<Dashboard />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </AuthProvider>
+    <div className="app">
+      <motion.div
+        id="scroll-indicator"
+        style={{
+          scaleX: scrollYProgress,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          originX: 0,
+          backgroundColor: "#10b981",
+          zIndex: 1100,
+        }}
+      />
+      <Header />
+      <ScrollToTop />
+      <main className="main-content">
+        <Routes>
+          <Route path="/auth" element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Auth />
+          } />
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Navigate to="/dashboard/news" replace />
+            </PrivateRoute>
+          } />
+          <Route path="/dashboard/*" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/" element={<Home />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/news/:slug" element={<NewsDetail />} />
+          <Route path="/classes" element={<Classes />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+// کامپوننت اصلی که Provider‌ها را تنظیم می‌کند
+const App: React.FC = () => {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <HelmetProvider>
+        <Router>
+          <AuthProvider>
+            <AppContent />
+            <Toaster />
+          </AuthProvider>
+        </Router>
+      </HelmetProvider>
+    </I18nextProvider>
   );
 };
 

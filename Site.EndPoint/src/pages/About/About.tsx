@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HeroSection from '../../components/HeroSection/HeroSection';
 import EditableContent from '../../components/EditableContent/EditableContent';
 import { useAuth } from '../../contexts/AuthContext';
+import SEO from '../../components/SEO';
 import { Helmet } from 'react-helmet-async';
 
 interface AboutContent {
@@ -17,17 +18,17 @@ interface AboutContent {
   }[];
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const About: React.FC = () => {
-  const title = process.env.REACT_APP_ABOUT_TITLE || 'درباره ما - دبیرستان پسرانه معراج';
+  const title = import.meta.env.VITE_ABOUT_TITLE || 'درباره ما - دبیرستان پسرانه معراج';
   const description =
-    process.env.REACT_APP_ABOUT_DESCRIPTION ||
+    import.meta.env.VITE_ABOUT_DESCRIPTION ||
     'آشنایی با تاریخچه، مأموریت و تیم دبیرستان پسرانه معراج؛ مرکزی پیشرو در آموزش با استانداردهای جهانی.';
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
   const pagePath = '/about';
   const fullUrl = `${siteUrl}${pagePath}`;
-  const ogImagePath = process.env.REACT_APP_OG_IMAGE_PATH || '/images/logo.png';
+  const ogImagePath = import.meta.env.VITE_OG_IMAGE_PATH || '/images/logo.png';
   const ogImage = `${siteUrl}${ogImagePath}`;
 
   const structuredData = {
@@ -38,7 +39,7 @@ const About: React.FC = () => {
     "description": description,
     "isPartOf": {
       "@type": "School",
-      "name": process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+      "name": import.meta.env.VITE_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
       "url": siteUrl,
       "logo": `${siteUrl}/images/logo.png`
     }
@@ -141,6 +142,12 @@ const About: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="درباره ما | دبیرستان پسرانه معراج"
+        description="معرفی دبیرستان پسرانه معراج مشهد. تاریخچه، اهداف، امکانات و افتخارات مدرسه. مدرسه‌ای پیشرفته با امکانات آموزشی مدرن."
+        keywords="درباره دبیرستان معراج, تاریخچه مدرسه, امکانات مدرسه, افتخارات مدرسه, مدرسه هوشمند مشهد"
+        url="/about"
+      />
       <Helmet>
         {/* تنظیم عنوان و توضیحات متا */}
         <title>{title}</title>

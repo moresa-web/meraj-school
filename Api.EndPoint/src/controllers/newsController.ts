@@ -2,13 +2,20 @@ import { Request, Response } from 'express';
 import News, { INews } from '../models/News';
 import path from 'path';
 import fs from 'fs';
+import slugify from 'slugify';
 
 // Get all news with filtering and sorting
 export const getNews = async (req: Request, res: Response) => {
   try {
-    const { category, sortBy, search } = req.query;
+    const { category, sortBy, search, showAll } = req.query;
     
     let query: any = {};
+    
+    // Only show published news for regular users,
+    // admins can see all news when showAll=true is passed
+    if (showAll !== 'true') {
+      query.isPublished = true;
+    }
     
     // Apply category filter
     if (category && category !== 'همه اخبار') {
@@ -46,10 +53,10 @@ export const getNews = async (req: Request, res: Response) => {
   }
 };
 
-// Get single news by ID
-export const getNewsById = async (req: Request, res: Response) => {
+// Get single news by slug
+export const getNewsBySlug = async (req: Request, res: Response) => {
   try {
-    const news = await News.findById(req.params.id);
+    const news = await News.findOne({ slug: req.params.slug });
     if (!news) {
       return res.status(404).json({ message: 'News not found' });
     }
@@ -67,7 +74,7 @@ export const getNewsById = async (req: Request, res: Response) => {
 // Create new news
 export const createNews = async (req: Request, res: Response) => {
   try {
-    const { title, description, content, category, tags, author, isPublished } = req.body;
+    const { title, description, content, category, tags, author, isPublished, slug } = req.body;
     let image = '';
 
     if (req.file) {
@@ -76,19 +83,42 @@ export const createNews = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'تصویر خبر الزامی است' });
     }
 
+    // Create slug from title if not provided
+    const newsSlug = typeof slug === 'string' ? slug : slugify(title, {
+      lower: true,
+      strict: true,
+      locale: 'fa'
+    });
+
+    // Parse tags safely
+    let parsedTags = [];
+    try {
+      if (tags) {
+        parsedTags = JSON.parse(tags);
+        // Validate that it's actually an array
+        if (!Array.isArray(parsedTags)) {
+          parsedTags = [];
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing tags JSON:', error);
+      parsedTags = [];
+    }
+
     const news = new News({
       title,
       description,
       content,
       category,
-      tags: JSON.parse(tags || '[]'),
+      tags: parsedTags,
       author,
       date: new Date().toLocaleDateString('fa-IR'),
       image,
       isPublished: isPublished === 'true',
       views: 0,
       likes: 0,
-      likedBy: []
+      likedBy: [],
+      slug: newsSlug
     });
 
     await news.save();
@@ -102,20 +132,46 @@ export const createNews = async (req: Request, res: Response) => {
 // Update news
 export const updateNews = async (req: Request, res: Response) => {
   try {
-    const { title, description, content, category, tags, author, isPublished } = req.body;
+    const { title, description, content, category, tags, author, isPublished, slug } = req.body;
     const updateData: any = {
       title,
       description,
       content,
       category,
-      tags: JSON.parse(tags || '[]'),
       author,
       isPublished: isPublished === 'true'
     };
 
+    // Parse tags safely
+    try {
+      if (tags) {
+        updateData.tags = JSON.parse(tags);
+        // Validate that it's actually an array
+        if (!Array.isArray(updateData.tags)) {
+          updateData.tags = [];
+        }
+      } else {
+        updateData.tags = [];
+      }
+    } catch (error) {
+      console.error('Error parsing tags JSON:', error);
+      updateData.tags = [];
+    }
+
+    // Update slug if provided or if title is changed
+    if (typeof slug === 'string' && slug) {
+      updateData.slug = slug;
+    } else if (title) {
+      updateData.slug = slugify(title, {
+        lower: true,
+        strict: true,
+        locale: 'fa'
+      });
+    }
+
     if (req.file) {
       // Delete old image if exists
-      const news = await News.findById(req.params.id);
+      const news = await News.findOne({ slug: req.params.slug });
       if (news?.image) {
         const oldImagePath = path.join(__dirname, '../../', news.image);
         if (fs.existsSync(oldImagePath)) {
@@ -125,8 +181,8 @@ export const updateNews = async (req: Request, res: Response) => {
       updateData.image = `/uploads/${req.file.filename}`;
     }
 
-    const updatedNews = await News.findByIdAndUpdate(
-      req.params.id,
+    const updatedNews = await News.findOneAndUpdate(
+      { slug: req.params.slug },
       updateData,
       { new: true, runValidators: true }
     );
@@ -144,7 +200,7 @@ export const updateNews = async (req: Request, res: Response) => {
 // Delete news
 export const deleteNews = async (req: Request, res: Response) => {
   try {
-    const news = await News.findById(req.params.id);
+    const news = await News.findOne({ slug: req.params.slug });
     if (!news) {
       return res.status(404).json({ message: 'News not found' });
     }
@@ -168,7 +224,7 @@ export const deleteNews = async (req: Request, res: Response) => {
 // Like/Unlike news
 export const toggleLike = async (req: Request, res: Response) => {
   try {
-    const news = await News.findById(req.params.id);
+    const news = await News.findOne({ slug: req.params.slug });
     if (!news) {
       return res.status(404).json({ message: 'News not found' });
     }

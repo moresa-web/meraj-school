@@ -21,7 +21,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ news, onSubmit, onCancel, saving })
     date: new Date().toLocaleDateString('fa-IR'),
     author: user?.fullName || '',
     isPublished: true,
-    image: undefined
+    image: undefined,
+    slug: ''
   });
 
   useEffect(() => {
@@ -35,7 +36,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ news, onSubmit, onCancel, saving })
         date: news.date,
         author: news.author,
         isPublished: news.isPublished,
-        image: undefined
+        image: undefined,
+        slug: news.slug
       });
     }
   }, [news]);
@@ -53,7 +55,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ news, onSubmit, onCancel, saving })
         date: new Date().toLocaleDateString('fa-IR'),
         author: user?.fullName || '',
         isPublished: true,
-        image: undefined
+        image: undefined,
+        slug: ''
       });
     }
   };
@@ -71,6 +74,17 @@ const NewsForm: React.FC<NewsFormProps> = ({ news, onSubmit, onCancel, saving })
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           placeholder="عنوان خبر را وارد کنید"
           required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="slug">نامک (اختیاری)</label>
+        <input
+          id="slug"
+          type="text"
+          value={formData.slug}
+          onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+          placeholder="نامک خبر را وارد کنید (در صورت خالی بودن، از عنوان خبر ساخته می‌شود)"
         />
       </div>
 
@@ -135,6 +149,18 @@ const NewsForm: React.FC<NewsFormProps> = ({ news, onSubmit, onCancel, saving })
           })}
           placeholder="برچسب‌ها را با کاما جدا کنید"
         />
+      </div>
+
+      <div className="form-group">
+        <div className="checkbox-label">
+          <input
+            type="checkbox"
+            id="isPublished"
+            checked={formData.isPublished}
+            onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+          />
+          <label htmlFor="isPublished">منتشر شود</label>
+        </div>
       </div>
 
       <div className="form-group">

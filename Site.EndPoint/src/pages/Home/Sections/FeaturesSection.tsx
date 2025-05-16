@@ -14,7 +14,7 @@ interface FeaturesContent {
   features: Feature[];
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const defaultFeatures: Feature[] = [
   {
@@ -72,7 +72,7 @@ export const FeaturesSection: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/content/home/features`);
+        const response = await fetch(`${API_URL}/api/content/home/features`);
         if (response.ok) {
           const data = await response.json();
           if (data.features && data.features.length > 0) {

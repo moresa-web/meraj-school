@@ -64,4 +64,10 @@ code {
 
 .mb-4 {
   margin-bottom: 2rem;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 } 

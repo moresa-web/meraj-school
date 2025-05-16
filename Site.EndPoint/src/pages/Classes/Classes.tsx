@@ -11,9 +11,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NoResults from '../../components/NoResults/NoResults';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../../components/SEO';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface ClassInfo {
   _id: string;
@@ -45,16 +45,16 @@ interface RegistrationForm {
 
 const Classes: React.FC = () => {
   const title =
-    process.env.REACT_APP_CLASSES_TITLE ||
+    import.meta.env.VITE_CLASSES_TITLE ||
     'کلاس‌های تقویتی - دبیرستان پسرانه معراج';
   const description =
-    process.env.REACT_APP_CLASSES_DESCRIPTION ||
+    import.meta.env.VITE_CLASSES_DESCRIPTION ||
     'معرفی کلاس‌های تقویتی دبیرستان پسرانه معراج در دروس ریاضی، فیزیک و شیمی با اساتید مجرب.';
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
   const pagePath = '/classes';
   const fullUrl = `${siteUrl}${pagePath}`;
   const ogImagePath =
-    process.env.REACT_APP_OG_IMAGE_PATH || '/images/logo.png';
+    import.meta.env.VITE_OG_IMAGE_PATH || '/images/logo.png';
   const ogImage = `${siteUrl}${ogImagePath}`;
 
   const { handleError, handleAxiosError } = useErrorHandler();
@@ -125,7 +125,7 @@ const Classes: React.FC = () => {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/classes`);
+      const response = await axios.get(`${API_URL}/api/classes`);
       setClasses(response.data);
     } catch (error) {
       handleAxiosError(error);
@@ -487,7 +487,7 @@ const Classes: React.FC = () => {
           description: course.description,
           provider: {
             "@type": "Organization",
-            name: process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+            name: import.meta.env.VITE_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
             url: siteUrl
           },
           courseCode: course._id,
@@ -504,30 +504,12 @@ const Classes: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        {/* عنوان و توضیحات متا */}
-        <title>{title}</title>
-        <meta name="description" content={description} data-rh="true" />
-        <link rel="canonical" href={fullUrl} data-rh="true" />
-
-        {/* Open Graph */}
-        <meta property="og:type" content="website" data-rh="true" />
-        <meta property="og:title" content={title} data-rh="true" />
-        <meta property="og:description" content={description} data-rh="true" />
-        <meta property="og:url" content={fullUrl} data-rh="true" />
-        <meta property="og:image" content={ogImage} data-rh="true" />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" data-rh="true" />
-        <meta name="twitter:title" content={title} data-rh="true" />
-        <meta name="twitter:description" content={description} data-rh="true" />
-        <meta name="twitter:image" content={ogImage} data-rh="true" />
-
-        <script type="application/ld+json" data-rh="true">
-          {JSON.stringify(structuredData)}
-        </script>
-      </Helmet>
-      
+      <SEO
+        title="کلاس‌های تقویتی | دبیرستان پسرانه معراج"
+        description="ثبت‌نام در کلاس‌های تقویتی دبیرستان پسرانه معراج. کلاس‌های ریاضی، فیزیک، شیمی و زیست‌شناسی با اساتید مجرب."
+        keywords="کلاس تقویتی, ریاضی, فیزیک, شیمی, زیست‌شناسی, دبیرستان معراج, مشهد"
+        url="/classes"
+      />
       <div className="min-h-screen bg-gray-50">
         <ToastContainer
           position="top-right"
