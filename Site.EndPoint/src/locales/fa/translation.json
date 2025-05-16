@@ -9,7 +9,11 @@
       "title": "خطا در بارگذاری صفحه",
       "message": "متأسفانه در بارگذاری صفحه مشکلی پیش آمده است. لطفاً دوباره تلاش کنید.",
       "retry": "تلاش مجدد"
-    }
+    },
+    "fetchingSeoData": "خطا در دریافت اطلاعات SEO",
+    "updatingSeoData": "خطا در بروزرسانی اطلاعات SEO",
+    "fetchingSiteInfo": "خطا در دریافت اطلاعات سایت",
+    "updatingSiteInfo": "خطا در بروزرسانی اطلاعات سایت"
   },
   "studentRegistration": {
     "title": "ثبت‌نام دانش‌آموز",
@@ -84,5 +88,101 @@
       "invalid": "شماره موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد"
     }
   },
-  "currency": "تومان"
+  "currency": "تومان",
+  "dashboard": {
+    "title": "داشبورد مدیریت",
+    "menu": {
+      "dashboard": "داشبورد",
+      "news": "اخبار",
+      "classes": "کلاس‌ها",
+      "users": "کاربران",
+      "seo": "سئو",
+      "siteInfo": "اطلاعات سایت",
+      "settings": "تنظیمات",
+      "newsletter": "خبرنامه"
+    },
+    "seo": {
+      "title": "بهینه‌سازی موتور جستجو",
+      "schoolName": "نام مدرسه",
+      "description": "توضیحات",
+      "keywords": "کلمات کلیدی",
+      "image": "آدرس تصویر",
+      "siteUrl": "آدرس سایت",
+      "address": "آدرس",
+      "phone": "شماره تماس",
+      "email": "ایمیل",
+      "instagram": "اینستاگرام",
+      "twitter": "توییتر"
+    },
+    "siteInfo": {
+      "title": "اطلاعات پایه سایت",
+      "mainInfo": "اطلاعات اصلی",
+      "contactInfo": "اطلاعات تماس",
+      "schoolName": "نام مدرسه",
+      "description": "توضیحات",
+      "keywords": "کلمات کلیدی",
+      "image": "آدرس لوگو",
+      "siteUrl": "آدرس سایت",
+      "address": "آدرس",
+      "phone": "شماره تماس",
+      "email": "ایمیل",
+      "instagram": "اینستاگرام",
+      "twitter": "توییتر"
+    },
+    "classes": {
+      "title": "مدیریت کلاس‌ها",
+      "addNew": "افزودن کلاس جدید",
+      "edit": "ویرایش کلاس",
+      "delete": "حذف کلاس",
+      "capacity": "ظرفیت",
+      "price": "قیمت",
+      "teacher": "استاد",
+      "schedule": "زمان برگزاری",
+      "confirmDelete": "آیا از حذف این کلاس اطمینان دارید؟"
+    },
+    "newsletter": {
+      "title": "مدیریت خبرنامه",
+      "subscribers": "مشترکین خبرنامه",
+      "exportCSV": "دانلود CSV",
+      "email": "ایمیل",
+      "date": "تاریخ عضویت",
+      "status": "وضعیت",
+      "active": "فعال",
+      "inactive": "غیرفعال",
+      "noSubscribers": "هیچ مشترکی یافت نشد",
+      "fetchError": "خطا در دریافت اطلاعات مشترکین"
+    }
+  },
+  "common": {
+    "save": "ذخیره",
+    "saving": "در حال ذخیره..."
+  },
+  "success": {
+    "seoUpdated": "اطلاعات سئو با موفقیت بروزرسانی شد",
+    "siteInfoUpdated": "اطلاعات سایت با موفقیت بروزرسانی شد"
+  },
+  "nav": {
+    "home": "خانه",
+    "news": "اخبار",
+    "classes": "کلاس‌ها",
+    "about": "درباره ما",
+    "contact": "تماس با ما",
+    "login": "ورود",
+    "logout": "خروج",
+    "dashboard": "داشبورد"
+  },
+  "footer": {
+    "about": "درباره ما",
+    "quickLinks": "دسترسی سریع",
+    "contactInfo": "اطلاعات تماس",
+    "newsletter": "خبرنامه",
+    "newsletterDescription": "برای اطلاع از آخرین اخبار و رویدادها در خبرنامه ما عضو شوید",
+    "emailPlaceholder": "ایمیل خود را وارد کنید",
+    "subscribe": "عضویت",
+    "subscribing": "در حال ثبت...",
+    "subscribeSuccess": "ثبت نام شما در خبرنامه با موفقیت انجام شد",
+    "subscribeError": "خطا در ثبت نام. لطفا دوباره تلاش کنید",
+    "invalidEmail": "لطفا یک ایمیل معتبر وارد کنید",
+    "allRightsReserved": "تمامی حقوق محفوظ است"
+  }
 } 

@@ -14,22 +14,25 @@ interface StatsContent {
   description: string;
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const defaultContent: StatsContent = {
+  stats: [
+    { number: '۲۰+', text: 'سال تجربه آموزشی' },
+    { number: '۵۰+', text: 'معلم مجرب' },
+    { number: '۱۰۰۰+', text: 'دانش‌آموز موفق' },
+    { number: '۹۵٪', text: 'قبولی در دانشگاه' }
+  ],
+  title: 'آمار',
+  description: 'این بخش به آمارهای مربوط به مدرسه خود می‌پردازد.'
+};
 
 export const StatsSection: React.FC = () => {
   const { user } = useAuth();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
-  const [content, setContent] = useState<StatsContent>({
-    stats: [
-      { number: '۲۰+', text: 'سال تجربه آموزشی' },
-      { number: '۵۰+', text: 'معلم مجرب' },
-      { number: '۱۰۰۰+', text: 'دانش‌آموز موفق' },
-      { number: '۹۵٪', text: 'قبولی در دانشگاه' }
-    ],
-    title: 'آمار',
-    description: 'این بخش به آمارهای مربوط به مدرسه خود می‌پردازد.'
-  });
+  const [content, setContent] = useState<StatsContent>(defaultContent);
+  const [isLoading, setIsLoading] = useState(true);
 
   // تابع برای تبدیل اعداد فارسی به انگلیسی
   const persianToEnglish = (num: string) => {
@@ -69,13 +72,18 @@ export const StatsSection: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/content/home/stats`);
+        const response = await fetch(`${API_URL}/api/content/home/stats`);
         if (response.ok) {
           const data = await response.json();
-          setContent(data);
+          // فقط اگر داده‌ها با مقادیر پیش‌فرض متفاوت باشند، آنها را به‌روزرسانی می‌کنیم
+          if (JSON.stringify(data) !== JSON.stringify(defaultContent)) {
+            setContent(data);
+          }
         }
       } catch (error) {
         console.error('Error fetching stats content:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -117,7 +125,7 @@ export const StatsSection: React.FC = () => {
         (updatedContent as any)[field] = value;
       }
 
-      const response = await fetch(`${API_URL}/content/home/stats`, {
+      const response = await fetch(`${API_URL}/api/content/home/stats`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -136,6 +144,10 @@ export const StatsSection: React.FC = () => {
       alert('خطا در به‌روزرسانی آمار');
     }
   };
+
+  if (isLoading) {
+    return null; // یا یک کامپوننت loading نمایش دهید
+  }
 
   return (
     <section ref={sectionRef} className="py-20 bg-gradient-to-b from-emerald-50 to-white relative overflow-hidden">
@@ -188,17 +200,18 @@ export const StatsSection: React.FC = () => {
                       <CountUp
                         start={0}
                         end={number}
-                        duration={5}
+                        duration={2.5}
                         useEasing={true}
                         enableScrollSpy={false}
                         easingFn={(t, b, c, d) => {
-                          // تابع easing برای حرکت نرم‌تر
                           t /= d;
                           return c * t * t * t + b;
                         }}
                         separator=","
                         suffix={suffix}
                         formattingFn={(value) => englishToPersian(value.toString())}
+                        preserveValue={false}
+                        redraw={true}
                       />
                     ) : englishToPersian(number.toString()) + suffix}
                   </div>

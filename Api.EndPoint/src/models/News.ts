@@ -12,9 +12,11 @@ export interface INews extends Document {
   content: string;
   author: string;
   tags: string[];
+  slug: string;
+  isPublished: boolean;
 }
 
-const NewsSchema: Schema = new Schema({
+const newsSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   date: { type: String, required: true },
@@ -25,9 +27,11 @@ const NewsSchema: Schema = new Schema({
   likedBy: [{ type: String }],
   content: { type: String, required: true },
   author: { type: String, required: true },
-  tags: [{ type: String }]
+  tags: [{ type: String }],
+  slug: { type: String, required: true, unique: true },
+  isPublished: { type: Boolean, default: false }
 }, {
   timestamps: true
 });
 
-export default mongoose.model<INews>('News', NewsSchema); 
+export default mongoose.model<INews>('News', newsSchema); 

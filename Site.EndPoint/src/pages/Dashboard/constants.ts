@@ -1,4 +1,4 @@
-export const API_URL = 'http://mohammadrezasardashti.ir/api';
+export const API_URL = 'http://localhost:5000';
 
 export const PAGES = [
   { id: 'news', title: 'مدیریت اخبار' },

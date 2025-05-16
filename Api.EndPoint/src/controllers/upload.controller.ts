@@ -4,14 +4,18 @@ import path from 'path';
 import fs from 'fs';
 import { checkIsAdmin } from '../middleware/auth';
 
+// تنظیم مسیر آپلود فایل‌ها بر اساس محیط
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' 
+  ? 'C:\\inetpub\\wwwroot\\moresa\\mohammadrezasardashti\\site\\uploads'
+  : path.join(__dirname, '../../uploads');
+
 // تنظیمات ذخیره‌سازی فایل
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = 'uploads';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     }
-    cb(null, uploadDir);
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -47,8 +51,11 @@ export const uploadImage = async (req: Request, res: Response) => {
     }
 
     // Return the full path including /uploads/
-    res.json({ url: `/uploads/${req.file.filename}` });
+    const fileUrl = `/uploads/${req.file.filename}`;
+    console.log('File uploaded:', fileUrl);
+    res.json({ url: fileUrl });
   } catch (error) {
+    console.error('Error uploading file:', error);
     res.status(500).json({ message: 'خطا در آپلود فایل' });
   }
 }; 

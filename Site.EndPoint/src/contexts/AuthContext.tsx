@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-
-// تعریف API URL با مقدار پیش‌فرض
-const API_URL = 'http://mohammadrezasardashti.ir/api';
+import { API_URL } from '../constants';
 
 interface User {
   _id: string;
@@ -38,24 +35,19 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
 
   const fetchUserData = async (token: string) => {
     try {
-      console.log('Fetching user data with token:', token);
-      const response = await axios.get(`${API_URL}/auth/me`, {
+      const response = await axios.get(`${API_URL}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log('User data response:', response.data);
       
       if (response.data) {
         setUser(response.data);
         setIsAuthenticated(true);
-        console.log('User authenticated successfully:', response.data);
       } else {
-        console.log('No user data received');
         localStorage.removeItem('token');
         setUser(null);
         setIsAuthenticated(false);
@@ -70,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('Initial token check:', token);
     if (token) {
       fetchUserData(token);
     }
@@ -78,36 +69,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      console.log('Attempting login with:', { email });
-      console.log('API URL for login:', `${API_URL}/auth/login`);
-      
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password,
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
-      console.log('Login response:', response.data);
 
-      const { token, user } = response.data;
-      if (!token || !user) {
-        throw new Error('Invalid response from server');
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
       }
 
-      localStorage.setItem('token', token);
-      setUser(user);
-      setIsAuthenticated(true);
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      await fetchUserData(data.token);
       toast.success('ورود با موفقیت انجام شد');
-      navigate('/dashboard');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || 'خطا در ورود. لطفاً دوباره تلاش کنید.';
-      toast.error(errorMessage);
-      throw error;
+    } catch (error) {
+      throw new Error('Login failed');
     }
   };
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         name,
         email,
         password,
@@ -121,7 +106,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       setIsAuthenticated(true);
       toast.success('ثبت‌نام با موفقیت انجام شد');
-      navigate('/');
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'خطا در ثبت‌نام. لطفاً دوباره تلاش کنید.';
       toast.error(errorMessage);
@@ -133,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
-    navigate('/');
+    toast.success('خروج با موفقیت انجام شد');
   };
 
   return (

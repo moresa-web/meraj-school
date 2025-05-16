@@ -11,6 +11,7 @@ export interface News {
   author: string;
   tags: string[];
   isPublished: boolean;
+  slug: string;
 }
 
 export interface Class {
@@ -40,6 +41,7 @@ export interface NewsFormData {
   author: string;
   isPublished: boolean;
   image?: File;
+  slug?: string;
 }
 
 export interface ClassFormData {

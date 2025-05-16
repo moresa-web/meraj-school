@@ -2,13 +2,176 @@
   "error": {
     "network": {
       "title": "Network Error",
-      "message": "Sorry, there was a problem connecting to the server. Please check your internet connection and try again.",
-      "retry": "Try Again"
+      "message": "There was a problem connecting to the server. Please check your internet connection and try again.",
+      "retry": "Retry"
     },
     "page": {
-      "title": "Page Error",
-      "message": "Sorry, there was a problem loading the page. Please try again.",
-      "retry": "Try Again"
+      "title": "Page Load Error",
+      "message": "There was a problem loading the page. Please try again.",
+      "retry": "Retry"
+    },
+    "fetchingSeoData": "Error fetching SEO data",
+    "updatingSeoData": "Error updating SEO data",
+    "fetchingSiteInfo": "Error fetching site information",
+    "updatingSiteInfo": "Error updating site information"
+  },
+  "studentRegistration": {
+    "title": "Student Registration",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "nationalCode": "National Code",
+    "phoneNumber": "Phone Number",
+    "grade": "Grade",
+    "selectGrade": "Select Grade",
+    "grade10": "10th Grade",
+    "grade11": "11th Grade",
+    "grade12": "12th Grade",
+    "submit": "Register"
+  },
+  "reinforcementClasses": {
+    "title": "Reinforcement Classes",
+    "teacher": "Teacher",
+    "schedule": "Schedule",
+    "capacity": "Capacity",
+    "price": "Price",
+    "register": "Register",
+    "full": "Full",
+    "back": "Back",
+    "registrationForm": "Registration Form",
+    "studentName": "Student Name",
+    "studentPhone": "Student Phone",
+    "parentPhone": "Parent Phone",
+    "submit": "Register"
+  },
+  "Classes": {
+    "title": "Reinforcement Classes",
+    "teacher": "Teacher",
+    "schedule": "Schedule",
+    "capacity": "Capacity",
+    "price": "Price",
+    "register": "Register",
+    "full": "Full",
+    "back": "Back",
+    "registrationForm": "Registration Form",
+    "studentName": "Student Name",
+    "studentPhone": "Student Phone",
+    "parentPhone": "Parent Phone",
+    "submit": "Register"
+  },
+  "validation": {
+    "firstName": {
+      "required": "Please enter your first name"
+    },
+    "lastName": {
+      "required": "Please enter your last name"
+    },
+    "nationalCode": {
+      "required": "Please enter your national code",
+      "invalid": "National code must be 10 digits"
+    },
+    "phoneNumber": {
+      "required": "Please enter your phone number",
+      "invalid": "Phone number must start with 09 and be 11 digits"
+    },
+    "grade": {
+      "required": "Please select your grade"
+    },
+    "studentName": {
+      "required": "Please enter student name"
+    },
+    "studentPhone": {
+      "required": "Please enter student phone number",
+      "invalid": "Phone number must start with 09 and be 11 digits"
+    },
+    "parentPhone": {
+      "required": "Please enter parent phone number",
+      "invalid": "Phone number must start with 09 and be 11 digits"
     }
+  },
+  "currency": "Toman",
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "menu": {
+      "dashboard": "Dashboard",
+      "news": "News",
+      "classes": "Classes",
+      "users": "Users",
+      "seo": "SEO",
+      "siteInfo": "Site Info",
+      "settings": "Settings",
+      "newsletter": "Newsletter"
+    },
+    "seo": {
+      "title": "Search Engine Optimization",
+      "schoolName": "School Name",
+      "description": "Description",
+      "keywords": "Keywords",
+      "image": "Image URL",
+      "siteUrl": "Site URL",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "instagram": "Instagram",
+      "twitter": "Twitter"
+    },
+    "siteInfo": {
+      "title": "Basic Site Information",
+      "mainInfo": "Main Information",
+      "contactInfo": "Contact Information",
+      "schoolName": "School Name",
+      "description": "Description",
+      "keywords": "Keywords",
+      "image": "Logo URL",
+      "siteUrl": "Site URL",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "instagram": "Instagram",
+      "twitter": "Twitter"
+    },
+    "newsletter": {
+      "title": "Newsletter Management",
+      "subscribers": "Newsletter Subscribers",
+      "exportCSV": "Export CSV",
+      "email": "Email",
+      "date": "Subscription Date",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "noSubscribers": "No subscribers found",
+      "fetchError": "Error fetching subscribers data"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving..."
+  },
+  "success": {
+    "seoUpdated": "SEO information updated successfully",
+    "siteInfoUpdated": "Site information updated successfully"
+  },
+  "nav": {
+    "home": "Home",
+    "news": "News",
+    "classes": "Classes",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "dashboard": "Dashboard"
+  },
+  "footer": {
+    "about": "About Us",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Info",
+    "newsletter": "Newsletter",
+    "newsletterDescription": "Subscribe to our newsletter to receive the latest news and updates.",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "subscribeSuccess": "You have successfully subscribed to our newsletter",
+    "subscribeError": "Error subscribing. Please try again",
+    "invalidEmail": "Please enter a valid email address",
+    "allRightsReserved": "All rights reserved."
   }
 } 

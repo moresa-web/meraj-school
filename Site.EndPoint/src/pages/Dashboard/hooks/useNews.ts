@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { News, NewsFormData } from '../types';
-import { API_URL } from '../constants';
+import { API_URL } from '@/constants';
+import slugify from 'slugify';
 
 export const useNews = () => {
   const [news, setNews] = useState<News[]>([]);
@@ -8,71 +10,88 @@ export const useNews = () => {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // ایجاد یک نمونه axios با تنظیمات پیش‌فرض
+  const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // اضافه کردن interceptor برای اضافه کردن توکن به همه درخواست‌ها
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
   const fetchNews = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/news`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await api.get('/api/news', {
+        params: {
+          showAll: 'true' // برای داشبورد ادمین، همه اخبار (منتشر شده و منتشر نشده) را نمایش می‌دهیم
         }
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در دریافت اخبار');
-      }
-      const data = await response.json();
-      setNews(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+      console.log('Fetched news:', response.data);
+      setNews(response.data);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+      setError('خطا در دریافت اخبار');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
   const addNews = async (formData: NewsFormData): Promise<boolean> => {
     try {
       setSaving(true);
-      setError(null);
+      const formDataToSend = new FormData();
       
-      const data = new FormData();
+      // اضافه کردن slug به فرم
+      const slug = formData.slug || slugify(formData.title, {
+        lower: true,
+        strict: true,
+        locale: 'fa'
+      });
+      formDataToSend.append('slug', slug);
+
+      // اضافه کردن سایر فیلدها
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          if (key === 'tags') {
-            data.append(key, JSON.stringify(value));
-          } else if (key === 'isPublished') {
-            data.append(key, String(value));
-          } else if (key === 'image' && value instanceof File) {
-            data.append(key, value);
-          } else if (key !== 'image') {
-            data.append(key, value);
+        if (key === 'tags') {
+          // Ensure tags array is properly encoded for Arabic text
+          try {
+            const tagsStr = JSON.stringify(value);
+            formDataToSend.append(key, tagsStr);
+          } catch (err) {
+            console.error('Error stringifying tags:', err);
+            // Fallback to empty array if JSON stringify fails
+            formDataToSend.append(key, '[]');
           }
+        } else if (key === 'image' && value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (value !== undefined) {
+          formDataToSend.append(key, value.toString());
         }
       });
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('توکن احراز هویت یافت نشد');
-      }
-
-      const response = await fetch(`${API_URL}/news`, {
-        method: 'POST',
+      const response = await api.post('/api/news', formDataToSend, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data',
         },
-        body: data
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در افزودن خبر');
-      }
-
-      await fetchNews();
+      setNews(prev => [...prev, response.data]);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+    } catch (error) {
+      console.error('Error adding news:', error);
+      setError('خطا در افزودن خبر');
       return false;
     } finally {
       setSaving(false);
@@ -82,45 +101,46 @@ export const useNews = () => {
   const updateNews = async (id: string, formData: NewsFormData): Promise<boolean> => {
     try {
       setSaving(true);
-      setError(null);
+      const formDataToSend = new FormData();
       
-      const data = new FormData();
+      // اضافه کردن slug به فرم
+      const slug = formData.slug || slugify(formData.title, {
+        lower: true,
+        strict: true,
+        locale: 'fa'
+      });
+      formDataToSend.append('slug', slug);
+
+      // اضافه کردن سایر فیلدها
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          if (key === 'tags') {
-            data.append(key, JSON.stringify(value));
-          } else if (key === 'isPublished') {
-            data.append(key, String(value));
-          } else if (key === 'image' && value instanceof File) {
-            data.append(key, value);
-          } else if (key !== 'image') {
-            data.append(key, value);
+        if (key === 'tags') {
+          // Ensure tags array is properly encoded for Arabic text
+          try {
+            const tagsStr = JSON.stringify(value);
+            formDataToSend.append(key, tagsStr);
+          } catch (err) {
+            console.error('Error stringifying tags:', err);
+            // Fallback to empty array if JSON stringify fails
+            formDataToSend.append(key, '[]');
           }
+        } else if (key === 'image' && value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (value !== undefined) {
+          formDataToSend.append(key, value.toString());
         }
       });
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('توکن احراز هویت یافت نشد');
-      }
-
-      const response = await fetch(`${API_URL}/news/${id}`, {
-        method: 'PUT',
+      const response = await api.put(`/api/news/${id}`, formDataToSend, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data',
         },
-        body: data
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در بروزرسانی خبر');
-      }
-
-      await fetchNews();
+      setNews(prev => prev.map(item => item._id === id ? response.data : item));
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+    } catch (error) {
+      console.error('Error updating news:', error);
+      setError('خطا در به‌روزرسانی خبر');
       return false;
     } finally {
       setSaving(false);
@@ -129,39 +149,19 @@ export const useNews = () => {
 
   const deleteNews = async (id: string): Promise<boolean> => {
     try {
-      setSaving(true);
-      setError(null);
-      
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('توکن احراز هویت یافت نشد');
+      const newsItem = news.find(item => item._id === id);
+      if (!newsItem) {
+        throw new Error('News not found');
       }
-
-      const response = await fetch(`${API_URL}/news/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در حذف خبر');
-      }
-
-      setNews(prevNews => prevNews.filter(item => item._id !== id));
+      await api.delete(`/api/news/${newsItem.slug}`);
+      setNews(prev => prev.filter(item => item._id !== id));
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+    } catch (error) {
+      console.error('Error deleting news:', error);
+      setError('خطا در حذف خبر');
       return false;
-    } finally {
-      setSaving(false);
     }
   };
-
-  useEffect(() => {
-    fetchNews();
-  }, []);
 
   return {
     news,
@@ -170,6 +170,7 @@ export const useNews = () => {
     saving,
     addNews,
     updateNews,
-    deleteNews
+    deleteNews,
+    fetchNews
   };
 }; 

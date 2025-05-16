@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Class, ClassFormData } from '../types';
-import { API_URL } from '../constants';
+import { Class, ClassFormData } from '../features/classes/types';
+import { API_URL } from '../../../constants';
+import toast from 'react-hot-toast';
 
 export const useClasses = () => {
   const [classes, setClasses] = useState<Class[]>([]);
@@ -8,177 +9,117 @@ export const useClasses = () => {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/classes`);
+      const token = localStorage.getItem('token');
+      console.log('Fetching classes from:', `${API_URL}/api/classes`);
+      const response = await fetch(`${API_URL}/api/classes`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      console.log('Response status:', response.status);
       if (!response.ok) {
         throw new Error('خطا در دریافت کلاس‌ها');
       }
       const data = await response.json();
+      console.log('Received data:', data);
       setClasses(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+      console.error('Error fetching classes:', err);
+      setError(err instanceof Error ? err.message : 'خطا در دریافت کلاس‌ها');
     } finally {
       setLoading(false);
     }
   };
 
-  const addClass = async (formData: ClassFormData): Promise<boolean> => {
+  const addClass = async (formData: ClassFormData) => {
     try {
       setSaving(true);
-      
-      // ایجاد FormData برای ارسال تصویر
-      const data = new FormData();
-      
-      // اضافه کردن تصویر
-      if (formData.image instanceof File) {
-        data.append('image', formData.image);
-      } else {
-        throw new Error('تصویر کلاس الزامی است');
-      }
-
-      // اضافه کردن سایر فیلدها
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'image') {
-          if (key === 'price' || key === 'capacity') {
-            data.append(key, String(Number(value)));
-          } else if (key === 'isActive') {
-            data.append(key, String(Boolean(value)));
-          } else {
-            data.append(key, String(value));
-          }
-        }
-      });
-
-      // لاگ کردن داده‌های ارسالی
-      console.log('Form Data:', formData);
-      console.log('FormData entries:');
-      for (let [key, value] of data.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('توکن احراز هویت یافت نشد. لطفاً دوباره وارد شوید.');
-      }
-
-      const response = await fetch(`${API_URL}/classes`, {
+      const response = await fetch(`${API_URL}/api/classes`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        body: data
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        throw new Error(errorData.message || 'خطا در افزودن کلاس');
+        throw new Error('خطا در افزودن کلاس');
       }
 
-      await fetchClasses();
+      const newClass = await response.json();
+      setClasses(prev => [...prev, newClass]);
+      toast.success('کلاس با موفقیت افزوده شد');
       return true;
     } catch (err) {
-      console.error('Error in addClass:', err);
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+      const message = err instanceof Error ? err.message : 'خطا در افزودن کلاس';
+      toast.error(message);
       return false;
     } finally {
       setSaving(false);
     }
   };
 
-  const updateClass = async (id: string, formData: ClassFormData): Promise<boolean> => {
+  const updateClass = async (id: string, formData: ClassFormData) => {
     try {
       setSaving(true);
-      
-      // ایجاد FormData برای ارسال تصویر
-      const data = new FormData();
-      
-      // اضافه کردن تصویر اگر وجود داشته باشد
-      if (formData.image instanceof File) {
-        data.append('image', formData.image);
-      }
-
-      // اضافه کردن سایر فیلدها
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'image') {
-          if (key === 'price' || key === 'capacity') {
-            data.append(key, String(Number(value)));
-          } else if (key === 'isActive') {
-            data.append(key, String(Boolean(value)));
-          } else {
-            data.append(key, String(value));
-          }
-        }
-      });
-
-      // لاگ کردن داده‌های ارسالی
-      console.log('Form Data:', formData);
-      console.log('FormData entries:');
-      for (let [key, value] of data.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('توکن احراز هویت یافت نشد. لطفاً دوباره وارد شوید.');
-      }
-
-      const response = await fetch(`${API_URL}/classes/${id}`, {
+      const response = await fetch(`${API_URL}/api/classes/${id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        body: data
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        throw new Error(errorData.message || 'خطا در بروزرسانی کلاس');
+        throw new Error('خطا در بروزرسانی کلاس');
       }
 
-      await fetchClasses();
+      const updatedClass = await response.json();
+      setClasses(prev => prev.map(item => item._id === id ? updatedClass : item));
+      toast.success('کلاس با موفقیت بروزرسانی شد');
       return true;
     } catch (err) {
-      console.error('Error in updateClass:', err);
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
+      const message = err instanceof Error ? err.message : 'خطا در بروزرسانی کلاس';
+      toast.error(message);
       return false;
     } finally {
       setSaving(false);
     }
   };
 
-  const deleteClass = async (id: string): Promise<boolean> => {
+  const deleteClass = async (id: string) => {
     try {
-      setSaving(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/classes/${id}`, {
+      const response = await fetch(`${API_URL}/api/classes/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
         throw new Error('خطا در حذف کلاس');
       }
 
-      setClasses(prevClasses => prevClasses.filter(item => item._id !== id));
-      return true;
+      setClasses(prev => prev.filter(item => item._id !== id));
+      toast.success('کلاس با موفقیت حذف شد');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای ناشناخته');
-      return false;
-    } finally {
-      setSaving(false);
+      const message = err instanceof Error ? err.message : 'خطا در حذف کلاس';
+      toast.error(message);
     }
   };
-
-  useEffect(() => {
-    fetchClasses();
-  }, []);
 
   return {
     classes,
@@ -187,6 +128,7 @@ export const useClasses = () => {
     saving,
     addClass,
     updateClass,
-    deleteClass
+    deleteClass,
+    refreshClasses: fetchClasses
   };
 }; 

@@ -1,103 +1,85 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { SidebarProps } from '../types';
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-const Sidebar: React.FC<SidebarProps> = ({ onAddNews, onAddClass }) => {
-  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+const Sidebar: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const path = location.pathname.split('/').pop() || 'news';
-
-  const handleMenuClick = (menuId: string) => {
-    setExpandedMenu(expandedMenu === menuId ? null : menuId);
-  };
-
-  const handleAddNews = () => {
-    navigate('/dashboard/news/add');
-    onAddNews();
-  };
-
-  const handleAddClass = () => {
-    navigate('/dashboard/classes/add');
-    onAddClass();
-  };
+  const { t } = useTranslation();
 
   return (
-    <aside className="dashboard-sidebar">
+    <div className="dashboard-sidebar">
       <div className="sidebar-header">
-        <h2>پنل مدیریت</h2>
+        <h1>{t('dashboard.title')}</h1>
       </div>
+      
       <nav className="sidebar-nav">
-        <div className="menu-item">
-          <button
-            className={`menu-button ${expandedMenu === 'news' ? 'active' : ''}`}
-            onClick={() => handleMenuClick('news')}
-          >
-            <span className="nav-icon">📰</span>
-            <span className="nav-text">مدیریت اخبار</span>
-            <span className="menu-arrow">{expandedMenu === 'news' ? '▼' : '▶'}</span>
-          </button>
-          {expandedMenu === 'news' && (
-            <div className="submenu">
-              <Link
-                to="/dashboard/news"
-                className={`submenu-button ${path === 'news' ? 'active' : ''}`}
-              >
-                <span className="nav-icon">📋</span>
-                <span className="nav-text">لیست اخبار</span>
-              </Link>
-              <Link
-                to="/dashboard/news/add"
-                className={`submenu-button add-button ${path === 'add' ? 'active' : ''}`}
-                onClick={onAddNews}
-              >
-                <span className="nav-icon">📝</span>
-                <span className="nav-text">افزودن خبر جدید</span>
-              </Link>
-            </div>
-          )}
-        </div>
+        <NavLink 
+          to="/dashboard/news" 
+          className={({ isActive }) => 
+            `sidebar-nav-item ${isActive ? 'active' : ''}`
+          }
+        >
+          <span className="material-icons">newspaper</span>
+          <span>{t('dashboard.menu.news')}</span>
+        </NavLink>
 
-        <div className="menu-item">
-          <button
-            className={`menu-button ${expandedMenu === 'classes' ? 'active' : ''}`}
-            onClick={() => handleMenuClick('classes')}
-          >
-            <span className="nav-icon">📚</span>
-            <span className="nav-text">مدیریت کلاس‌های تقویتی</span>
-            <span className="menu-arrow">{expandedMenu === 'classes' ? '▼' : '▶'}</span>
-          </button>
-          {expandedMenu === 'classes' && (
-            <div className="submenu">
-              <Link
-                to="/dashboard/classes"
-                className={`submenu-button ${path === 'classes' ? 'active' : ''}`}
-              >
-                <span className="nav-icon">📋</span>
-                <span className="nav-text">لیست کلاس‌ها</span>
-              </Link>
-              <Link
-                to="/dashboard/classes/add"
-                className={`submenu-button add-button ${path === 'add' ? 'active' : ''}`}
-                onClick={onAddClass}
-              >
-                <span className="nav-icon">➕</span>
-                <span className="nav-text">افزودن کلاس جدید</span>
-              </Link>
-            </div>
-          )}
-        </div>
-        <div className="menu-item">
-          <Link
-            to="/dashboard/contacts"
-            className={`submenu-button ${path === 'contacts' ? 'active' : ''}`}
-          >
-            <span className="nav-icon">📞</span>
-            <span className="nav-text">لیست پیام‌ها</span>
-          </Link>
-        </div>
+        <NavLink 
+          to="/dashboard/classes" 
+          className={({ isActive }) => 
+            `sidebar-nav-item ${isActive ? 'active' : ''}`
+          }
+        >
+          <span className="material-icons">school</span>
+          <span>{t('dashboard.menu.classes')}</span>
+        </NavLink>
+
+        <NavLink 
+          to="/dashboard/newsletter" 
+          className={({ isActive }) => 
+            `sidebar-nav-item ${isActive ? 'active' : ''}`
+          }
+        >
+          <span className="material-icons">mail</span>
+          <span>{t('dashboard.menu.newsletter')}</span>
+        </NavLink>
+
+        <NavLink 
+          to="/dashboard/seo" 
+          className={({ isActive }) => 
+            `sidebar-nav-item ${isActive ? 'active' : ''}`
+          }
+        >
+          <span className="material-icons">search</span>
+          <span>{t('dashboard.menu.seo')}</span>
+        </NavLink>
       </nav>
-    </aside>
+
+      <div className="sidebar-actions">
+        {location.pathname.includes('/news') && (
+          <NavLink 
+            to="/dashboard/news/add" 
+            className={({ isActive }) => 
+              `sidebar-action-button ${isActive ? 'active' : ''}`
+            }
+          >
+            <span className="material-icons">add</span>
+            <span>افزودن خبر</span>
+          </NavLink>
+        )}
+
+        {location.pathname.includes('/classes') && (
+          <NavLink 
+            to="/dashboard/classes/add" 
+            className={({ isActive }) => 
+              `sidebar-action-button ${isActive ? 'active' : ''}`
+            }
+          >
+            <span className="material-icons">add</span>
+            <span>افزودن کلاس</span>
+          </NavLink>
+        )}
+      </div>
+    </div>
   );
 };
 

@@ -4,9 +4,10 @@ import './News.css';
 import axios from 'axios';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import ShareModal from '../../components/ShareModal/ShareModal';
+import SEO from '../../components/SEO';
 import { Helmet } from 'react-helmet-async';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface NewsItem {
   _id: string;
@@ -22,10 +23,11 @@ interface NewsItem {
   author: string;
   tags: string[];
   likedBy: string[];
+  slug: string;
 }
 
 const NewsDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { handleAxiosError } = useErrorHandler();
   const [news, setNews] = useState<NewsItem | null>(null);
@@ -38,12 +40,11 @@ const NewsDetail: React.FC = () => {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await axios.get(`${API_URL}/news/${id}`);
+        const response = await axios.get(`${API_URL}/api/news/${slug}`);
         setNews(response.data);
 
-        // بررسی وضعیت لایک از سرور
-        const userIP = await axios.get(`${API_URL}/user/ip`);
+        // دریافت IP کاربر و بررسی لایک
+        const userIP = await axios.get(`${API_URL}/api/user/ip`);
         setIsLiked(response.data.likedBy.includes(userIP.data));
       } catch (error) {
         handleAxiosError(error);
@@ -54,18 +55,15 @@ const NewsDetail: React.FC = () => {
     };
 
     fetchNews();
-  }, [id]);
+  }, [slug, handleAxiosError]);
 
   const handleLike = async () => {
     try {
-      const response = await axios.post(`${API_URL}/news/${id}/like`);
+      if (!news) return;
+      const response = await axios.post(`${API_URL}/api/news/${news.slug}/like`);
       setNews(response.data);
-
-      // بررسی وضعیت لایک از سرور
-      const userIP = await axios.get(`${API_URL}/user/ip`);
-      setIsLiked(response.data.likedBy.includes(userIP.data));
+      setIsLiked(!isLiked);
     } catch (error) {
-      console.error('Error toggling like:', error);
       handleAxiosError(error);
     }
   };
@@ -98,8 +96,8 @@ const NewsDetail: React.FC = () => {
     );
   }
 
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
-  const pageUrl = `${siteUrl}/news/${news._id}`;
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
+  const pageUrl = `${siteUrl}/news/${news.slug}`;
   const ogImage = `${siteUrl}${news.image}`;
   const structuredData = {
     "@context": "https://schema.org",
@@ -117,7 +115,7 @@ const NewsDetail: React.FC = () => {
     },
     "publisher": {
       "@type": "Organization",
-      "name": process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+      "name": import.meta.env.VITE_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
       "logo": {
         "@type": "ImageObject",
         "url": `${siteUrl}/logo.png`
@@ -130,6 +128,14 @@ const NewsDetail: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={`${news.title} | دبیرستان پسرانه معراج`}
+        description={news.description}
+        keywords={news.tags.join(', ')}
+        image={`${API_URL.replace('/api', '')}${news.image}`}
+        url={`/news/${news.slug}`}
+        type="article"
+      />
       <Helmet>
         <title>{news.title} - دبیرستان پسرانه معراج</title>
         <meta name="description" content={news.description} />
@@ -181,7 +187,7 @@ const NewsDetail: React.FC = () => {
                 <p className="text-white/90 text-lg mb-8 max-w-2xl">
                   {news.description}
                 </p>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-6">
                   <div className="flex items-center text-white/80">
                     <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -195,25 +201,6 @@ const NewsDetail: React.FC = () => {
                     </svg>
                     <span>{news.views} بازدید</span>
                   </div>
-                  <button
-                    onClick={handleLike}
-                    className={`flex items-center transition-colors ${isLiked ? 'text-emerald-400' : 'text-white/80 hover:text-emerald-400'
-                      }`}
-                  >
-                    <svg
-                      className={`w-5 h-5 ml-2 ${isLiked ? 'fill-current' : 'fill-none'}`}
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                    <span>{news.likes} لایک</span>
-                  </button>
                 </div>
               </div>
             </div>

@@ -12,14 +12,19 @@ export const useContacts = () => {
         const fetchContacts = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${API_URL}/contact`);
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/api/contact`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (!response.ok) {
                     throw new Error('Failed to fetch contacts');
                 }
                 const data = await response.json();
                 setContacts(data);
             } catch (error) {
-                setError(error.message);
+                setError(error instanceof Error ? error.message : 'خطای ناشناخته');
             } finally {
                 setLoading(false);
             }

@@ -6,9 +6,10 @@ import axios from 'axios';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import ShareModal from '../../components/ShareModal/ShareModal';
 import NoResults from '../../components/NoResults/NoResults';
+import SEO from '../../components/SEO';
 import { Helmet } from 'react-helmet-async';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface NewsItem {
   _id: string;
@@ -22,6 +23,7 @@ interface NewsItem {
   likes: number;
   likedBy: string[];
   tags?: string[];
+  slug: string;
 }
 
 const News: React.FC = () => {
@@ -42,16 +44,16 @@ const News: React.FC = () => {
   const itemsPerPage = 6;
 
   const title =
-    process.env.REACT_APP_NEWS_TITLE ||
+    import.meta.env.VITE_NEWS_TITLE ||
     'اخبار و اطلاعیه‌ها - دبیرستان پسرانه معراج';
   const description =
-    process.env.REACT_APP_NEWS_DESCRIPTION ||
+    import.meta.env.VITE_NEWS_DESCRIPTION ||
     'جدیدترین اخبار، اطلاعیه‌ها و رویدادهای دبیرستان پسرانه معراج را اینجا دنبال کنید.';
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
   const pagePath = '/news';
   const fullUrl = `${siteUrl}${pagePath}`;
   const ogImagePath =
-    process.env.REACT_APP_OG_IMAGE_PATH || '/images/logo.png';
+    import.meta.env.VITE_OG_IMAGE_PATH || '/images/logo.png';
   const ogImage = `${siteUrl}${ogImagePath}`;
 
   const updateSearchParams = (key: string, value: string) => {
@@ -107,17 +109,18 @@ const News: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get('http://mohammadrezasardashti.ir/api/news', {
+        const response = await axios.get(`${API_URL}/api/news`, {
           params: {
             category: selectedCategory !== 'همه اخبار' ? selectedCategory : undefined,
             sortBy,
             search: searchQuery
           }
         });
+        console.log('API Response:', response.data);
         setNewsItems(response.data);
 
         // دریافت IP کاربر و بررسی لایک‌ها
-        const userIP = await axios.get('http://mohammadrezasardashti.ir/api/user/ip');
+        const userIP = await axios.get(`${API_URL}/api/user/ip`);
         const liked = new Set<string>(
           response.data
             .filter((news: NewsItem) => news.likedBy.includes(userIP.data))
@@ -159,7 +162,10 @@ const News: React.FC = () => {
   // Handle like
   const handleLike = async (id: string) => {
     try {
-      const response = await axios.post(`http://mohammadrezasardashti.ir/api/news/${id}/like`);
+      const newsItem = newsItems.find(item => item._id === id);
+      if (!newsItem) return;
+
+      const response = await axios.post(`${API_URL}/api/news/${newsItem.slug}/like`);
       setNewsItems(prevNews =>
         prevNews.map(news =>
           news._id === id ? response.data : news
@@ -167,7 +173,7 @@ const News: React.FC = () => {
       );
 
       // دریافت IP کاربر و به‌روزرسانی وضعیت لایک
-      const userIP = await axios.get('http://mohammadrezasardashti.ir/api/user/ip');
+      const userIP = await axios.get(`${API_URL}/api/user/ip`);
       setLikedNews(prev => {
         const newSet = new Set(prev);
         if (response.data.likedBy.includes(userIP.data)) {
@@ -213,6 +219,12 @@ const News: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="اخبار و اطلاعیه‌ها | دبیرستان پسرانه معراج"
+        description="آخرین اخبار و اطلاعیه‌های دبیرستان پسرانه معراج. اطلاع از برنامه‌های آموزشی، مسابقات، اردوها و رویدادهای مدرسه."
+        keywords="اخبار مدرسه, اطلاعیه‌های مدرسه, برنامه‌های آموزشی, مسابقات مدرسه, اردوهای مدرسه, دبیرستان معراج"
+        url="/news"
+      />
       <Helmet>
         {/* عنوان و توضیحات متا */}
         <title>{title}</title>
@@ -318,69 +330,80 @@ const News: React.FC = () => {
                     className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden animate-fade-in-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className="relative aspect-[16/9] overflow-hidden">
-                      <img
-                        src={`${API_URL.replace('/api', '')}${newsItem.image}`}
-                        alt={newsItem.title}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                      <div className="absolute bottom-4 right-4">
-                        <span className="px-3 py-1 rounded-full bg-emerald-500 text-white text-sm transform transition-transform duration-300 group-hover:scale-105">
-                          {newsItem.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                        <div className="flex items-center">
-                          <svg className="w-5 h-5 ml-2 text-emerald-600 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span>{newsItem.date}</span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center">
-                            <svg className="w-5 h-5 ml-1 text-emerald-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            <span>{newsItem.views}</span>
-                          </div>
-                          <button
-                            onClick={() => handleLike(newsItem._id)}
-                            className={`flex items-center ${likedNews.has(newsItem._id) ? 'text-red-500' : 'text-gray-500'}`}
-                          >
-                            <svg className="w-5 h-5 ml-1" fill={likedNews.has(newsItem._id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            <span>{newsItem.likes}</span>
-                          </button>
-                          <button
-                            onClick={() => handleShare(newsItem)}
-                            className="text-gray-400 hover:text-emerald-400 transition-colors"
-                          >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                          </button>
+                    <Link to={`/news/${newsItem.slug}`} className="block">
+                      <div className="relative aspect-[16/9] overflow-hidden">
+                        <img
+                          src={`${API_URL.replace('/api', '')}${newsItem.image}`}
+                          alt={newsItem.title}
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div className="absolute bottom-4 right-4">
+                          <span className="px-3 py-1 rounded-full bg-emerald-500 text-white text-sm transform transition-transform duration-300 group-hover:scale-105">
+                            {newsItem.category}
+                          </span>
                         </div>
                       </div>
-                      <Link to={`/news/${newsItem._id}`} className="block">
-                        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-emerald-600 transition-colors">
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
                           {newsItem.title}
                         </h3>
                         <p className="text-gray-600 mb-4 line-clamp-2">
                           {newsItem.description}
                         </p>
-                        <div className="flex items-center text-emerald-600 font-medium group-hover:translate-x-2 transition-transform">
-                          <span>ادامه مطلب</span>
-                          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                          </svg>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>{newsItem.date}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              {newsItem.views}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleLike(newsItem._id);
+                              }}
+                              className={`flex items-center transition-colors ${
+                                likedNews.has(newsItem._id) ? 'text-emerald-500' : 'text-gray-500 hover:text-emerald-500'
+                              }`}
+                            >
+                              <svg
+                                className={`w-4 h-4 ml-1 ${likedNews.has(newsItem._id) ? 'fill-current' : 'fill-none'}`}
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                              {newsItem.likes}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleShare(newsItem);
+                              }}
+                              className="text-gray-500 hover:text-emerald-500 transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
-                      </Link>
-                    </div>
+                      </div>
+                    </Link>
                   </article>
                 ))}
               </div>

@@ -158,6 +158,24 @@ const defaultContent: Record<string, Record<string, any>> = {
         }
       ]
     }
+  },
+  contact: {
+    main: {
+      title: 'تماس با ما',
+      description: 'برای ارتباط با ما می‌توانید از طریق فرم زیر یا اطلاعات تماس با ما در ارتباط باشید.',
+      address: 'بلوار دانش آموز، دانش آموز 10',
+      phone: '+985138932030',
+      email: 'info@merajschool.ir',
+      socialMedia: {
+        instagram: 'https://www.instagram.com/merajschool/',
+        twitter: '@MerajSchoolIR'
+      },
+      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3257.1234567890123!2d59.12345678901234!3d36.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDA3JzI0LjUiTiA1OcKwMDcnMjQuNSJF!5e0!3m2!1sen!2sir!4v1234567890123!5m2!1sen!2sir',
+      mapLocation: {
+        lat: 36.2972,
+        lng: 59.6067
+      }
+    }
   }
 };
 

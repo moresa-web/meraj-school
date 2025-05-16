@@ -5,6 +5,7 @@ import HeroSection from '../../components/HeroSection/HeroSection';
 import EditableContent from '../../components/EditableContent/EditableContent';
 import { useAuth } from '../../contexts/AuthContext';
 import ContactForm from './ContactForm';
+import SEO from '../../components/SEO';
 
 interface ContactContent {
   heroTitle: string;
@@ -20,22 +21,23 @@ interface ContactContent {
     location: string;
   };
   mapUrl: string;
+  mapLocation: { lat: number; lng: number };
 }
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://mohammadrezasardashti.ir/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Contact: React.FC = () => {
   const { user } = useAuth();
 
   // --- متغیرهای Helmet ---
-  const title = process.env.REACT_APP_CONTACT_TITLE || 'تماس با ما - دبیرستان پسرانه معراج';
+  const title = import.meta.env.VITE_CONTACT_TITLE || 'تماس با ما - دبیرستان پسرانه معراج';
   const description =
-    process.env.REACT_APP_CONTACT_DESCRIPTION ||
+    import.meta.env.VITE_CONTACT_DESCRIPTION ||
     'راه‌های ارتباطی و پشتیبانی با دبیرستان پسرانه معراج؛ شامل فرم ارسال پیام، اطلاعات تماس و موقعیت مکانی.';
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://merajschool.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
   const pagePath = '/contact';
   const fullUrl = `${siteUrl}${pagePath}`;
-  const ogImagePath = process.env.REACT_APP_OG_IMAGE_PATH || '/images/logo.png';
+  const ogImagePath = import.meta.env.VITE_OG_IMAGE_PATH || '/images/logo.png';
   const ogImage = `${siteUrl}${ogImagePath}`;
 
   const structuredData = {
@@ -46,7 +48,7 @@ const Contact: React.FC = () => {
     "description": description,
     "mainEntity": {
       "@type": "Organization",
-      "name": process.env.REACT_APP_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+      "name": import.meta.env.VITE_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
       "url": siteUrl,
       "contactPoint": {
         "@type": "ContactPoint",
@@ -74,8 +76,14 @@ const Contact: React.FC = () => {
       location: 'موقعیت مکانی'
     },
     mapUrl:
-      'https://www.google.com/maps/embed?pb=!1m18...'
+      'https://www.google.com/maps/embed?pb=!1m18...',
+    mapLocation: { lat: 36.2972, lng: 59.6067 }
   });
+
+  // --- وضعیت برای ویرایش موقعیت مکانی ---
+  const [showMapLocationModal, setShowMapLocationModal] = useState(false);
+  const [editLat, setEditLat] = useState(content.mapLocation?.lat || 36.2972);
+  const [editLng, setEditLng] = useState(content.mapLocation?.lng || 59.6067);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -111,16 +119,14 @@ const Contact: React.FC = () => {
   const handleSave = async (field: keyof ContactContent, newValue: any) => {
     try {
       const updatedContent = { ...content, [field]: newValue };
-
       const response = await fetch(`${API_URL}/content/contact/main`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(updatedContent)
+        body: JSON.stringify({ ...updatedContent, mapLocation: content.mapLocation, mapUrl: content.mapUrl })
       });
-
       if (response.ok) {
         setContent(updatedContent);
       } else {
@@ -182,8 +188,40 @@ const Contact: React.FC = () => {
     }
   };
 
+  const handleMapLocationSave = async () => {
+    try {
+      const updatedContent = {
+        ...content,
+        mapLocation: { lat: editLat, lng: editLng }
+      };
+      const response = await fetch(`${API_URL}/content/contact/main`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ ...updatedContent, mapUrl: content.mapUrl })
+      });
+      if (response.ok) {
+        setContent(updatedContent);
+        setShowMapLocationModal(false);
+      } else {
+        throw new Error('Failed to update map location');
+      }
+    } catch (error) {
+      console.error('Error updating map location:', error);
+      alert('خطا در به‌روزرسانی موقعیت مکانی');
+    }
+  };
+
   return (
     <>
+      <SEO
+        title="تماس با ما | دبیرستان پسرانه معراج"
+        description="راه‌های ارتباطی با دبیرستان پسرانه معراج مشهد. آدرس، شماره تماس، ایمیل و فرم ارتباط با ما. پاسخگویی به سوالات والدین و دانش‌آموزان."
+        keywords="تماس با مدرسه, آدرس مدرسه, شماره تماس مدرسه, ایمیل مدرسه, فرم ارتباط با ما, دبیرستان معراج"
+        url="/contact"
+      />
       <Helmet>
         {/* عنوان و توضیحات متا */}
         <title>{title}</title>
@@ -330,74 +368,81 @@ const Contact: React.FC = () => {
                       />
                     </h2>
                     {user?.role === 'admin' && (
-                      <div className="relative">
-                        <button
-                          onClick={() => {
-                            const modal = document.createElement('div');
-                            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-
-                            const modalContent = document.createElement('div');
-                            modalContent.className = 'bg-white rounded-lg p-6 w-full max-w-lg';
-
-                            const title = document.createElement('h3');
-                            title.className = 'text-lg font-semibold mb-4';
-                            title.textContent = 'ویرایش لینک نقشه';
-
-                            const input = document.createElement('input');
-                            input.type = 'text';
-                            input.id = 'mapUrlInput';
-                            input.className = 'w-full px-4 py-2 border rounded-lg mb-4';
-                            input.value = content.mapUrl;
-
-                            const buttonContainer = document.createElement('div');
-                            buttonContainer.className = 'flex justify-end gap-2';
-
-                            const cancelButton = document.createElement('button');
-                            cancelButton.className = 'px-4 py-2 text-gray-600 hover:text-gray-800';
-                            cancelButton.textContent = 'انصراف';
-                            cancelButton.onclick = () => modal.remove();
-
-                            const saveButton = document.createElement('button');
-                            saveButton.className = 'px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700';
-                            saveButton.textContent = 'ذخیره';
-                            saveButton.onclick = async () => {
-                              const newValue = input.value;
-                              try {
-                                const response = await fetch(`${API_URL}/content/contact/main`, {
-                                  method: 'PUT',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                                  },
-                                  body: JSON.stringify({ ...content, mapUrl: newValue })
-                                });
-
-                                if (response.ok) {
-                                  window.location.reload();
-                                } else {
+                      <div className="flex gap-2">
+                        {/* دکمه ویرایش لینک نقشه */}
+                        <div className="relative">
+                          <button
+                            onClick={() => {
+                              const modal = document.createElement('div');
+                              modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                              const modalContent = document.createElement('div');
+                              modalContent.className = 'bg-white rounded-lg p-6 w-full max-w-lg';
+                              const title = document.createElement('h3');
+                              title.className = 'text-lg font-semibold mb-4';
+                              title.textContent = 'ویرایش لینک نقشه';
+                              const input = document.createElement('input');
+                              input.type = 'text';
+                              input.id = 'mapUrlInput';
+                              input.className = 'w-full px-4 py-2 border rounded-lg mb-4';
+                              input.value = content.mapUrl;
+                              const buttonContainer = document.createElement('div');
+                              buttonContainer.className = 'flex justify-end gap-2';
+                              const cancelButton = document.createElement('button');
+                              cancelButton.className = 'px-4 py-2 text-gray-600 hover:text-gray-800';
+                              cancelButton.textContent = 'انصراف';
+                              cancelButton.onclick = () => modal.remove();
+                              const saveButton = document.createElement('button');
+                              saveButton.className = 'px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700';
+                              saveButton.textContent = 'ذخیره';
+                              saveButton.onclick = async () => {
+                                const newValue = input.value;
+                                try {
+                                  const response = await fetch(`${API_URL}/content/contact/main`, {
+                                    method: 'PUT',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                    },
+                                    body: JSON.stringify({ ...content, mapUrl: newValue, mapLocation: content.mapLocation })
+                                  });
+                                  if (response.ok) {
+                                    window.location.reload();
+                                  } else {
+                                    alert('خطا در به‌روزرسانی لینک نقشه');
+                                  }
+                                } catch (error) {
+                                  console.error('Error updating map URL:', error);
                                   alert('خطا در به‌روزرسانی لینک نقشه');
                                 }
-                              } catch (error) {
-                                console.error('Error updating map URL:', error);
-                                alert('خطا در به‌روزرسانی لینک نقشه');
-                              }
-                              modal.remove();
-                            };
-
-                            buttonContainer.appendChild(cancelButton);
-                            buttonContainer.appendChild(saveButton);
-
-                            modalContent.appendChild(title);
-                            modalContent.appendChild(input);
-                            modalContent.appendChild(buttonContainer);
-
-                            modal.appendChild(modalContent);
-                            document.body.appendChild(modal);
+                                modal.remove();
+                              };
+                              buttonContainer.appendChild(cancelButton);
+                              buttonContainer.appendChild(saveButton);
+                              modalContent.appendChild(title);
+                              modalContent.appendChild(input);
+                              modalContent.appendChild(buttonContainer);
+                              modal.appendChild(modalContent);
+                              document.body.appendChild(modal);
+                            }}
+                            className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-emerald-200 transition-colors"
+                          >
+                            <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                        </div>
+                        {/* دکمه ویرایش lat/lng */}
+                        <button
+                          onClick={() => {
+                            setEditLat(content.mapLocation?.lat || 36.2972);
+                            setEditLng(content.mapLocation?.lng || 59.6067);
+                            setShowMapLocationModal(true);
                           }}
-                          className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-emerald-200 transition-colors"
+                          className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 transition-colors"
+                          title="ویرایش موقعیت مکانی (lat/lng)"
                         >
-                          <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                           </svg>
                         </button>
                       </div>
@@ -420,6 +465,43 @@ const Contact: React.FC = () => {
           </div>
         </section>
       </div>
+
+      {/* modal ویرایش lat/lng */}
+      {showMapLocationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">ویرایش موقعیت مکانی (lat/lng)</h3>
+            <div className="mb-4">
+              <label className="block mb-1">Latitude (عرض جغرافیایی)</label>
+              <input
+                type="number"
+                value={editLat}
+                onChange={e => setEditLat(Number(e.target.value))}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1">Longitude (طول جغرافیایی)</label>
+              <input
+                type="number"
+                value={editLng}
+                onChange={e => setEditLng(Number(e.target.value))}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                onClick={() => setShowMapLocationModal(false)}
+              >انصراف</button>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                onClick={handleMapLocationSave}
+              >ذخیره</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
