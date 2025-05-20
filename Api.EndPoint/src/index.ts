@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import uploadRoutes from './routes/upload';
+import routes from './routes';
 
 // لود کردن متغیرهای محیطی
 dotenv.config();
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
-app.use('/api/upload', uploadRoutes);
+app.use('/api', routes);
 
 // اتصال به دیتابیس
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/meraj')
