@@ -13,13 +13,13 @@ router.get('/stats', async (req, res) => {
       recentClasses,
       recentNews
     ] = await Promise.all([
-      Class.countDocuments(),
-      Newsletter.countDocuments(),
-      Class.find()
+      Class.countDocuments({ isActive: true }),
+      Newsletter.countDocuments({ active: true }),
+      Class.find({ isActive: true })
         .sort({ startDate: -1 })
         .limit(5)
         .select('title teacher startDate'),
-      News.find()
+      News.find({ isPublished: true })
         .sort({ createdAt: -1 })
         .limit(5)
         .select('title createdAt')
