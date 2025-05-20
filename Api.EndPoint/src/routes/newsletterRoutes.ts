@@ -1,16 +1,40 @@
 import express from 'express';
-import { subscribeToNewsletter, unsubscribeFromNewsletter, getSubscribers } from '../controllers/newsletterController';
 import { authMiddleware, isAdmin } from '../middleware/auth.middleware';
+import {
+  getNewsletters,
+  getNewsletter,
+  createNewsletter,
+  updateNewsletter,
+  deleteNewsletter,
+  sendNewsletter,
+  subscribeToNewsletter,
+  unsubscribeFromNewsletter,
+  getSubscribers,
+  deleteSubscriber,
+  deactivateSubscriber,
+  activateSubscriber
+} from '../controllers/newsletterController';
 
 const router = express.Router();
 
-// مسیر عمومی برای ثبت نام در خبرنامه - بدون نیاز به احراز هویت
+// مسیرهای عمومی برای مشترکین
 router.post('/subscribe', subscribeToNewsletter);
-
-// مسیر عمومی برای لغو اشتراک از خبرنامه - بدون نیاز به احراز هویت
 router.post('/unsubscribe', unsubscribeFromNewsletter);
 
-// مسیر مدیریتی برای دریافت لیست مشترکین - نیازمند احراز هویت و دسترسی ادمین
+// مسیرهای مدیریتی برای خبرنامه‌ها
+router.get('/', authMiddleware, isAdmin, getNewsletters);
+// مسیر مدیریتی برای دریافت لیست مشترکین - باید قبل از مسیر با پارامتر باشد
 router.get('/subscribers', authMiddleware, isAdmin, getSubscribers);
+router.get('/:id', authMiddleware, isAdmin, getNewsletter);
+router.post('/', authMiddleware, isAdmin, createNewsletter);
+router.put('/:id', authMiddleware, isAdmin, updateNewsletter);
+router.delete('/:id', authMiddleware, isAdmin, deleteNewsletter);
+router.post('/:id/send', authMiddleware, isAdmin, sendNewsletter);
+// مسیر مدیریتی برای حذف مشترک خبرنامه
+router.delete('/subscribers/:id', authMiddleware, isAdmin, deleteSubscriber);
+// مسیر مدیریتی برای غیرفعال کردن مشترک خبرنامه
+router.patch('/subscribers/:id/deactivate', authMiddleware, isAdmin, deactivateSubscriber);
+// مسیر مدیریتی برای فعال‌سازی مشترک خبرنامه
+router.patch('/subscribers/:id/activate', authMiddleware, isAdmin, activateSubscriber);
 
 export default router; 

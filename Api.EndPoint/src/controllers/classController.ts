@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { Class, IClass } from '../models/Class';
 import path from 'path';
 import fs from 'fs';
+import { sendEmail } from '../utils/mailer';
+import Newsletter from '../models/Newsletter';
+import { getActiveTemplateByType, sendTemplatedEmail } from '../utils/emailTemplate';
 
 // دریافت همه کلاس‌ها
 export const getAllClasses = async (req: Request, res: Response) => {
@@ -83,6 +86,32 @@ export const createClass = async (req: Request, res: Response) => {
     });
 
     await classData.save();
+
+    // ارسال ایمیل به مشترکین خبرنامه
+    try {
+      const subscribers = await Newsletter.find({ active: true });
+      const template = await getActiveTemplateByType('new_class');
+
+      if (template && subscribers.length > 0) {
+        const variables = {
+          title: classData.title,
+          description: classData.description,
+          teacher: classData.teacher,
+          schedule: classData.schedule,
+          capacity: classData.capacity,
+          startDate: new Date(classData.startDate).toLocaleDateString('fa-IR'),
+          endDate: new Date(classData.endDate).toLocaleDateString('fa-IR'),
+          image: `${process.env.API_URL}${classData.image}`
+        };
+
+        for (const subscriber of subscribers) {
+          await sendTemplatedEmail(template, subscriber.email, variables);
+        }
+      }
+    } catch (error) {
+      console.error('خطا در ارسال ایمیل به مشترکین:', error);
+    }
+
     res.status(201).json(classData);
   } catch (error) {
     console.error('Error creating class:', error);

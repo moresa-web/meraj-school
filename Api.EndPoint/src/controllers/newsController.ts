@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import News, { INews } from '../models/News';
+import Newsletter from '../models/Newsletter';
 import path from 'path';
 import fs from 'fs';
 import slugify from 'slugify';
+import { sendEmail } from '../utils/mailer';
+import { getActiveTemplateByType, sendTemplatedEmail } from '../utils/emailTemplate';
 
 // Get all news with filtering and sorting
 export const getNews = async (req: Request, res: Response) => {
@@ -122,6 +125,28 @@ export const createNews = async (req: Request, res: Response) => {
     });
 
     await news.save();
+
+    // ارسال ایمیل به مشترکین خبرنامه
+    try {
+      const subscribers = await Newsletter.find({ active: true });
+      const template = await getActiveTemplateByType('new_news');
+
+      if (template && subscribers.length > 0) {
+        const variables = {
+          title: news.title,
+          content: news.content,
+          image: news.image.startsWith('http') ? news.image : `${process.env.API_URL}${news.image}`,
+          date: news.date
+        };
+
+        for (const subscriber of subscribers) {
+          await sendTemplatedEmail(template, subscriber.email, variables);
+        }
+      }
+    } catch (error) {
+      console.error('خطا در ارسال ایمیل به مشترکین:', error);
+    }
+
     res.status(201).json(news);
   } catch (error) {
     console.error('Error creating news:', error);
