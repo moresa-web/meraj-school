@@ -7,8 +7,6 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
 import { 
   AcademicCapIcon, 
-  UserGroupIcon, 
-  UserIcon, 
   NewspaperIcon 
 } from '@heroicons/react/24/outline'
 
@@ -27,26 +25,12 @@ export default function Home() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">داشبورد</h1>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2">
         <StatCard 
           title="کلاس‌ها" 
           value={stats?.totalClasses || 0}
           icon={<AcademicCapIcon className="w-6 h-6" />}
           color="emerald"
-        />
-        
-        <StatCard 
-          title="دانش‌آموزان" 
-          value={stats?.totalStudents || 0}
-          icon={<UserGroupIcon className="w-6 h-6" />}
-          color="blue"
-        />
-
-        <StatCard 
-          title="معلمان" 
-          value={stats?.totalTeachers || 0}
-          icon={<UserIcon className="w-6 h-6" />}
-          color="purple"
         />
         
         <StatCard 
