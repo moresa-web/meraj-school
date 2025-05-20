@@ -1,20 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 
-interface DashboardStats {
+interface RecentClass {
+  id: string
+  title: string
+  teacher: string
+  startDate: string
+}
+
+interface RecentNews {
+  id: string
+  title: string
+  createdAt: string
+}
+
+export interface DashboardStats {
   totalClasses: number
   totalNewsletters: number
-  recentClasses: Array<{
-    id: string
-    title: string
-    teacher: string
-    startDate: string
-  }>
-  recentNews: Array<{
-    id: string
-    title: string
-    createdAt: string
-  }>
+  recentClasses: RecentClass[]
+  recentNews: RecentNews[]
+  totalNews: number
+  totalActiveNews: number
+  totalActiveClasses: number
+  totalActiveNewsletters: number
 }
 
 export function useDashboardStats() {
@@ -24,7 +32,7 @@ export function useDashboardStats() {
       const { data } = await api.get('/api/dashboard/stats')
       return data
     },
-    staleTime: 5 * 60 * 1000, // 5 دقیقه
-    retry: 1
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 3
   })
 } 
