@@ -5,15 +5,11 @@ export async function GET() {
   try {
     const [
       totalClasses,
-      totalStudents,
-      totalTeachers,
       totalNewsletters,
       recentClasses,
       recentNews
     ] = await Promise.all([
       prisma.class.count(),
-      prisma.student.count(),
-      prisma.teacher.count(),
       prisma.newsletter.count(),
       prisma.class.findMany({
         take: 5,
@@ -38,8 +34,6 @@ export async function GET() {
 
     return NextResponse.json({
       totalClasses,
-      totalStudents,
-      totalTeachers,
       totalNewsletters,
       recentClasses,
       recentNews

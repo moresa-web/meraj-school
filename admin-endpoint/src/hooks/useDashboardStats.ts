@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { api } from '@/services/api'
+import api from '@/services/api'
 
 interface DashboardStats {
   totalClasses: number
-  totalStudents: number
-  totalTeachers: number
   totalNewsletters: number
   recentClasses: Array<{
     id: string
