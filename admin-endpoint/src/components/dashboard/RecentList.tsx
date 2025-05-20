@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { formatDate } from '@/utils/format'
+import { format } from 'date-fns'
+import { faIR } from 'date-fns/locale'
 
 interface RecentItem {
   id: string
@@ -9,33 +10,37 @@ interface RecentItem {
 }
 
 interface RecentListProps {
-  title: string
   items: RecentItem[]
   emptyMessage: string
 }
 
-export function RecentList({ title, items, emptyMessage }: RecentListProps) {
+export function RecentList({ items, emptyMessage }: RecentListProps) {
+  if (items.length === 0) {
+    return (
+      <p className="text-sm text-gray-500 text-center py-4">{emptyMessage}</p>
+    )
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
-      
-      {items.length === 0 ? (
-        <p className="text-gray-500 text-sm">{emptyMessage}</p>
-      ) : (
-        <ul className="space-y-3">
-          {items.map((item) => (
-            <li key={item.id}>
-              <Link 
-                href={item.link}
-                className="flex items-center justify-between hover:bg-gray-50 p-2 rounded-md transition-colors"
-              >
-                <span className="text-gray-700">{item.title}</span>
-                <span className="text-sm text-gray-500">{formatDate(item.date)}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="space-y-4">
+      {items.map((item) => (
+        <Link
+          key={item.id}
+          href={item.link}
+          className="block p-4 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {item.title}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                {format(new Date(item.date), 'd MMMM yyyy', { locale: faIR })}
+              </p>
+            </div>
+          </div>
+        </Link>
+      ))}
     </div>
   )
 } 

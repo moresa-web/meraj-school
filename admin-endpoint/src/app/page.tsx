@@ -8,7 +8,8 @@ import { ErrorMessage } from '@/components/common/ErrorMessage'
 import { NewsletterChart } from '@/components/NewsletterChart'
 import { 
   AcademicCapIcon, 
-  NewspaperIcon 
+  NewspaperIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
 
 export default function Home() {
@@ -23,51 +24,95 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">داشبورد</h1>
-      
-      <div className="grid gap-6 md:grid-cols-2">
-        <StatCard 
-          title="کلاس‌ها" 
-          value={stats?.totalClasses || 0}
-          icon={<AcademicCapIcon className="w-6 h-6" />}
-          color="emerald"
-        />
-        
-        <StatCard 
-          title="خبرنامه‌ها" 
-          value={stats?.totalNewsletters || 0}
-          icon={<NewspaperIcon className="w-6 h-6" />}
-          color="orange"
-        />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="md:col-span-2">
-          <NewsletterChart />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">داشبورد</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            مدیریت و نظارت بر عملکرد سیستم
+          </p>
         </div>
 
-        <RecentList
-          title="کلاس‌های اخیر"
-          items={stats?.recentClasses.map(cls => ({
-            id: cls.id,
-            title: cls.title,
-            date: cls.startDate,
-            link: `/classes/${cls.id}`
-          })) || []}
-          emptyMessage="هیچ کلاسی یافت نشد"
-        />
+        {/* کارت‌های آمار */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <StatCard 
+            title="کلاس‌های فعال" 
+            value={stats?.totalClasses || 0}
+            icon={<AcademicCapIcon className="w-8 h-8" />}
+            color="emerald"
+            className="bg-white"
+          />
+          
+          <StatCard 
+            title="مشترکان خبرنامه" 
+            value={stats?.totalNewsletters || 0}
+            icon={<NewspaperIcon className="w-8 h-8" />}
+            color="orange"
+            className="bg-white"
+          />
 
-        <RecentList
-          title="اخبار اخیر"
-          items={stats?.recentNews.map(news => ({
-            id: news.id,
-            title: news.title,
-            date: news.createdAt,
-            link: `/news/${news.id}`
-          })) || []}
-          emptyMessage="هیچ خبری یافت نشد"
-        />
+          <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">آمار کلی</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                مشاهده آمار و گزارشات
+              </p>
+            </div>
+            <ChartBarIcon className="w-8 h-8 text-blue-500" />
+          </div>
+        </div>
+
+        {/* نمودار و لیست‌های اخیر */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* نمودار تاریخچه خبرنامه */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow">
+            <div className="p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                تاریخچه مشترکان خبرنامه
+              </h2>
+              <div className="h-[400px]">
+                <NewsletterChart />
+              </div>
+            </div>
+          </div>
+
+          {/* لیست‌های اخیر */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  کلاس‌های اخیر
+                </h2>
+                <RecentList
+                  items={stats?.recentClasses.map(cls => ({
+                    id: cls.id,
+                    title: cls.title,
+                    date: cls.startDate,
+                    link: `/classes/${cls.id}`
+                  })) || []}
+                  emptyMessage="هیچ کلاسی یافت نشد"
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  اخبار اخیر
+                </h2>
+                <RecentList
+                  items={stats?.recentNews.map(news => ({
+                    id: news.id,
+                    title: news.title,
+                    date: news.createdAt,
+                    link: `/news/${news.id}`
+                  })) || []}
+                  emptyMessage="هیچ خبری یافت نشد"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
