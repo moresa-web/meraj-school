@@ -1,6 +1,5 @@
 'use client'
 
-import { Metadata } from 'next'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { RecentList } from '@/components/dashboard/RecentList'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
@@ -12,11 +11,6 @@ import {
   UserIcon, 
   NewspaperIcon 
 } from '@heroicons/react/24/outline'
-
-export const metadata: Metadata = {
-  title: 'داشبورد - پنل مدیریت دبیرستان معراج',
-  description: 'داشبورد مدیریت دبیرستان معراج',
-}
 
 export default function Home() {
   const { data: stats, isLoading, error } = useDashboardStats()
