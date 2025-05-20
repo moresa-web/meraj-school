@@ -1,8 +1,9 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import Class from '../models/Class';
+import News from '../models/News';
+import Newsletter from '../models/Newsletter';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router.get('/stats', async (req, res) => {
   try {
@@ -12,27 +13,16 @@ router.get('/stats', async (req, res) => {
       recentClasses,
       recentNews
     ] = await Promise.all([
-      prisma.class.count(),
-      prisma.newsletter.count(),
-      prisma.class.findMany({
-        take: 5,
-        orderBy: { startDate: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          teacher: true,
-          startDate: true
-        }
-      }),
-      prisma.news.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          createdAt: true
-        }
-      })
+      Class.countDocuments(),
+      Newsletter.countDocuments(),
+      Class.find()
+        .sort({ startDate: -1 })
+        .limit(5)
+        .select('title teacher startDate'),
+      News.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select('title createdAt')
     ]);
 
     res.json({
