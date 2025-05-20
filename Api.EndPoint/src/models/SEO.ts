@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISEO extends Document {
   title: string;
   description: string;
-  keywords: string;
+  keywords: string[];
   image: string;
   siteUrl: string;
   schoolName: string;
@@ -19,7 +19,7 @@ export interface ISEO extends Document {
 const SEOSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  keywords: { type: String, required: true },
+  keywords: [{ type: String, required: true }],
   image: { type: String, required: true },
   siteUrl: { type: String, required: true },
   schoolName: { type: String, required: true },
