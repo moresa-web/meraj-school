@@ -7,7 +7,8 @@
     "commitLanguage": "نوشتن پیام commit به زبان فارسی و به صورت معنادار",
     "autoPush": "push کردن تغییرات به remote repository بلافاصله بعد از commit",
     "commitAfterAccept": "commit کردن تغییرات بلافاصله بعد از تأیید (Accept) تغییرات توسط کاربر",
-    "rollback": "برگرداندن پروژه به نسخه قبلی با استفاده از git revert یا git reset در صورت درخواست کاربر"
+    "rollback": "برگرداندن پروژه به نسخه قبلی با استفاده از git revert یا git reset در صورت درخواست کاربر",
+    "pushOnCommand": "push کردن تغییرات به remote repository فقط زمانی که کاربر دستور 'git push' را صادر کند"
   },
   "ui": {
     "consistency": "اعمال تغییرات ظاهری در تمام صفحات مرتبط در پروژه‌های admin-endpoint و site-endpoint",
