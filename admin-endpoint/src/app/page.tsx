@@ -42,9 +42,11 @@ export default function Home() {
         />
       </div>
 
-      <NewsletterChart />
-
       <div className="grid gap-6 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <NewsletterChart />
+        </div>
+
         <RecentList
           title="کلاس‌های اخیر"
           items={stats?.recentClasses.map(cls => ({
