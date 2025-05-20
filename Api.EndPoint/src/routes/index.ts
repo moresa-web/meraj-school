@@ -8,6 +8,7 @@ import contentRoutes from './content';
 import pageContentRoutes from './pageContent.routes';
 import seoRoutes from './seo';
 import uploadRoutes from './upload';
+import dashboardRoutes from './dashboard';
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/content', contentRoutes);
 router.use('/page-content', pageContentRoutes);
 router.use('/seo', seoRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router; 
