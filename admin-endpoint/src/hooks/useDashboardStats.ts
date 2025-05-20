@@ -21,13 +21,8 @@ export function useDashboardStats() {
   return useQuery<DashboardStats>({
     queryKey: ['dashboardStats'],
     queryFn: async () => {
-      try {
-        const response = await api.get('/dashboard/stats')
-        return response.data
-      } catch (error) {
-        console.error('خطا در دریافت آمار داشبورد:', error)
-        throw error
-      }
+      const { data } = await api.get('/dashboard/stats')
+      return data
     },
     staleTime: 5 * 60 * 1000, // 5 دقیقه
     retry: 1
