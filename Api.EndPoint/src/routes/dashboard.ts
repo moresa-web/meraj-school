@@ -1,5 +1,5 @@
 import express from 'express';
-import Class from '../models/Class';
+import { Class } from '../models/Class';
 import News from '../models/News';
 import Newsletter from '../models/Newsletter';
 
