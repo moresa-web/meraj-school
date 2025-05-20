@@ -9,7 +9,8 @@ import { NewsletterChart } from '@/components/NewsletterChart'
 import { 
   AcademicCapIcon, 
   NewspaperIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline'
 
 export default function Home() {
@@ -37,7 +38,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard 
             title="کلاس‌های فعال" 
-            value={stats?.totalClasses || 0}
+            value={stats?.totalActiveClasses || 0}
             icon={<AcademicCapIcon className="w-8 h-8" />}
             color="emerald"
             className="bg-white"
@@ -45,21 +46,19 @@ export default function Home() {
           
           <StatCard 
             title="مشترکان خبرنامه" 
-            value={stats?.totalNewsletters || 0}
+            value={stats?.totalActiveNewsletters || 0}
             icon={<NewspaperIcon className="w-8 h-8" />}
             color="orange"
             className="bg-white"
           />
 
-          <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">آمار کلی</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                مشاهده آمار و گزارشات
-              </p>
-            </div>
-            <ChartBarIcon className="w-8 h-8 text-blue-500" />
-          </div>
+          <StatCard 
+            title="اخبار منتشر شده" 
+            value={stats?.totalActiveNews || 0}
+            icon={<DocumentTextIcon className="w-8 h-8" />}
+            color="blue"
+            className="bg-white"
+          />
         </div>
 
         {/* نمودار و لیست‌های اخیر */}
