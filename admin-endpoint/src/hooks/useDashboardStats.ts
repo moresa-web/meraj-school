@@ -21,7 +21,7 @@ export function useDashboardStats() {
   return useQuery<DashboardStats>({
     queryKey: ['dashboardStats'],
     queryFn: async () => {
-      const { data } = await api.get('/dashboard/stats')
+      const { data } = await api.get('/api/dashboard/stats')
       return data
     },
     staleTime: 5 * 60 * 1000, // 5 دقیقه

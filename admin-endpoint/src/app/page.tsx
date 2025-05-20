@@ -5,6 +5,7 @@ import { RecentList } from '@/components/dashboard/RecentList'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
+import { NewsletterChart } from '@/components/NewsletterChart'
 import { 
   AcademicCapIcon, 
   NewspaperIcon 
@@ -40,6 +41,8 @@ export default function Home() {
           color="orange"
         />
       </div>
+
+      <NewsletterChart />
 
       <div className="grid gap-6 md:grid-cols-2">
         <RecentList
