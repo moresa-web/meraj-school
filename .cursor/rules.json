@@ -14,5 +14,11 @@
     "theme": "رعایت تم و استایل‌های یکسان در تمام بخش‌های سایت",
     "responsive": "تضمین responsive بودن تغییرات در تمام دستگاه‌ها",
     "crossProject": "اعمال تغییرات ظاهری در هر دو پروژه admin-endpoint و site-endpoint به صورت همزمان"
+  },
+  "api": {
+    "checkBeforeChange": "بررسی api-endpoint قبل از ایجاد هر تغییری در پروژه‌های admin-endpoint و site-endpoint",
+    "errorHandling": "بررسی و رفع خطاهای ارتباطی با api-endpoint قبل از اعمال تغییرات",
+    "endpointValidation": "تأیید صحت endpoint‌ها و پارامترهای API قبل از ایجاد تغییرات",
+    "versionCompatibility": "اطمینان از سازگاری تغییرات با نسخه فعلی api-endpoint"
   }
 } 
