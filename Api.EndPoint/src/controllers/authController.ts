@@ -277,3 +277,34 @@ export const loginOrRegister = async (req: Request, res: Response) => {
     });
   }
 }; 
+
+// ایجاد کاربر ادمین
+export const createAdmin = async (req: Request, res: Response) => {
+  try {
+    const { email, password, username, studentName, studentPhone, parentPhone } = req.body;
+
+    // بررسی وجود کاربر
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'کاربری با این ایمیل یا نام کاربری قبلاً ثبت‌نام کرده است' });
+    }
+
+    // ایجاد کاربر ادمین
+    const user = new User({
+      username,
+      email,
+      password,
+      role: 'admin',
+      studentName,
+      studentPhone,
+      parentPhone
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: 'کاربر ادمین با موفقیت ایجاد شد' });
+  } catch (error) {
+    console.error('Create admin error:', error);
+    res.status(500).json({ message: 'خطا در ایجاد کاربر ادمین' });
+  }
+}; 

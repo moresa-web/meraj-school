@@ -15,6 +15,7 @@ import seoRoutes from './routes/seo';
 import newsletterRoutes from './routes/newsletterRoutes';
 import { upload } from './controllers/upload.controller';
 import uploadRoutes from './routes/upload';
+import emailTemplateRoutes from './routes/emailTemplate';
 
 // لود کردن متغیرهای محیطی
 dotenv.config();
@@ -25,9 +26,9 @@ const app = express();
 // میدلورها
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? 'http://mohammadrezasardashti.ir'
-    : ['http://localhost:5173', 'http://mohammadrezasardashti.ir'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    ? ['http://mohammadrezasardashti.ir', 'http://admin.mohammadrezasardashti.ir']
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
@@ -63,6 +64,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/email-templates', emailTemplateRoutes);
 
 // مسیر آپلود فایل
 app.post('/api/upload', upload.single('image'), (req, res) => {
