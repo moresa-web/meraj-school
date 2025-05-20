@@ -33,7 +33,7 @@ export function NewsletterChart() {
   const { data, isLoading, error } = useQuery<NewsletterStats[]>({
     queryKey: ['newsletterHistory'],
     queryFn: async () => {
-      const { data } = await api.get('/dashboard/newsletter-history');
+      const { data } = await api.get('/api/dashboard/newsletter-history');
       return data;
     }
   });
