@@ -105,7 +105,9 @@ export function NewsletterChart() {
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <Line data={chartData} options={options} />
+      <div className="h-[300px]">
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
 } 
