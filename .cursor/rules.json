@@ -8,5 +8,11 @@
     "autoPush": "push کردن تغییرات به remote repository بلافاصله بعد از commit",
     "commitAfterAccept": "commit کردن تغییرات بلافاصله بعد از تأیید (Accept) تغییرات توسط کاربر",
     "rollback": "برگرداندن پروژه به نسخه قبلی با استفاده از git revert یا git reset در صورت درخواست کاربر"
+  },
+  "ui": {
+    "consistency": "اعمال تغییرات ظاهری در تمام صفحات مرتبط در پروژه‌های admin و site",
+    "theme": "رعایت تم و استایل‌های یکسان در تمام بخش‌های سایت",
+    "responsive": "تضمین responsive بودن تغییرات در تمام دستگاه‌ها",
+    "crossProject": "اعمال تغییرات ظاهری در هر دو پروژه admin و site به صورت همزمان"
   }
 } 
