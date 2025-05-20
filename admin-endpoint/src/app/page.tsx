@@ -1,4 +1,17 @@
+'use client'
+
 import { Metadata } from 'next'
+import { StatCard } from '@/components/dashboard/StatCard'
+import { RecentList } from '@/components/dashboard/RecentList'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
+import { LoadingSpinner } from '@/components/common/LoadingSpinner'
+import { ErrorMessage } from '@/components/common/ErrorMessage'
+import { 
+  AcademicCapIcon, 
+  UserGroupIcon, 
+  UserIcon, 
+  NewspaperIcon 
+} from '@heroicons/react/24/outline'
 
 export const metadata: Metadata = {
   title: 'داشبورد - پنل مدیریت دبیرستان معراج',
@@ -6,30 +19,72 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
+  const { data: stats, isLoading, error } = useDashboardStats()
+
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
+  if (error) {
+    return <ErrorMessage message="خطا در دریافت اطلاعات داشبورد" />
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">داشبورد</h1>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">کلاس‌ها</h2>
-          <p className="text-3xl font-bold text-emerald-600">12</p>
-        </div>
+        <StatCard 
+          title="کلاس‌ها" 
+          value={stats?.totalClasses || 0}
+          icon={<AcademicCapIcon className="w-6 h-6" />}
+          color="emerald"
+        />
         
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">دانش‌آموزان</h2>
-          <p className="text-3xl font-bold text-emerald-600">240</p>
-        </div>
+        <StatCard 
+          title="دانش‌آموزان" 
+          value={stats?.totalStudents || 0}
+          icon={<UserGroupIcon className="w-6 h-6" />}
+          color="blue"
+        />
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">معلمان</h2>
-          <p className="text-3xl font-bold text-emerald-600">24</p>
-        </div>
+        <StatCard 
+          title="معلمان" 
+          value={stats?.totalTeachers || 0}
+          icon={<UserIcon className="w-6 h-6" />}
+          color="purple"
+        />
         
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">خبرنامه‌ها</h2>
-          <p className="text-3xl font-bold text-emerald-600">8</p>
-        </div>
+        <StatCard 
+          title="خبرنامه‌ها" 
+          value={stats?.totalNewsletters || 0}
+          icon={<NewspaperIcon className="w-6 h-6" />}
+          color="orange"
+        />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <RecentList
+          title="کلاس‌های اخیر"
+          items={stats?.recentClasses.map(cls => ({
+            id: cls.id,
+            title: cls.title,
+            date: cls.startDate,
+            link: `/classes/${cls.id}`
+          })) || []}
+          emptyMessage="هیچ کلاسی یافت نشد"
+        />
+
+        <RecentList
+          title="اخبار اخیر"
+          items={stats?.recentNews.map(news => ({
+            id: news.id,
+            title: news.title,
+            date: news.createdAt,
+            link: `/news/${news.id}`
+          })) || []}
+          emptyMessage="هیچ خبری یافت نشد"
+        />
       </div>
     </div>
   )
