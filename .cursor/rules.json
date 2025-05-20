@@ -10,9 +10,9 @@
     "rollback": "برگرداندن پروژه به نسخه قبلی با استفاده از git revert یا git reset در صورت درخواست کاربر"
   },
   "ui": {
-    "consistency": "اعمال تغییرات ظاهری در تمام صفحات مرتبط در پروژه‌های admin و site",
+    "consistency": "اعمال تغییرات ظاهری در تمام صفحات مرتبط در پروژه‌های admin-endpoint و site-endpoint",
     "theme": "رعایت تم و استایل‌های یکسان در تمام بخش‌های سایت",
     "responsive": "تضمین responsive بودن تغییرات در تمام دستگاه‌ها",
-    "crossProject": "اعمال تغییرات ظاهری در هر دو پروژه admin و site به صورت همزمان"
+    "crossProject": "اعمال تغییرات ظاهری در هر دو پروژه admin-endpoint و site-endpoint به صورت همزمان"
   }
 } 
