@@ -22,7 +22,7 @@ export function useDashboardStats() {
     queryKey: ['dashboardStats'],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/dashboard/stats')
+        const response = await api.get('/dashboard/stats')
         return response.data
       } catch (error) {
         console.error('خطا در دریافت آمار داشبورد:', error)
