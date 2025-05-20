@@ -8,7 +8,21 @@ export const getSEO = async (req: Request, res: Response) => {
     
     // If no SEO document exists, create one with default values
     if (!seo) {
-      seo = await SEO.create({});
+      seo = await SEO.create({
+        title: 'عنوان پیش‌فرض',
+        description: 'توضیحات پیش‌فرض',
+        keywords: ['کلمه کلیدی 1', 'کلمه کلیدی 2'],
+        image: '/images/default-og.jpg',
+        siteUrl: 'http://localhost:3000',
+        schoolName: 'نام مدرسه',
+        address: 'آدرس مدرسه',
+        phone: 'شماره تماس',
+        email: 'ایمیل',
+        socialMedia: {
+          instagram: '',
+          twitter: ''
+        }
+      });
     }
     
     res.json(seo);
@@ -44,7 +58,10 @@ export const updateSEO = async (req: Request, res: Response) => {
     // Update fields if they are provided
     if (title) seo.title = title;
     if (description) seo.description = description;
-    if (keywords) seo.keywords = keywords;
+    if (keywords) {
+      // اگر keywords یک رشته است، آن را به آرایه تبدیل می‌کنیم
+      seo.keywords = Array.isArray(keywords) ? keywords : keywords.split(',').map(k => k.trim());
+    }
     if (image) seo.image = image;
     if (siteUrl) seo.siteUrl = siteUrl;
     if (schoolName) seo.schoolName = schoolName;
