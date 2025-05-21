@@ -15,12 +15,12 @@ export function ClassCard({ class: classData }: ClassCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!classData._id) return;
+    if (!classData.id) return;
     
     if (window.confirm('آیا از حذف این کلاس اطمینان دارید؟')) {
       setIsDeleting(true);
       try {
-        await deleteClass.mutateAsync(classData._id);
+        await deleteClass.mutateAsync(classData.id);
       } catch (error) {
         console.error('Error deleting class:', error);
       } finally {
@@ -30,8 +30,8 @@ export function ClassCard({ class: classData }: ClassCardProps) {
   };
 
   const handleEdit = () => {
-    if (!classData._id) return;
-    router.push(`/classes/edit/${classData._id}`);
+    if (!classData.id) return;
+    router.push(`/classes/${classData.id}`);
   };
 
   return (
@@ -63,7 +63,7 @@ export function ClassCard({ class: classData }: ClassCardProps) {
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">{classData.title}</h3>
         <div className="space-y-2 text-sm text-gray-600">
-          <p>استاد: {classData.teacher?.name || 'نامشخص'}</p>
+          <p>استاد: {classData.teacher}</p>
           <p>ظرفیت: {formatNumber(classData.capacity)} نفر</p>
           <p>تاریخ شروع: {formatDate(classData.startDate)}</p>
           <p>زمان: {classData.schedule}</p>

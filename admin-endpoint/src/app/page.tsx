@@ -87,7 +87,7 @@ export default function Home() {
                     id: cls.id,
                     title: cls.title,
                     date: cls.startDate,
-                    link: `/classes/${cls.id}`
+                    link: `/admin/classes/${cls.id}`
                   })) || []}
                   emptyMessage="هیچ کلاسی یافت نشد"
                 />

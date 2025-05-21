@@ -16,6 +16,8 @@ import newsletterRoutes from './routes/newsletterRoutes';
 import { upload } from './controllers/upload.controller';
 import uploadRoutes from './routes/upload';
 import emailTemplateRoutes from './routes/emailTemplate';
+import dashboard from "./routes/dashboard"
+import classesRouter from './routes/classes';
 
 // لود کردن متغیرهای محیطی
 dotenv.config();
@@ -49,13 +51,13 @@ if (!require('fs').existsSync(uploadPath)) {
 app.use('/uploads', express.static(uploadPath));
 
 // اضافه کردن لاگ برای بررسی مسیر
-console.log('App upload path:', uploadPath);
-console.log('App upload path exists:', require('fs').existsSync(uploadPath));
-console.log('App upload path is directory:', require('fs').statSync(uploadPath).isDirectory());
+console.log('Static files path:', uploadPath);
+console.log('Static files path exists:', require('fs').existsSync(uploadPath));
+console.log('Static files path is directory:', require('fs').statSync(uploadPath).isDirectory());
 
 // مسیرهای API
 app.use('/api/auth', authRoutes);
-app.use('/api/classes', classRoutes);
+app.use('/api/classes', classesRouter);
 app.use('/api/news', newsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/page-content', pageContentRoutes);
@@ -65,6 +67,7 @@ app.use('/api/seo', seoRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
+app.use('/api/dashboard', dashboard);
 
 // مسیر آپلود فایل
 app.post('/api/upload', upload.single('image'), (req, res) => {

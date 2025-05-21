@@ -73,7 +73,7 @@ const About: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/content/about/main`);
+        const response = await fetch(`${API_URL}/api/content/about/main`);
         if (response.ok) {
           const data = await response.json();
           setContent({
@@ -95,7 +95,7 @@ const About: React.FC = () => {
     try {
       const updatedContent = { ...content, [field]: newValue };
 
-      const response = await fetch(`${API_URL}/content/about/main`, {
+      const response = await fetch(`${API_URL}/api/content/about/main`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ const About: React.FC = () => {
       const updatedFeatures = [...content.features];
       updatedFeatures[index] = { ...updatedFeatures[index], [field]: newValue };
 
-      const response = await fetch(`${API_URL}/content/about/main`, {
+      const response = await fetch(`${API_URL}/api/content/about/main`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

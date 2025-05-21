@@ -23,11 +23,13 @@ router.get('/stats', async (req, res) => {
       Class.find({ isActive: true })
         .sort({ startDate: -1 })
         .limit(5)
-        .select('title teacher startDate'),
+        .select('title teacher startDate')
+        .lean(),
       News.find({ isPublished: true })
         .sort({ createdAt: -1 })
         .limit(5)
-        .select('title createdAt'),
+        .select('title createdAt')
+        .lean(),
       News.countDocuments(),
       News.countDocuments({ isPublished: true }),
       Class.countDocuments({ isActive: true }),
@@ -37,8 +39,17 @@ router.get('/stats', async (req, res) => {
     res.json({
       totalClasses,
       totalNewsletters,
-      recentClasses,
-      recentNews,
+      recentClasses: recentClasses.map(cls => ({
+        id: cls._id?.toString(),
+        title: cls.title,
+        teacher: cls.teacher,
+        startDate: cls.startDate
+      })),
+      recentNews: recentNews.map(news => ({
+        id: news._id?.toString(),
+        title: news.title,
+        createdAt: (news as any).createdAt?.toString()
+      })),
       totalNews,
       totalActiveNews,
       totalActiveClasses,

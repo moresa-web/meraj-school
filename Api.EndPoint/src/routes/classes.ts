@@ -12,6 +12,7 @@ import {
 } from '../controllers/classController';
 import { auth } from '../middleware/auth';
 import { upload } from '../controllers/upload.controller';
+import { Class } from '../models/Class';
 
 const router = express.Router();
 

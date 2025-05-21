@@ -5,6 +5,13 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Vazirmatn } from 'next/font/google';
+
+const vazirmatn = Vazirmatn({
+  subsets: ['arabic'],
+  display: 'swap',
+  variable: '--font-vazirmatn',
+});
 
 // ایجاد یک نمونه از QueryClient
 const queryClient = new QueryClient({
@@ -23,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
