@@ -1,23 +1,15 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth';
+import { User, IUser } from '../models/User';
+import { auth } from '../middleware/auth';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // دریافت لیست کاربران
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const users = await User.find({}, {
+      password: 0
+    }).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: 'خطا در دریافت لیست کاربران' });
@@ -25,19 +17,9 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // دریافت اطلاعات یک کاربر
-router.get('/:id', authenticateToken, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const user = await User.findById(req.params.id, { password: 0 });
     if (!user) {
       return res.status(404).json({ error: 'کاربر یافت نشد' });
     }
@@ -48,51 +30,65 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // ایجاد کاربر جدید
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password, // در حالت واقعی باید رمزنگاری شود
-        role: role || 'USER',
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    let { username, email, password, role, fullName, phone, studentName, studentPhone, parentPhone } = req.body;
+    if (!username) username = email;
+    if (role === 'student') {
+      studentName = fullName;
+      if (!studentPhone && !parentPhone) {
+        return res.status(400).json({ error: 'حداقل یکی از شماره‌های دانش‌آموز یا والد الزامی است' });
+      }
+      if (!phone) {
+        phone = studentPhone || parentPhone;
+      }
+    }
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ error: 'کاربری با این ایمیل یا نام کاربری قبلاً ثبت شده است' });
+    }
+    const user = new User({
+      username,
+      email,
+      password,
+      role: role || 'user',
+      fullName,
+      phone,
+      studentName,
+      studentPhone,
+      parentPhone
     });
-    res.status(201).json(user);
+    await user.save();
+    const { password: _, ...userWithoutPassword } = user.toObject();
+    res.status(201).json(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ error: 'خطا در ایجاد کاربر' });
   }
 });
 
 // ویرایش کاربر
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
-    const { name, email, role } = req.body;
-    const user = await prisma.user.update({
-      where: { id: req.params.id },
-      data: {
-        name,
-        email,
-        role,
+    const { name, email, role, fullName, phone, studentName, studentPhone, parentPhone } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          name,
+          email,
+          role,
+          fullName,
+          phone,
+          studentName,
+          studentPhone,
+          parentPhone
+        }
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+      { new: true, projection: { password: 0 } }
+    );
+    if (!user) {
+      return res.status(404).json({ error: 'کاربر یافت نشد' });
+    }
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: 'خطا در ویرایش کاربر' });
@@ -100,11 +96,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // حذف کاربر
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
-    await prisma.user.delete({
-      where: { id: req.params.id },
-    });
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'کاربر یافت نشد' });
+    }
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'خطا در حذف کاربر' });
