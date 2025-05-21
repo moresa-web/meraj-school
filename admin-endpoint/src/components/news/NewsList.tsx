@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { News } from '@/types/news';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,6 +15,8 @@ interface NewsListProps {
 }
 
 const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
+  const [search, setSearch] = useState('');
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -23,9 +25,25 @@ const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
     );
   }
 
-  if (news.length === 0) {
+  const searchValue = search.toLowerCase();
+  const filteredNews = news.filter(item =>
+    item.title.toLowerCase().includes(searchValue) ||
+    (item.category && item.category.toLowerCase().includes(searchValue)) ||
+    (item.date && item.date.toLowerCase().includes(searchValue)) ||
+    (item.description && item.description.toLowerCase().includes(searchValue)) ||
+    (item.content && item.content.toLowerCase().includes(searchValue))
+  );
+
+  if (filteredNews.length === 0) {
     return (
       <div className="text-center py-12">
+        <input
+          type="text"
+          placeholder="جستجو در اخبار..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="mb-6 px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 shadow-sm bg-white text-gray-900 placeholder-gray-400 text-base"
+        />
         <p className="text-gray-500 text-lg mb-4">هیچ خبری یافت نشد</p>
         <Link
           href="/news/new"
@@ -41,8 +59,21 @@ const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
   }
 
   return (
+    <div>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <input
+          type="text"
+          placeholder="جستجو در اخبار بر اساس عنوان، دسته‌بندی، تاریخ و ..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 shadow-sm bg-white text-gray-900 placeholder-gray-400 text-base"
+        />
+        <svg className="-ml-10 w-5 h-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {news.map((item) => (
+        {filteredNews.map((item) => (
         <div
           key={item._id}
           className="card group"
@@ -91,6 +122,7 @@ const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 };

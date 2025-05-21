@@ -18,7 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, role?: string, phone?: string, studentPhone?: string, parentPhone?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -90,16 +90,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (
+    name: string, 
+    email: string, 
+    password: string, 
+    role?: string, 
+    phone?: string,
+    studentPhone?: string,
+    parentPhone?: string
+  ) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, {
-        name,
+      let phoneToSend = phone;
+      if (role === 'student') {
+        if (studentPhone) {
+          phoneToSend = studentPhone;
+        } else if (parentPhone) {
+          phoneToSend = parentPhone;
+        } else {
+          throw new Error('حداقل یکی از شماره‌های دانش‌آموز یا والد باید وارد شود');
+        }
+      }
+      // اعتبارسنجی اولیه
+      if (!name || !email || !password || !phoneToSend) {
+        throw new Error('لطفاً تمام فیلدها را پر کنید');
+      }
+
+      // اعتبارسنجی ایمیل
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        throw new Error('فرمت ایمیل نامعتبر است');
+      }
+
+      // اعتبارسنجی رمز عبور
+      if (password.length < 6) {
+        throw new Error('رمز عبور باید حداقل 6 کاراکتر باشد');
+      }
+
+      // اعتبارسنجی شماره تماس
+      const phoneRegex = /^09[0-9]{9}$/;
+      if (!phoneRegex.test(phoneToSend)) {
+        throw new Error('فرمت شماره تماس نامعتبر است');
+      }
+
+      // اعتبارسنجی فیلدهای دانش‌آموز (اگر وارد شده باشند)
+      if (studentPhone && !phoneRegex.test(studentPhone)) {
+        throw new Error('فرمت شماره تلفن دانش‌آموز نامعتبر است');
+      }
+      if (parentPhone && !phoneRegex.test(parentPhone)) {
+        throw new Error('فرمت شماره تلفن والد نامعتبر است');
+      }
+
+      const payload = {
+        fullName: name,
         email,
         password,
-      });
+        phone: phoneToSend,
+        role: role || 'user',
+        studentPhone: studentPhone || undefined,
+        parentPhone: parentPhone || undefined
+      };
+
+      console.log('Sending register request with payload:', { ...payload, password: '***' });
+
+      const response = await axios.post(`${API_URL}/api/auth/register`, payload);
+      console.log('Register response:', response.data);
+
       const { token, user } = response.data;
+      
       if (!token || !user) {
-        throw new Error('Invalid response from server');
+        throw new Error('پاسخ نامعتبر از سرور');
       }
 
       localStorage.setItem('token', token);
@@ -107,9 +166,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       toast.success('ثبت‌نام با موفقیت انجام شد');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'خطا در ثبت‌نام. لطفاً دوباره تلاش کنید.';
+      console.error('Register error:', error);
+      
+      let errorMessage = 'خطا در ثبت‌نام. لطفاً دوباره تلاش کنید.';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
-      throw error;
+      throw new Error(errorMessage);
     }
   };
 

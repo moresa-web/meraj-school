@@ -27,6 +27,7 @@ export default function NewsletterList() {
   const [newEmail, setNewEmail] = useState('');
   const [adding, setAdding] = useState(false);
   const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   const fetchSubscribers = async () => {
     try {
@@ -179,6 +180,13 @@ export default function NewsletterList() {
     }
   };
 
+  const searchValue = search.toLowerCase();
+  const filteredSubscribers = subscribers.filter(sub =>
+    sub.email.toLowerCase().includes(searchValue) ||
+    (sub.active ? 'فعال' : 'غیرفعال').includes(searchValue) ||
+    (sub.subscribedAt && sub.subscribedAt.toLowerCase().includes(searchValue))
+  );
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -199,6 +207,19 @@ export default function NewsletterList() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">خبرنامه‌ها</h1>
+      </div>
+
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <input
+          type="text"
+          placeholder="جستجو در مشترکین بر اساس ایمیل، وضعیت، تاریخ و ..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 shadow-sm bg-white text-gray-900 placeholder-gray-400 text-base"
+        />
+        <svg className="-ml-10 w-5 h-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
       </div>
 
       {/* بخش مشترکین */}
@@ -243,7 +264,7 @@ export default function NewsletterList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {subscribers.map((subscriber) => (
+                {filteredSubscribers.map((subscriber) => (
                   <tr key={subscriber._id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{subscriber.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">

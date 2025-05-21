@@ -1,44 +1,62 @@
 'use client'
 
+import React from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import api from '@/services/api'
-import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { ErrorMessage } from '@/components/common/ErrorMessage'
-import EditClassClient from './edit/EditClassClient'
+import { useClasses } from '@/hooks/useClasses'
+import { useClassStudents } from '@/hooks/useClassStudents'
+import { StudentList } from '@/components/classes/StudentList'
+import { formatDate, getImageUrl } from '@/utils/format'
 
-interface ClassDetails {
-  id: string
-  title: string
-  teacher: string
-  startDate: string
-  description: string
-  isActive: boolean
-}
+export default function ClassDetailsPage() {
+  const { id } = useParams()
+  const { classes, isLoading: isLoadingClass } = useClasses()
+  const { students, isLoading: isLoadingStudents } = useClassStudents(id as string)
 
-export default function ClassEditPage() {
-  const params = useParams()
-  const classId = params.id as string
+  const classItem = classes.find(c => c._id === id)
 
-  const { data: classDetails, isLoading, error } = useQuery({
-    queryKey: ['class', classId],
-    queryFn: async () => {
-      const { data } = await api.get(`/api/classes/${classId}`)
-      return data
-    }
-  })
-
-  if (isLoading) {
-    return <LoadingSpinner />
+  if (isLoadingClass) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    )
   }
 
-  if (error) {
-    return <ErrorMessage message="خطا در دریافت اطلاعات کلاس" />
+  if (!classItem) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">کلاس مورد نظر یافت نشد</h2>
+      </div>
+    )
   }
 
-  if (!classDetails) {
-    return <ErrorMessage message="کلاس مورد نظر یافت نشد" />
-  }
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* اطلاعات کلاس */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div className="flex items-start gap-6">
+          <img
+            src={getImageUrl(classItem.image)}
+            alt={classItem.title}
+            className="w-32 h-32 rounded-lg object-cover"
+          />
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">{classItem.title}</h1>
+            <div className="space-y-2 text-sm text-gray-800">
+              <p className="text-base">استاد: {classItem.teacher}</p>
+              <p className="text-base">ظرفیت: {classItem.capacity} نفر</p>
+              <p className="text-base">تاریخ شروع: {formatDate(classItem.startDate)}</p>
+              <p className="text-base">زمان: {classItem.schedule}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  return <EditClassClient initialData={classDetails} />
+      {/* لیست دانش‌آموزان */}
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-6">لیست دانش‌آموزان ثبت‌نام شده</h2>
+        <StudentList students={students} isLoading={isLoadingStudents} />
+      </div>
+    </div>
+  )
 } 

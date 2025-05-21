@@ -332,7 +332,7 @@ export const unregisterFromClass = async (req: Request, res: Response) => {
     console.error('Unregister error:', error);
     res.status(500).json({ message: 'خطا در انصراف از کلاس' });
   }
-};
+}; 
 
 export const getClassStudents = async (req: Request, res: Response) => {
   try {

@@ -49,7 +49,7 @@ export default function EditClassClient({ initialData }: EditClassClientProps) {
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      await updateClass(initialData.id, formData);
+      await updateClass(initialData._id, formData);
       router.push('/classes');
     } catch (err) {
       console.error('Error updating class:', err);
@@ -68,7 +68,7 @@ export default function EditClassClient({ initialData }: EditClassClientProps) {
         )}
 
         <EditClassForm
-          classId={initialData.id}
+          classId={initialData._id}
           initialData={formData}
           onSubmit={handleSubmit}
           isSubmitting={loading}
