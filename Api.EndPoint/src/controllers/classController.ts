@@ -332,4 +332,26 @@ export const unregisterFromClass = async (req: Request, res: Response) => {
     console.error('Unregister error:', error);
     res.status(500).json({ message: 'خطا در انصراف از کلاس' });
   }
+};
+
+export const getClassStudents = async (req: Request, res: Response) => {
+  try {
+    const classId = req.params.id;
+    const classItem = await Class.findById(classId);
+
+    if (!classItem) {
+      return res.status(404).json({ message: 'کلاس مورد نظر یافت نشد' });
+    }
+
+    // فقط ادمین می‌تواند لیست دانش‌آموزان را ببیند
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ message: 'شما دسترسی لازم برای مشاهده این اطلاعات را ندارید' });
+    }
+
+    // برگرداندن لیست دانش‌آموزان
+    res.json(classItem.registrations || []);
+  } catch (error) {
+    console.error('Get class students error:', error);
+    res.status(500).json({ message: 'خطا در دریافت لیست دانش‌آموزان' });
+  }
 }; 

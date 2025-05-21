@@ -8,7 +8,8 @@ import {
   toggleLike,
   registerForClass,
   checkRegistration,
-  unregisterFromClass
+  unregisterFromClass,
+  getClassStudents
 } from '../controllers/classController';
 import { auth } from '../middleware/auth';
 import { upload } from '../controllers/upload.controller';
@@ -28,5 +29,8 @@ router.post('/:id/unregister', unregisterFromClass); // انصراف از کلا
 router.post('/', auth, upload.single('image'), createClass);           // ایجاد کلاس جدید
 router.put('/:id', auth, upload.single('image'), updateClass);         // بروزرسانی کلاس
 router.delete('/:id', auth, deleteClass);      // حذف کلاس
+
+// مسیرهای ادمین
+router.get('/:id/students', auth, getClassStudents); // اضافه کردن مسیر جدید
 
 export default router; 
