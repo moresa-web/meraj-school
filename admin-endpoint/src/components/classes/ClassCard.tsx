@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Class } from '@/types/class';
 import { useClasses } from '@/hooks/useClasses';
 import { formatDate, formatNumber, getImageUrl } from '@/utils/format';
@@ -15,12 +15,12 @@ export function ClassCard({ class: classData }: ClassCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!classData.id) return;
+    if (!classData._id) return;
     
     if (window.confirm('آیا از حذف این کلاس اطمینان دارید؟')) {
       setIsDeleting(true);
       try {
-        await deleteClass.mutateAsync(classData.id);
+        await deleteClass.mutateAsync(classData._id);
       } catch (error) {
         console.error('Error deleting class:', error);
       } finally {
@@ -30,8 +30,13 @@ export function ClassCard({ class: classData }: ClassCardProps) {
   };
 
   const handleEdit = () => {
-    if (!classData.id) return;
-    router.push(`/classes/${classData.id}`);
+    if (!classData._id) return;
+    router.push(`/classes/${classData._id}/edit`);
+  };
+
+  const handleViewStudents = () => {
+    if (!classData._id) return;
+    router.push(`/classes/${classData._id}`);
   };
 
   return (
@@ -53,10 +58,17 @@ export function ClassCard({ class: classData }: ClassCardProps) {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="p-2 bg-white rounded-full text-red-600 hover:bg-gray-100 transition-colors"
+            className="p-2 bg-white rounded-full text-red-600 hover:bg-gray-100 transition-colors ml-2"
             title="حذف"
           >
             <TrashIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={handleViewStudents}
+            className="p-2 bg-white rounded-full text-emerald-600 hover:bg-gray-100 transition-colors"
+            title="مشاهده دانش‌آموزان ثبت‌نام‌شده"
+          >
+            <EyeIcon className="h-5 w-5" />
           </button>
         </div>
       </div>

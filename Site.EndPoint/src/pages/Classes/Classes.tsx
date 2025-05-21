@@ -12,6 +12,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NoResults from '../../components/NoResults/NoResults';
 import SEO from '../../components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -485,11 +486,16 @@ const Classes: React.FC = () => {
     <>
       <SEO
         title="کلاس‌های تقویتی | دبیرستان پسرانه معراج"
-        description="ثبت‌نام در کلاس‌های تقویتی دبیرستان پسرانه معراج. کلاس‌های ریاضی، فیزیک، شیمی و زیست‌شناسی با اساتید مجرب."
-        keywords="کلاس تقویتی, ریاضی, فیزیک, شیمی, زیست‌شناسی, دبیرستان معراج, مشهد"
+        description="کلاس‌های تقویتی دبیرستان پسرانه معراج مشهد. ثبت‌نام آنلاین در کلاس‌های ریاضی، فیزیک، شیمی و سایر دروس با اساتید برجسته."
+        keywords="کلاس تقویتی, کلاس ریاضی, کلاس فیزیک, کلاس شیمی, ثبت‌نام آنلاین, دبیرستان معراج"
         url="/classes"
       />
-      <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs
+          items={[
+            { label: 'کلاس‌های تقویتی' }
+          ]}
+        />
         <ToastContainer
           position="top-right"
           autoClose={4000}

@@ -7,8 +7,11 @@ const Auth: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    confirmPassword: '',
-    name: ''
+    name: '',
+    phone: '',
+    role: 'user',
+    studentPhone: '',
+    parentPhone: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,10 +27,27 @@ const Auth: React.FC = () => {
       if (isLogin) {
         await login(formData.email, formData.password);
       } else {
-        if (formData.password !== formData.confirmPassword) {
-          throw new Error('رمز عبور و تکرار آن مطابقت ندارند');
+        let phoneToSend = formData.phone;
+        if (formData.role === 'student') {
+          if (formData.studentPhone) {
+            phoneToSend = formData.studentPhone;
+          } else if (formData.parentPhone) {
+            phoneToSend = formData.parentPhone;
+          } else {
+            setError('حداقل یکی از شماره‌های دانش‌آموز یا والد باید وارد شود');
+            setLoading(false);
+            return;
+          }
         }
-        await register(formData.email, formData.password, formData.name);
+        await register(
+          formData.name,
+          formData.email,
+          formData.password,
+          formData.role,
+          phoneToSend,
+          formData.studentPhone,
+          formData.parentPhone
+        );
       }
       navigate('/');
     } catch (err: any) {
@@ -38,6 +58,13 @@ const Auth: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
@@ -91,7 +118,81 @@ const Auth: React.FC = () => {
                 </div>
               )}
 
-              <div className="animate-fade-in-up animation-delay-200">
+              {!isLogin && formData.role !== 'student' && (
+                <div className="animate-fade-in-up animation-delay-150">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                    شماره تماس
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                    placeholder="شماره تماس خود را وارد کنید"
+                  />
+                </div>
+              )}
+
+              {!isLogin && (
+                <>
+                  <div className="animate-fade-in-up animation-delay-200">
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                      نقش
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleSelectChange}
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                    >
+                      <option value="user">کاربر عادی</option>
+                      <option value="student">دانش‌آموز</option>
+                      <option value="parent">والد دانش‌آموز</option>
+                    </select>
+                  </div>
+
+                  {formData.role === 'student' && (
+                    <>
+                      <div className="animate-fade-in-up animation-delay-400">
+                        <label htmlFor="studentPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                          شماره دانش‌آموز (حداقل یکی از این یا شماره والد الزامی است)
+                        </label>
+                        <input
+                          type="tel"
+                          id="studentPhone"
+                          name="studentPhone"
+                          value={formData.studentPhone}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                          placeholder="شماره موبایل دانش‌آموز را وارد کنید"
+                        />
+                      </div>
+
+                      <div className="animate-fade-in-up animation-delay-500">
+                        <label htmlFor="parentPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                          شماره والد (حداقل یکی از این یا شماره دانش‌آموز الزامی است)
+                        </label>
+                        <input
+                          type="tel"
+                          id="parentPhone"
+                          name="parentPhone"
+                          value={formData.parentPhone}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                          placeholder="شماره موبایل والد را وارد کنید"
+                        />
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+
+              <div className="animate-fade-in-up animation-delay-300">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   ایمیل
                 </label>
@@ -107,7 +208,7 @@ const Auth: React.FC = () => {
                 />
               </div>
 
-              <div className="animate-fade-in-up animation-delay-300">
+              <div className="animate-fade-in-up animation-delay-400">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   رمز عبور
                 </label>
@@ -122,24 +223,6 @@ const Auth: React.FC = () => {
                   placeholder="رمز عبور خود را وارد کنید"
                 />
               </div>
-
-              {!isLogin && (
-                <div className="animate-fade-in-up animation-delay-400">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                    تکرار رمز عبور
-                  </label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
-                    placeholder="رمز عبور را تکرار کنید"
-                  />
-                </div>
-              )}
 
               <button
                 type="submit"
@@ -170,8 +253,11 @@ const Auth: React.FC = () => {
                   setFormData({
                     email: '',
                     password: '',
-                    confirmPassword: '',
-                    name: ''
+                    name: '',
+                    phone: '',
+                    role: 'user',
+                    studentPhone: '',
+                    parentPhone: ''
                   });
                 }}
                 className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"

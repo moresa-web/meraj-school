@@ -10,6 +10,7 @@ import {
   EnvelopeIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 const menuItems = [
@@ -42,6 +43,11 @@ const menuItems = [
     name: 'تنظیمات SEO',
     href: '/seo',
     icon: Cog6ToothIcon,
+  },
+  {
+    name: 'مدیریت کاربران',
+    href: '/users',
+    icon: UsersIcon,
   },
 ];
 

@@ -1,14 +1,13 @@
-export function formatDate(dateString: string) {
-  if (!dateString) return '';
+export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const persianDate = new Intl.DateTimeFormat('fa-IR', {
+  return new Intl.DateTimeFormat('fa-IR', {
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    calendar: 'persian'
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   }).format(date);
-  return persianDate;
-}
+};
 
 export function formatNumber(num: number | string) {
   return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
@@ -17,5 +16,8 @@ export function formatNumber(num: number | string) {
 export function getImageUrl(imagePath: string) {
   if (!imagePath) return '/images/placeholder.jpg';
   if (imagePath.startsWith('http')) return imagePath;
+  if (imagePath.startsWith('/uploads')) {
   return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${imagePath}`;
+  }
+  return imagePath;
 } 

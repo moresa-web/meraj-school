@@ -36,10 +36,6 @@ const limiter = rateLimit({
   message: 'تعداد درخواست‌های شما بیش از حد مجاز است. لطفاً کمی صبر کنید.'
 });
 
-// میدلورها
-app.use(helmet()); // اضافه کردن helmet برای امنیت بیشتر
-app.use(limiter); // اضافه کردن rate limiter
-
 // تنظیمات CORS
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? ['http://mohammadrezasardashti.ir', 'http://admin.mohammadrezasardashti.ir']
@@ -75,7 +71,10 @@ if (!require('fs').existsSync(uploadPath)) {
 
 // اضافه کردن هدرهای CORS و CORP برای مسیر /uploads
 app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 });
