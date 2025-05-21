@@ -6,6 +6,8 @@ import { SEO } from '@/types/seo';
 import { toast } from 'react-hot-toast';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { getImageUrl } from '@/utils/format';
+import { cookies, headers } from 'next/headers';
 
 interface SEOFormData {
   title: string;
@@ -22,6 +24,54 @@ interface SEOFormData {
     twitter?: string;
   };
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+// تنظیمات پیش‌فرض axios
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.baseURL = API_URL;
+axios.defaults.timeout = 10000; // 10 seconds timeout
+
+// تنظیم interceptor برای اضافه کردن توکن به همه درخواست‌ها
+axios.interceptors.request.use(async (config) => {
+  try {
+    const response = await fetch('/api/auth/token');
+    const data = await response.json();
+    
+    if (data.token) {
+      config.headers.Authorization = `Bearer ${data.token}`;
+    }
+
+    console.log('Request config:', {
+      ...config,
+      headers: {
+        ...config.headers,
+        Authorization: config.headers.Authorization ? 'Bearer [HIDDEN]' : undefined
+      }
+    });
+  } catch (error) {
+    console.error('Error getting token:', error);
+  }
+  return config;
+});
+
+// تنظیم interceptor برای لاگ کردن پاسخ‌ها
+axios.interceptors.response.use(
+  (response) => {
+    console.log('Response:', response);
+    return response;
+  },
+  (error) => {
+    console.error('Response error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers,
+    });
+    return Promise.reject(error);
+  }
+);
 
 export default function SEOSettingsPage() {
   const { seoList, loading: seoLoading, error, updateSEO, createSEO } = useSEO();
@@ -89,15 +139,35 @@ export default function SEOSettingsPage() {
     setFormData((prev: SEOFormData) => ({ ...prev, keywords }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-        setFormData((prev: SEOFormData) => ({ ...prev, image: URL.createObjectURL(file) }));
-      };
-      reader.readAsDataURL(file);
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data) {
+        const imageUrl = getImageUrl(response.data.url);
+        setPreviewImage(imageUrl);
+        setFormData((prev: SEOFormData) => ({ ...prev, image: response.data.url }));
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          message: error.message,
+          code: error.code,
+          response: error.response?.data,
+          headers: error.response?.headers,
+        });
+        toast.error(error.response?.data?.message || 'خطا در آپلود تصویر');
+      } else {
+        toast.error('خطا در آپلود تصویر');
+      }
     }
   };
 
@@ -248,12 +318,7 @@ export default function SEOSettingsPage() {
                   e.currentTarget.classList.remove('border-emerald-500');
                   const file = e.dataTransfer.files[0];
                   if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setPreviewImage(reader.result as string);
-                      setFormData((prev: SEOFormData) => ({ ...prev, image: URL.createObjectURL(file) }));
-                    };
-                    reader.readAsDataURL(file);
+                    handleImageUpload(file);
                   } else {
                     toast.error('لطفاً فقط فایل تصویر آپلود کنید');
                   }
@@ -263,9 +328,10 @@ export default function SEOSettingsPage() {
                   {previewImage ? (
                     <div className="relative w-full h-48 mb-4">
                       <img
-                        src={previewImage}
+                        src={getImageUrl(previewImage)}
                         alt="تصویر پیش‌فرض"
                         className="w-full h-full object-cover rounded-lg"
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
                       />
                       <button
                         type="button"
@@ -304,7 +370,12 @@ export default function SEOSettingsPage() {
                             name="image"
                             type="file"
                             accept="image/*"
-                            onChange={handleImageChange}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleImageUpload(file);
+                              }
+                            }}
                             className="sr-only"
                           />
                         </label>

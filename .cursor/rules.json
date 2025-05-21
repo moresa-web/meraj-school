@@ -4,7 +4,7 @@
     "branching": "ایجاد branch‌های جداگانه برای هر ویژگی",
     "codeReview": "بررسی کد قبل از merge",
     "autoCommit": "commit کردن بلافاصله هر تغییری که در پروژه ایجاد می‌شود",
-    "commitLanguage": "نوشتن پیام commit به زبان فارسی و به صورت معنادار",
+    "commitLanguage": "نوشتن پیام commit به زبان انگلیسی کوتاه و به صورت معنادار",
     "autoPush": "push کردن تغییرات به remote repository بلافاصله بعد از commit",
     "commitAfterAccept": "commit کردن تغییرات بلافاصله بعد از تأیید (Accept) تغییرات توسط کاربر",
     "rollback": "برگرداندن پروژه به نسخه قبلی با استفاده از git revert یا git reset در صورت درخواست کاربر",

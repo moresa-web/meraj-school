@@ -10,7 +10,7 @@ const router = express.Router();
 // تنظیم مسیر آپلود
 const uploadPath = process.env.NODE_ENV === 'production'
   ? 'C:\\inetpub\\wwwroot\\moresa\\mohammadrezasardashti\\site\\uploads'
-  : path.join(__dirname, '../uploads');
+  : path.join(__dirname, '../../uploads');
 
 // اطمینان از وجود پوشه آپلود
 if (!fs.existsSync(uploadPath)) {

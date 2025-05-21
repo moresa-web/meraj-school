@@ -12,6 +12,11 @@ const UPLOAD_DIR = process.env.NODE_ENV === 'production'
   ? 'C:\\inetpub\\wwwroot\\moresa\\mohammadrezasardashti\\site\\uploads'
   : path.join(__dirname, '../../uploads');
 
+// اضافه کردن لاگ برای بررسی مسیر
+console.log('Upload directory:', UPLOAD_DIR);
+console.log('Upload directory exists:', fs.existsSync(UPLOAD_DIR));
+console.log('Upload directory is directory:', fs.statSync(UPLOAD_DIR).isDirectory());
+
 // تنظیمات ذخیره‌سازی فایل
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

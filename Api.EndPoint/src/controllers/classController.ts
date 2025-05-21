@@ -47,7 +47,11 @@ export const getClassById = async (req: Request, res: Response) => {
     classData.views += 1;
     await classData.save();
 
-    res.json(classData);
+    const response = classData.toObject();
+    response.id = response._id.toString();
+    delete response._id;
+
+    res.json(response);
   } catch (error) {
     res.status(500).json({ message: 'خطا در دریافت اطلاعات کلاس' });
   }

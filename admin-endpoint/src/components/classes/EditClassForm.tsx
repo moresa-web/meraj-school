@@ -18,7 +18,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 interface EditClassFormProps {
   classId: string;
   initialData: ClassFormData;
-  onSubmit: (data: ClassFormData) => Promise<void>;
+  onSubmit: (formData: FormData) => Promise<void>;
   isSubmitting: boolean;
 }
 
@@ -193,7 +193,7 @@ export default function EditClassForm({
         hasExistingImage: !!formData.image
       });
 
-      await onSubmit(formDataToSend as any);
+      await onSubmit(formDataToSend);
       toast.success('کلاس با موفقیت به‌روزرسانی شد');
     } catch (err: any) {
       console.error('Submit error:', err);

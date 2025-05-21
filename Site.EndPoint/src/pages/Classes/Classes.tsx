@@ -125,10 +125,25 @@ const Classes: React.FC = () => {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/api/classes`);
+      const response = await axios.get(`${API_URL}/api/classes`, {
+        params: {
+          category: selectedCategory !== 'همه کلاس‌ها' ? selectedCategory : undefined,
+          sortBy,
+          search: searchQuery
+        }
+      });
       setClasses(response.data);
+      // دریافت IP کاربر و بررسی لایک‌ها
+      const userIP = await axios.get(`${API_URL}/api/user/ip`);
+      const liked = new Set<string>(
+        response.data
+          .filter((course: ClassInfo) => course.likedBy?.includes(userIP.data))
+          .map((course: ClassInfo) => course._id)
+      );
+      setLikedClasses(liked);
     } catch (error) {
       handleAxiosError(error);
+      setError('خطا در دریافت کلاس‌ها');
     } finally {
       setLoading(false);
     }
@@ -142,40 +157,6 @@ const Classes: React.FC = () => {
     // Check if Web Share API is supported
     setIsWebShareSupported('share' in navigator);
   }, []);
-
-  // دریافت لیست کلاس‌ها از API
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get(`${API_URL}/classes`, {
-          params: {
-            category: selectedCategory !== 'همه کلاس‌ها' ? selectedCategory : undefined,
-            sortBy,
-            search: searchQuery
-          }
-        });
-        setClasses(response.data);
-
-        // دریافت IP کاربر و بررسی لایک‌ها
-        const userIP = await axios.get(`${API_URL}/user/ip`);
-        const liked = new Set<string>(
-          response.data
-            .filter((course: ClassInfo) => course.likedBy?.includes(userIP.data))
-            .map((course: ClassInfo) => course._id)
-        );
-        setLikedClasses(liked);
-      } catch (error) {
-        handleAxiosError(error);
-        setError('خطا در دریافت کلاس‌ها');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClasses();
-  }, [selectedCategory, sortBy, searchQuery]);
 
   // استخراج دسته‌بندی‌های منحصر به فرد از کلاس‌ها
   useEffect(() => {
@@ -194,20 +175,18 @@ const Classes: React.FC = () => {
       item.teacher.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
-      switch (sortBy) {
-        case 'جدیدترین':
-          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-        case 'پربازدیدترین':
-          return b.views - a.views;
-        case 'محبوب‌ترین':
-          return b.likes - a.likes;
-        case 'قیمت (صعودی)':
-          return a.price - b.price;
-        case 'قیمت (نزولی)':
-          return b.price - a.price;
-        default:
-          return 0;
+      const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه'];
+      const [aDay, aTime] = a.schedule ? a.schedule.split(' - ') : ['', ''];
+      const [bDay, bTime] = b.schedule ? b.schedule.split(' - ') : ['', ''];
+      const aDayIndex = days.indexOf(aDay);
+      const bDayIndex = days.indexOf(bDay);
+      if (aDayIndex !== bDayIndex) {
+        return aDayIndex - bDayIndex;
       }
+      if (!aTime && !bTime) return 0;
+      if (!aTime) return 1;
+      if (!bTime) return -1;
+      return aTime.localeCompare(bTime);
     });
 
   // Calculate pagination
@@ -234,7 +213,7 @@ const Classes: React.FC = () => {
 
       // بررسی وضعیت ثبت نام کاربر با استفاده از endpoint جدید
       try {
-        const response = await axios.get(`${API_URL}/classes/${course._id}/check-registration`);
+        const response = await axios.get(`${API_URL}/api/classes/${course._id}/check-registration`);
 
         if (response.data.isRegistered) {
           toast.error('شما قبلاً در این کلاس ثبت‌نام کرده‌اید');
@@ -265,7 +244,7 @@ const Classes: React.FC = () => {
       setLoadingCourseId(selectedCourse._id);
 
       const response = await axios.post(
-        `${API_URL}/classes/${selectedCourse._id}/register`,
+        `${API_URL}/api/classes/${selectedCourse._id}/register`,
         formData,
         {
           headers: {
@@ -321,7 +300,7 @@ const Classes: React.FC = () => {
 
   const handleLike = async (id: string) => {
     try {
-      const response = await axios.post(`${API_URL}/classes/${id}/like`);
+      const response = await axios.post(`${API_URL}/api/classes/${id}/like`);
       setClasses(prevClasses =>
         prevClasses.map(course =>
           course._id === id ? response.data : course
@@ -329,7 +308,7 @@ const Classes: React.FC = () => {
       );
 
       // دریافت IP کاربر و به‌روزرسانی وضعیت لایک
-      const userIP = await axios.get(`${API_URL}/user/ip`);
+      const userIP = await axios.get(`${API_URL}/api/user/ip`);
       setLikedClasses(prev => {
         const newSet = new Set(prev);
         if (response.data.likedBy.includes(userIP.data)) {
@@ -414,7 +393,7 @@ const Classes: React.FC = () => {
     try {
       const registrations = new Set<string>();
       for (const course of classes) {
-        const response = await axios.get(`${API_URL}/classes/${course._id}/check-registration`);
+        const response = await axios.get(`${API_URL}/api/classes/${course._id}/check-registration`);
         if (response.data.isRegistered) {
           registrations.add(course._id);
         }
@@ -429,7 +408,7 @@ const Classes: React.FC = () => {
   const handleUnregister = async (courseId: string) => {
     try {
       setLoadingCourseId(courseId);
-      const response = await axios.post(`${API_URL}/classes/${courseId}/unregister`);
+      const response = await axios.post(`${API_URL}/api/classes/${courseId}/unregister`);
 
       if (response.data.success) {
         toast.success('انصراف از کلاس با موفقیت انجام شد');
@@ -955,8 +934,7 @@ const Classes: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-emerald-50">
-                      <th className="px-6 py-4 text-right text-emerald-600 font-semibold">روز</th>
-                      <th className="px-6 py-4 text-right text-emerald-600 font-semibold">ساعت</th>
+                      <th className="px-6 py-4 text-right text-emerald-600 font-semibold">تاریخ</th>
                       <th className="px-6 py-4 text-right text-emerald-600 font-semibold">درس</th>
                       <th className="px-6 py-4 text-right text-emerald-600 font-semibold">استاد</th>
                       <th className="px-6 py-4 text-right text-emerald-600 font-semibold">سطح</th>
@@ -965,28 +943,22 @@ const Classes: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-emerald-100">
                     {classes
-                      .filter(course => course.isActive) // فقط کلاس‌های فعال
+                      .filter(course => course.isActive)
                       .sort((a, b) => {
-                        // مرتب‌سازی بر اساس روز و ساعت
-                        const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه'];
-                        const [aDay, aTime] = a.schedule.split(' - ');
-                        const [bDay, bTime] = b.schedule.split(' - ');
-
-                        const aDayIndex = days.indexOf(aDay);
-                        const bDayIndex = days.indexOf(bDay);
-
-                        if (aDayIndex !== bDayIndex) {
-                          return aDayIndex - bDayIndex;
-                        }
-
-                        return aTime.localeCompare(bTime);
+                        const aDate = new Date(a.startDate).getTime();
+                        const bDate = new Date(b.startDate).getTime();
+                        return aDate - bDate;
                       })
                       .map((course, index) => {
-                        const [day, time] = course.schedule.split(' - ');
+                        let formattedDate = '';
+                        try {
+                          formattedDate = new Date(course.startDate).toLocaleDateString('fa-IR');
+                        } catch {
+                          formattedDate = course.startDate;
+                        }
                         return (
                           <tr key={course._id} className="hover:bg-emerald-50 transition-colors">
-                            <td className="px-6 py-4 text-gray-700">{day}</td>
-                            <td className="px-6 py-4 text-gray-700">{time}</td>
+                            <td className="px-6 py-4 text-gray-700">{formattedDate}</td>
                             <td className="px-6 py-4 text-gray-700">{course.title}</td>
                             <td className="px-6 py-4 text-gray-700">{course.teacher}</td>
                             <td className="px-6 py-4">

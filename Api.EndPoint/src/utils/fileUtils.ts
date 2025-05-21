@@ -19,7 +19,7 @@ export const deleteFile = (filePath: string) => {
     }
 
     // ساخت مسیر کامل فایل
-    const fullPath = path.join(process.cwd(), 'uploads', relativePath);
+    const fullPath = path.join(__dirname, '../../uploads', relativePath);
     console.log('Full path to delete:', fullPath);
     
     // بررسی وجود فایل

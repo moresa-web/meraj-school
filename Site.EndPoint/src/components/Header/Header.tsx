@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Globe
 } from 'lucide-react';
+import { getImageUrl } from '../../utils/format';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -76,7 +77,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group" onClick={() => handleNavigation('/')}>
             <img
-              src={loading ? '/images/logo.png' : siteInfo?.image || '/images/logo.png'}
+              src={loading ? '/images/logo.png' : getImageUrl(siteInfo?.image || '') || '/images/logo.png'}
               alt={loading ? 'لوگو مدرسه' : siteInfo?.schoolName || 'دبیرستان معراج'}
               className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
             />
@@ -91,7 +92,7 @@ const Header: React.FC = () => {
               to="/"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/')
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
-                : isScrolled 
+                : isScrolled
                   ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                   : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
@@ -102,7 +103,7 @@ const Header: React.FC = () => {
               to="/about"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/about')
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
-                : isScrolled 
+                : isScrolled
                   ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                   : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
@@ -113,7 +114,7 @@ const Header: React.FC = () => {
               to="/classes"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/classes')
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
-                : isScrolled 
+                : isScrolled
                   ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                   : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
@@ -124,7 +125,7 @@ const Header: React.FC = () => {
               to="/news"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/news')
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
-                : isScrolled 
+                : isScrolled
                   ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                   : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
@@ -135,7 +136,7 @@ const Header: React.FC = () => {
               to="/contact"
               className={`text-lg font-medium transition-all duration-200 ${isActive('/contact')
                 ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent font-semibold'
-                : isScrolled 
+                : isScrolled
                   ? 'text-gray-800 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                   : 'text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:bg-clip-text hover:text-transparent hover:scale-105'
                 }`}
@@ -196,104 +197,104 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300">
             <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-xl transform transition-transform duration-300">
-            <div className="p-6 h-full flex flex-col bg-white">
-              <div className="flex justify-between items-center mb-8">
-                <button
-                    onClick={toggleMenu}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
-                  aria-label="بستن منو"
-                >
-                  <svg
-                    className="w-6 h-6 text-gray-600"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <span className="text-xl font-semibold text-gray-800">منو</span>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-center space-y-8">
-                <Link
-                  to="/"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                    }`}
-                >
-                  خانه
-                </Link>
-                <Link
-                  to="/about"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/about') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                    }`}
-                >
-                  درباره ما
-                </Link>
-                <Link
-                  to="/classes"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/classes') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                    }`}
-                >
-                    کلاس‌های تقویتی
-                </Link>
-                <Link
-                  to="/news"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/news') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                    }`}
-                >
-                  اخبار
-                </Link>
-                <Link
-                  to="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/contact') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
-                    }`}
-                >
-                  تماس با ما
-                </Link>
-              </div>
-
-              <div className="mt-auto pt-8">
-                {isAuthenticated ? (
+              <div className="p-6 h-full flex flex-col bg-white">
+                <div className="flex justify-between items-center mb-8">
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg text-lg"
+                    onClick={toggleMenu}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+                    aria-label="بستن منو"
                   >
-                    خروج
+                    <svg
+                      className="w-6 h-6 text-gray-600"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
-                ) : (
+                  <span className="text-xl font-semibold text-gray-800">منو</span>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-8">
                   <Link
-                    to="/auth"
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
+                    to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                      }`}
                   >
-                    ورود / ثبت‌نام
+                    خانه
                   </Link>
-                )}
-                {user?.role === 'admin' ? (
                   <Link
-                    to="/dashboard"
+                    to="/about"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
+                    className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/about') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                      }`}
                   >
-                    داشبورد
+                    درباره ما
                   </Link>
-                ) : (<></>)}
+                  <Link
+                    to="/classes"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/classes') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                      }`}
+                  >
+                    کلاس‌های تقویتی
+                  </Link>
+                  <Link
+                    to="/news"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/news') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                      }`}
+                  >
+                    اخبار
+                  </Link>
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block w-full text-right text-xl font-medium transition-all duration-200 ${isActive('/contact') ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+                      }`}
+                  >
+                    تماس با ما
+                  </Link>
+                </div>
+
+                <div className="mt-auto pt-8">
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg text-lg"
+                    >
+                      خروج
+                    </button>
+                  ) : (
+                    <Link
+                      to="/auth"
+                      className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      ورود / ثبت‌نام
+                    </Link>
+                  )}
+                  {user?.role === 'admin' ? (
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
+                    >
+                      داشبورد
+                    </Link>
+                  ) : (<></>)}
+                </div>
               </div>
             </div>
           </div>
-        </div>
         )}
       </div>
     </header>

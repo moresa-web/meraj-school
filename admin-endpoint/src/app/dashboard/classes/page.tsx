@@ -112,10 +112,12 @@ export default function ClassesPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">مدیریت کلاس‌ها</h1>
-        <Button onClick={() => router.push('/dashboard/classes/new')}>
-          <Plus className="w-4 h-4 mr-2" />
+        <button
+          onClick={() => router.push('/dashboard/classes/new')}
+          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+        >
           افزودن کلاس جدید
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

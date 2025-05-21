@@ -9,7 +9,7 @@ import { ErrorMessage } from '@/components/common/ErrorMessage';
 
 export default function ClassesPage() {
   const router = useRouter();
-  const { classes, isLoading, error } = useClasses();
+  const { classes, isLoading, queryError } = useClasses();
 
   return (
     <div className="container mx-auto py-8">
@@ -28,8 +28,8 @@ export default function ClassesPage() {
 
       {isLoading ? (
         <LoadingSpinner />
-      ) : error ? (
-        <ErrorMessage message={error.message || 'خطا در دریافت لیست کلاس‌ها'} />
+      ) : queryError ? (
+        <ErrorMessage message={queryError.message || 'خطا در دریافت لیست کلاس‌ها'} />
       ) : (
         <ClassList classes={classes} />
       )}

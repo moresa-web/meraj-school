@@ -23,7 +23,7 @@ export function ClassList({ classes }: ClassListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {classes.map((cls) => (
-        <ClassCard key={cls._id} class={cls} />
+        <ClassCard key={cls.id} class={cls} />
       ))}
     </div>
   );

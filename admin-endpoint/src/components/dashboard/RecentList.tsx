@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { format } from 'date-fns'
-import { faIR } from 'date-fns/locale'
+import { format } from 'date-fns-jalali'
+import { faIR } from 'date-fns-jalali/locale'
 
 interface RecentItem {
   id: string
@@ -35,7 +35,7 @@ export function RecentList({ items, emptyMessage }: RecentListProps) {
                 {item.title}
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                {format(new Date(item.date), 'd MMMM yyyy', { locale: faIR })}
+                {format(new Date(item.date), 'yyyy/MM/dd', { locale: faIR })}
               </p>
             </div>
           </div>

@@ -16,6 +16,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-vazirmatn)'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

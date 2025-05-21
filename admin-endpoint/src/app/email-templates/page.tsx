@@ -38,7 +38,7 @@ export default function EmailTemplatesPage() {
       const response = await fetch('/api/email-templates');
       if (!response.ok) throw new Error('خطا در دریافت قالب‌ها');
       const data = await response.json();
-      
+
       // اطمینان از اینکه data.data یک آرایه است
       if (data.success && Array.isArray(data.data)) {
         setTemplates(data.data);
@@ -63,7 +63,7 @@ export default function EmailTemplatesPage() {
       });
 
       if (!response.ok) throw new Error('خطا در بروزرسانی قالب');
-      
+
       toast.success('قالب با موفقیت بروزرسانی شد');
       fetchTemplates();
     } catch (error) {
@@ -74,17 +74,17 @@ export default function EmailTemplatesPage() {
   const handleToggleActive = async (templateId: string, isActive: boolean) => {
     try {
       console.log('Sending request to toggle template:', templateId, isActive);
-      
+
       const response = await fetch(`/api/email-templates/${templateId}`, {
         method: 'PATCH',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ isActive }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'خطا در تغییر وضعیت قالب');
       }
@@ -125,7 +125,7 @@ export default function EmailTemplatesPage() {
       });
 
       if (!response.ok) throw new Error('خطا در بروزرسانی موضوع');
-      
+
       const data = await response.json();
       if (data.success) {
         toast.success('موضوع با موفقیت بروزرسانی شد');
@@ -162,7 +162,7 @@ export default function EmailTemplatesPage() {
       });
 
       if (!response.ok) throw new Error('خطا در بروزرسانی محتوا');
-      
+
       const data = await response.json();
       if (data.success) {
         toast.success('محتوا با موفقیت بروزرسانی شد');
@@ -174,7 +174,7 @@ export default function EmailTemplatesPage() {
               : template
           )
         );
-        
+
         // به‌روزرسانی پیش‌نمایش اگر این قالب در حال نمایش است
         if (previewTemplate === templateId) {
           const template = templates.find(t => t._id === templateId);
@@ -206,7 +206,7 @@ export default function EmailTemplatesPage() {
 
   const replaceTemplateVariables = (html: string, type: string) => {
     let previewHtml = html;
-    const variables = type === 'new_news' 
+    const variables = type === 'new_news'
       ? {
           title: 'عنوان خبر نمونه',
           description: 'توضیحات خبر نمونه',
@@ -307,7 +307,7 @@ export default function EmailTemplatesPage() {
           <h1 className="text-2xl font-bold text-gray-900">مدیریت قالب‌های ایمیل</h1>
           <p className="text-gray-500 mt-1">مدیریت و ویرایش قالب‌های ایمیل ارسالی به مشترکین</p>
         </div>
-        <Button 
+        <Button
           className="bg-emerald-600 hover:bg-emerald-700"
           onClick={() => router.push('/email-templates/new')}
         >
