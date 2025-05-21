@@ -8,23 +8,97 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // ثبت‌نام کاربر جدید
 export const register = async (req: Request, res: Response) => {
   try {
-    const { username, email, password, studentName, studentPhone, parentPhone } = req.body;
+    console.log('Register request body:', req.body);
+
+    // دریافت و پاک‌سازی مقادیر
+    const fullName = req.body.fullName?.trim();
+    const email = req.body.email?.trim().toLowerCase();
+    const password = req.body.password;
+    const role = req.body.role || 'user';
+    const phone = req.body.phone?.trim();
+    // اگر نیاز به username باشد، می‌توانیم آن را برابر email قرار دهیم یا حذف کنیم
+    const username = email;
+    
+    // بررسی خالی نبودن مقادیر ضروری
+    if (!email || !fullName || !password || !phone) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'نام و نام خانوادگی، ایمیل، رمز عبور و شماره تماس الزامی است' 
+      });
+    }
+
+    // اعتبارسنجی ایمیل
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      console.log('Invalid email format:', email);
+      return res.status(400).json({ 
+        success: false,
+        message: 'فرمت ایمیل نامعتبر است' 
+      });
+    }
+
+    // اعتبارسنجی رمز عبور
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'رمز عبور باید حداقل 6 کاراکتر باشد' 
+      });
+    }
+
+    // اگر نقش student است، فیلدهای دانش‌آموز باید پر باشند
+    if (role === 'student') {
+      const { studentPhone, parentPhone } = req.body;
+      if (!studentPhone && !parentPhone) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'حداقل یکی از شماره‌های دانش‌آموز یا والد الزامی است' 
+        });
+      }
+      // اعتبارسنجی شماره تلفن
+      const phoneRegex = /^09[0-9]{9}$/;
+      if (studentPhone && !phoneRegex.test(studentPhone)) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'فرمت شماره دانش‌آموز نامعتبر است' 
+        });
+      }
+      if (parentPhone && !phoneRegex.test(parentPhone)) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'فرمت شماره والد نامعتبر است' 
+        });
+      }
+    }
 
     // بررسی وجود کاربر
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    const existingUser = await User.findOne({ 
+      $or: [{ email }, { username }] 
+    });
+    
     if (existingUser) {
-      return res.status(400).json({ message: 'کاربری با این ایمیل یا نام کاربری قبلاً ثبت‌نام کرده است' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'کاربری با این ایمیل قبلاً ثبت‌نام کرده است' 
+      });
     }
 
     // ایجاد کاربر جدید
-    const user = new User({
+    const userData: any = {
       username,
       email,
       password,
-      studentName,
-      studentPhone,
-      parentPhone
-    });
+      fullName,
+      phone,
+      role
+    };
+    if (role === 'student') {
+      userData.studentPhone = req.body.studentPhone;
+      userData.parentPhone = req.body.parentPhone;
+      userData.studentName = fullName;
+    }
+    const user = new User(userData);
+
+    console.log('Creating new user:', { username, email, fullName, role });
 
     await user.save();
 
@@ -35,9 +109,31 @@ export const register = async (req: Request, res: Response) => {
       { expiresIn: '7d' }
     );
 
-    res.status(201).json({ token, user: { ...user.toJSON(), password: undefined } });
-  } catch (error) {
-    res.status(500).json({ message: 'خطا در ثبت‌نام' });
+    res.status(201).json({ 
+      success: true,
+      message: 'ثبت‌نام با موفقیت انجام شد',
+      token, 
+      user: { ...user.toJSON() }
+    });
+  } catch (error: any) {
+    console.error('Register error:', error);
+    
+    // بررسی خطای تکراری بودن
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({ 
+        success: false,
+        message: `این ${field === 'email' ? 'ایمیل' : field === 'username' ? 'نام کاربری' : 'شماره تلفن'} قبلاً ثبت شده است` 
+      });
+    }
+
+    // سایر خطاها
+    const errorMessage = error?.message || 'خطا در ثبت‌نام';
+      
+    res.status(500).json({ 
+      success: false,
+      message: errorMessage 
+    });
   }
 };
 
