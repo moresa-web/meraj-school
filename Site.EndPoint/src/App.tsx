@@ -22,6 +22,7 @@ import i18n from './i18n';
 import { I18nextProvider } from 'react-i18next';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import Profile from './pages/Profile/Profile';
 
 // کامپوننت اصلی برنامه که از useAuth استفاده می‌کند
 const AppContent: React.FC = () => {
@@ -48,15 +49,13 @@ const AppContent: React.FC = () => {
       <ScrollToTop />
       <main className="main-content">
         <Routes>
-          <Route path="/auth" element={
-            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Auth />
-          } />
-          <Route path="/dashboard" element={
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/profile" element={
             <PrivateRoute>
-              <Navigate to="/dashboard/news" replace />
+              <Profile />
             </PrivateRoute>
           } />
-          <Route path="/dashboard/*" element={
+          <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
@@ -67,6 +66,7 @@ const AppContent: React.FC = () => {
           <Route path="/classes" element={<Classes />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </main>

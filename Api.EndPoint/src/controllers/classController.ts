@@ -220,18 +220,31 @@ export const toggleLike = async (req: Request, res: Response) => {
 
 export const registerForClass = async (req: Request, res: Response) => {
   try {
-    const { studentName, studentPhone, parentPhone, grade } = req.body;
+    const { studentName, studentPhone, parentPhone } = req.body;
     const userIP = req.ip || req.socket.remoteAddress || 'unknown';
 
     // Validate required fields
-    if (!studentName || !studentPhone || !parentPhone || !grade) {
-      return res.status(400).json({ message: 'لطفاً تمام فیلدهای ضروری را پر کنید' });
+    if (!studentName || !studentPhone || !parentPhone) {
+      return res.status(400).json({ 
+        message: 'لطفاً تمام فیلدهای ضروری را پر کنید',
+        missingFields: {
+          studentName: !studentName,
+          studentPhone: !studentPhone,
+          parentPhone: !parentPhone
+        }
+      });
     }
 
     // Validate phone numbers
     const phoneRegex = /^09\d{9}$/;
     if (!phoneRegex.test(studentPhone) || !phoneRegex.test(parentPhone)) {
-      return res.status(400).json({ message: 'شماره موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد' });
+      return res.status(400).json({ 
+        message: 'شماره موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد',
+        invalidFields: {
+          studentPhone: !phoneRegex.test(studentPhone),
+          parentPhone: !phoneRegex.test(parentPhone)
+        }
+      });
     }
 
     const classItem = await Class.findById(req.params.id);
@@ -261,7 +274,6 @@ export const registerForClass = async (req: Request, res: Response) => {
       studentName,
       studentPhone,
       parentPhone,
-      grade,
       registeredAt: new Date(),
       ip: userIP
     };
@@ -274,10 +286,20 @@ export const registerForClass = async (req: Request, res: Response) => {
     classItem.enrolledStudents = (classItem.registrations?.length || 0);
 
     await classItem.save();
-    res.json({ success: true, message: 'ثبت‌نام با موفقیت انجام شد' });
-  } catch (error) {
+    res.json({ 
+      success: true, 
+      message: 'ثبت‌نام با موفقیت انجام شد',
+      registration: {
+        studentName,
+        registeredAt: registration.registeredAt
+      }
+    });
+  } catch (error: any) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'خطا در ثبت‌نام' });
+    res.status(500).json({ 
+      message: 'خطا در ثبت‌نام',
+      error: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    });
   }
 };
 
