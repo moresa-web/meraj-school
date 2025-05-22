@@ -11,7 +11,7 @@ export default function NewClassPage() {
 
   const handleSubmit = async (data: any, image: File | null) => {
     try {
-      await createClass(data, image!);
+      await createClass.mutateAsync(data);
       router.push('/classes');
     } catch (error) {
       console.error('Error creating class:', error);

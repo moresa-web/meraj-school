@@ -5,7 +5,6 @@ interface Student {
   studentName: string;
   studentPhone: string;
   parentPhone: string;
-  grade: string;
   registeredAt: string;
 }
 
@@ -20,8 +19,7 @@ export const StudentList: React.FC<StudentListProps> = ({ students, isLoading })
   const filteredStudents = students.filter(student =>
     student.studentName.includes(search) ||
     student.studentPhone.includes(search) ||
-    student.parentPhone.includes(search) ||
-    student.grade.includes(search)
+    student.parentPhone.includes(search)
   );
 
   if (isLoading) {
@@ -63,9 +61,6 @@ export const StudentList: React.FC<StudentListProps> = ({ students, isLoading })
                 شماره موبایل والدین
               </th>
               <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                پایه تحصیلی
-              </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 تاریخ ثبت‌نام
               </th>
             </tr>
@@ -81,9 +76,6 @@ export const StudentList: React.FC<StudentListProps> = ({ students, isLoading })
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {student.parentPhone}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {student.grade}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatDate(student.registeredAt)}

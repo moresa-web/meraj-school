@@ -116,7 +116,9 @@ export default function ClassForm({ initialData = {}, onSubmit, loading, submitL
       }
 
       console.log('Submitting form data:', Object.fromEntries(formDataToSend));
-      await onSubmit(formDataToSend as any);
+      if (onSubmit) {
+        await onSubmit(formDataToSend as any, image);
+      }
       toast.success('کلاس با موفقیت ایجاد شد');
     } catch (err: any) {
       setError(err.message || 'خطا در ایجاد کلاس');

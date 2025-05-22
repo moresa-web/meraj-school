@@ -12,6 +12,8 @@ import {
   DocumentTextIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const menuItems = [
   {
@@ -53,6 +55,17 @@ const menuItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { user, loading } = useCurrentUser();
+
+  const getInitials = (name?: string) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <div className="h-screen w-64 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white flex flex-col">
@@ -83,12 +96,18 @@ const Sidebar = () => {
 
       <div className="p-4 border-t border-emerald-700">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center">
-            <span className="text-lg font-medium">ا</span>
-          </div>
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-emerald-600 text-white">
+              {loading ? '...' : getInitials(user?.fullName)}
+            </AvatarFallback>
+          </Avatar>
           <div>
-            <p className="font-medium">مدیر سیستم</p>
-            <p className="text-sm text-emerald-200">admin@example.com</p>
+            <p className="font-medium">
+              {loading ? 'در حال بارگذاری...' : user?.fullName || 'کاربر'}
+            </p>
+            <p className="text-sm text-emerald-200">
+              {loading ? '...' : user?.email || 'ایمیل نامشخص'}
+            </p>
           </div>
         </div>
       </div>
