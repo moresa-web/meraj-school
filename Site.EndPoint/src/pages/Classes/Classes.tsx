@@ -13,6 +13,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import NoResults from '../../components/NoResults/NoResults';
 import SEO from '../../components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ClassList from '../../components/classes/ClassList';
+import { useAuth } from '../../contexts/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -87,6 +89,7 @@ const Classes: React.FC = () => {
   const [likedClasses, setLikedClasses] = useState<Set<string>>(new Set());
   const [registeredClasses, setRegisteredClasses] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<string[]>(['همه کلاس‌ها']);
+  const { isAuthenticated, user } = useAuth();
 
   const updateSearchParams = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -197,103 +200,72 @@ const Classes: React.FC = () => {
     currentPage * itemsPerPage
   );
 
-  const handleRegister = async (course: ClassInfo) => {
+  const handleRegister = async (classItem: ClassInfo) => {
     try {
+      // بررسی وضعیت احراز هویت
+      if (!isAuthenticated || !user) {
+        // ذخیره مسیر فعلی در localStorage
+        localStorage.setItem('redirectAfterLogin', window.location.pathname);
+        toast.error('لطفاً ابتدا وارد حساب کاربری خود شوید');
+        navigate('/auth', { replace: true });
+        return;
+      }
+
+      // بررسی اطلاعات کاربر
+      if (!user.fullName || !user.studentPhone || !user.parentPhone) {
+        toast.error('لطفاً ابتدا اطلاعات پروفایل خود را تکمیل کنید');
+        navigate('/profile', { replace: true });
+        return;
+      }
+
       // بررسی وضعیت کلاس
-      if (!course.isActive) {
+      if (!classItem.isActive) {
         toast.error('این کلاس در حال حاضر فعال نیست');
         return;
       }
 
-      if (course.registrations && course.registrations.length >= course.capacity) {
+      if (classItem.enrolledStudents >= classItem.capacity) {
         toast.error('ظرفیت این کلاس تکمیل شده است');
         return;
       }
 
-      setLoadingCourseId(course._id);
-
-      // بررسی وضعیت ثبت نام کاربر با استفاده از endpoint جدید
-      try {
-        const response = await axios.get(`${API_URL}/api/classes/${course._id}/check-registration`);
-
-        if (response.data.isRegistered) {
-          toast.error('شما قبلاً در این کلاس ثبت‌نام کرده‌اید');
-          return;
-        }
-
-        // اگر کاربر ثبت نام نکرده باشد، مودال را باز می‌کنیم
-        setSelectedCourse(course);
-        setIsModalOpen(true);
-      } catch (error: any) {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.error('خطا در بررسی وضعیت ثبت‌نام');
-        }
+      // بررسی تکراری نبودن ثبت‌نام
+      if (registeredClasses.has(classItem._id)) {
+        toast.error('شما قبلاً در این کلاس ثبت‌نام کرده‌اید');
+        return;
       }
-    } catch (error) {
-      handleAxiosError(error);
-    } finally {
-      setLoadingCourseId(null);
-    }
-  };
 
-  const handleSubmitRegistration = async (formData: RegistrationForm) => {
-    if (!selectedCourse) return;
+      const payload = {
+        studentName: user.fullName,
+        studentPhone: user.studentPhone,
+        parentPhone: user.parentPhone,
+        grade: user.grade || ''
+      };
 
-    try {
-      setLoadingCourseId(selectedCourse._id);
+      // بررسی فرمت شماره تلفن‌ها
+      const phoneRegex = /^09\d{9}$/;
+      if (!phoneRegex.test(payload.studentPhone) || !phoneRegex.test(payload.parentPhone)) {
+        toast.error('فرمت شماره تلفن نامعتبر است. شماره تلفن باید با ۰۹ شروع شود و ۱۱ رقم باشد');
+        return;
+      }
 
-      const response = await axios.post(
-        `${API_URL}/api/classes/${selectedCourse._id}/register`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      console.log(payload);
 
+      setLoadingCourseId(classItem._id);
+      const response = await axios.post(`${API_URL}/api/classes/${classItem._id}/register`, payload);
+      
       if (response.data.success) {
-        toast.success('ثبت‌نام با موفقیت انجام شد');
-        setIsModalOpen(false);
-        // پاک کردن فرم
-        setFormData({
-          studentName: '',
-          studentPhone: '',
-          parentPhone: '',
-          grade: ''
-        });
-        // به‌روزرسانی لیست کلاس‌ها
-        fetchClasses();
-      }
-    } catch (error: any) {
-      console.error('Registration Error:', error.response?.data);
-
-      // نمایش پیام خطا به کاربر
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message, {
-          position: "top-center",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.success('ثبت‌نام شما با موفقیت انجام شد');
+        // به‌روزرسانی لیست کلاس‌ها و وضعیت ثبت‌نام
+        await fetchClasses();
+        await checkAllRegistrations();
       } else {
-        toast.error('خطا در ثبت‌نام. لطفاً دوباره تلاش کنید.', {
-          position: "top-center",
-          autoClose: 4000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error(response.data.message || 'خطا در ثبت‌نام');
       }
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      const errorMessage = err.response?.data?.message || 'خطا در ثبت‌نام';
+      toast.error(errorMessage);
     } finally {
       setLoadingCourseId(null);
     }
@@ -444,7 +416,6 @@ const Classes: React.FC = () => {
       <NetworkError
         onRetry={() => {
           setNetworkError(false);
-          handleSubmitRegistration(formData);
         }}
       />
     );
@@ -490,12 +461,12 @@ const Classes: React.FC = () => {
         keywords="کلاس تقویتی, کلاس ریاضی, کلاس فیزیک, کلاس شیمی, ثبت‌نام آنلاین, دبیرستان معراج"
         url="/classes"
       />
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs
-          items={[
-            { label: 'کلاس‌های تقویتی' }
-          ]}
+        <HeroSection
+          title="کلاس‌های تقویتی"
+          description="با بهترین روش‌های نوین آموزشی، مسیر موفقیت تحصیلی خود را هموار کنید"
+          imageUrl="/images/classes-hero.jpg"
         />
+      <div className="w-full">
         <ToastContainer
           position="top-right"
           autoClose={4000}
@@ -508,14 +479,20 @@ const Classes: React.FC = () => {
           pauseOnHover
           theme="light"
         />
-        <HeroSection
-          title="کلاس‌های تقویتی"
-          description="با بهترین روش‌های نوین آموزشی، مسیر موفقیت تحصیلی خود را هموار کنید"
-          imageUrl="/images/classes-hero.jpg"
-        />
 
-        {/* Search and Filter Section */}
-        <section className="py-8 md:py-12 bg-white">
+        {/* Breadcrumbs - Placed directly after HeroSection */}
+        <div className="container mx-auto px-4 mt-8"> {/* Added container and margin-top */}
+          <Breadcrumbs
+            items={[
+              { label: 'خانه', path: '/' },
+              { label: 'کلاس‌های تقویتی' }
+            ]}
+          />
+        </div>
+
+        {/* Main Content Area (Search, Filters, Class List, Pagination) */}
+        {/* Combined sections for unified layout */}
+        <div className="py-8 md:py-12 bg-white rounded-lg shadow-md mt-4"> {/* Unified padding, background, adjusted margin-top */}
           <div className="max-w-7xl mx-auto px-4">
             {/* Search Bar */}
             <div className="w-full mb-6 animate-fade-in-up animation-delay-300">
@@ -534,7 +511,7 @@ const Classes: React.FC = () => {
             </div>
 
             {/* Filters Row */}
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center animate-fade-in-up animation-delay-400">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center mb-8 animate-fade-in-up animation-delay-400"> {/* Added margin-bottom */}
               {/* Mobile Filter Button */}
               <div className="md:hidden w-full">
                 <button
@@ -620,12 +597,12 @@ const Classes: React.FC = () => {
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Courses Section */}
+        {/* Courses Section - Now part of the main content area */}
         <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-[1400px] mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-8">
               {loading ? (
                 <div className="text-center py-8">در حال بارگذاری...</div>
               ) : filteredClasses.length === 0 ? (
@@ -633,163 +610,13 @@ const Classes: React.FC = () => {
                   <NoResults message="کلاسی یافت نشد" />
                 </div>
               ) : (
-                currentClasses.map((course, index) => (
-                  <div
-                    key={course._id}
-                    className="group relative bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    {/* Course Image with Overlay */}
-                    <div className="relative h-64 overflow-hidden">
-                      <img
-                        src={`${API_URL.replace('/api', '')}${course.image}`}
-                        alt={course.title}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
-                      {/* Course Level Badge */}
-                      <div className="absolute top-4 right-4">
-                        <span className="px-4 py-2 rounded-full bg-emerald-500 text-white text-sm font-medium shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                          {course.level}
-                        </span>
-                      </div>
-                      {/* Course Category */}
-                      <div className="absolute top-4 left-4">
-                        <span className="px-4 py-2 rounded-full bg-white/90 text-emerald-600 text-sm font-medium backdrop-blur-sm shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                          {course.category}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Course Content */}
-                    <div className="p-6">
-                      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-emerald-600 transition-colors duration-300">
-                        {course.title}
-                      </h3>
-                      <div className="flex items-center text-gray-600 mb-4">
-                        <svg className="w-5 h-5 ml-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span className="text-sm">{course.teacher}</span>
-                      </div>
-                      <p className="text-gray-600 mb-6 line-clamp-2">
-                        {course.description}
-                      </p>
-                      {/* Course Schedule */}
-                      <div className="flex items-center text-gray-600 mb-6">
-                        <svg className="w-5 h-5 ml-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm">{course.schedule}</span>
-                      </div>
-                      {/* Course Stats */}
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center">
-                            <svg className="w-5 h-5 ml-1 text-emerald-600 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <span>{course.registrations?.length || 0}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleLike(course._id);
-                              }}
-                              className={`flex items-center transition-colors ${likedClasses.has(course._id) ? 'text-emerald-600' : 'hover:text-emerald-600'
-                                }`}
-                            >
-                              <svg
-                                className={`w-5 h-5 ml-1 transition-transform duration-300 group-hover:scale-110 ${likedClasses.has(course._id) ? 'fill-current' : 'fill-none'
-                                  }`}
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                />
-                              </svg>
-                              <span className="text-sm">{course.likes}</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <button
-                            onClick={() => handleShare(course)}
-                            className="text-gray-400 hover:text-emerald-400 transition-colors"
-                          >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                      {/* Price and Register Button */}
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span className="text-xl font-bold text-emerald-600">{course.price.toLocaleString("fa-IR")} تومان</span>
-                        {registeredClasses.has(course._id) ? (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleUnregister(course._id);
-                            }}
-                            className="px-6 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center min-w-[120px]"
-                            disabled={loadingCourseId === course._id}
-                          >
-                            {loadingCourseId === course._id ? (
-                              <>
-                                <span>در حال بارگذاری...</span>
-                                <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              </>
-                            ) : (
-                              <>
-                                <span>انصراف</span>
-                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </>
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleRegister(course);
-                            }}
-                            className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center min-w-[120px]"
-                            disabled={loadingCourseId === course._id}
-                          >
-                            {loadingCourseId === course._id ? (
-                              <>
-                                <span>در حال بارگذاری...</span>
-                                <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              </>
-                            ) : (
-                              <>
-                                <span>ثبت‌نام</span>
-                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
+                <ClassList 
+                  classes={currentClasses} 
+                  onSelect={handleRegister} 
+                  onUnregister={handleUnregister}
+                  loadingCourseId={loadingCourseId}
+                  registeredClasses={registeredClasses}
+                />
               )}
             </div>
 
@@ -879,7 +706,7 @@ const Classes: React.FC = () => {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Features Section - Keep as a separate section */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">
@@ -929,7 +756,7 @@ const Classes: React.FC = () => {
           </div>
         </section>
 
-        {/* Schedule Section */}
+        {/* Schedule Section - Keep as a separate section */}
         <section className="py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">
@@ -984,19 +811,6 @@ const Classes: React.FC = () => {
             </div>
           </div>
         </section>
-
-        {/* Registration Modal */}
-        {selectedCourse && (
-          <RegistrationModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            course={selectedCourse}
-            onSubmit={handleSubmitRegistration}
-            formData={formData}
-            onInputChange={handleInputChange}
-            fieldErrors={fieldErrors}
-          />
-        )}
 
         {/* Share Modal */}
         {showShareModal && selectedClass && (

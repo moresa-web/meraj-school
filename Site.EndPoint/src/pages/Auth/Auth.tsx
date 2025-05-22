@@ -26,6 +26,10 @@ const Auth: React.FC = () => {
     try {
       if (isLogin) {
         await login(formData.email, formData.password);
+        // بررسی مسیر ذخیره شده در localStorage
+        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+        localStorage.removeItem('redirectAfterLogin'); // پاک کردن مسیر ذخیره شده
+        navigate(redirectPath);
       } else {
         let phoneToSend = formData.phone;
         if (formData.role === 'student') {
@@ -48,8 +52,8 @@ const Auth: React.FC = () => {
           formData.studentPhone,
           formData.parentPhone
         );
+        navigate('/');
       }
-      navigate('/');
     } catch (err: any) {
       setError(err.message || 'خطایی رخ داد');
     } finally {
@@ -138,7 +142,7 @@ const Auth: React.FC = () => {
 
               {!isLogin && (
                 <>
-                  <div className="animate-fade-in-up animation-delay-200">
+              <div className="animate-fade-in-up animation-delay-200">
                     <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
                       نقش
                     </label>

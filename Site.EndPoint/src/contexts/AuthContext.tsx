@@ -10,8 +10,11 @@ interface User {
   role: string;
   fullName: string;
   phone: string;
+  studentPhone?: string;
+  parentPhone?: string;
   createdAt: string;
   updatedAt: string;
+  grade?: string;
 }
 
 interface AuthContextType {

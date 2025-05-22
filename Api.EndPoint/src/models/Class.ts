@@ -5,7 +5,6 @@ export interface IRegistration {
   studentName: string;
   studentPhone: string;
   parentPhone: string;
-  grade: string;
   registeredAt: Date;
   ip: string;
 }
@@ -104,7 +103,6 @@ const classSchema = new Schema<IClass>({
     studentName: { type: String, required: true },
     studentPhone: { type: String, required: true },
     parentPhone: { type: String, required: true },
-    grade: { type: String, required: true },
     registeredAt: { type: Date, default: Date.now },
     ip: { type: String, required: true }
   }]
