@@ -62,7 +62,6 @@ const SEO = ({
         }
       } catch (error) {
         console.error('Error fetching SEO data:', error);
-        // در صورت خطا از مقادیر پیش‌فرض استفاده می‌شود
       }
     };
 
