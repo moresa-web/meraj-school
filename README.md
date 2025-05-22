@@ -54,4 +54,8 @@ docker-compose up --build
 
 - Use meaningful commit messages (preferably in English).
 - Create a new branch for each feature or bugfix.
+<<<<<<< HEAD
 - Pull requests are welcome! 
+=======
+- Pull requests are welcome! 
+>>>>>>> a694c9efad895ef2c49e95f9c58c8b25c2c564fb
