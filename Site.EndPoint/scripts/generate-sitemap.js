@@ -9,7 +9,9 @@ const urls = [
   { url: '/classes', changefreq: 'daily', priority: 0.9 },
   { url: '/news', changefreq: 'daily', priority: 0.8 },
   { url: '/about', changefreq: 'monthly', priority: 0.7 },
-  { url: '/contact', changefreq: 'monthly', priority: 0.7 }
+  { url: '/contact', changefreq: 'monthly', priority: 0.7 },
+  { url: '/register', changefreq: 'monthly', priority: 0.7 },
+  { url: '/login', changefreq: 'monthly', priority: 0.7 }
 ];
 
 // تنظیمات sitemap

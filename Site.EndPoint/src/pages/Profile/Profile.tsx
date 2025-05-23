@@ -70,7 +70,7 @@ const Profile: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    navigate('/auth');
+    navigate('/login');
     return null;
   }
 
