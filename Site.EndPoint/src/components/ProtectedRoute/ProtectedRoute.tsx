@@ -21,7 +21,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!isAuthenticated || !user) {
     console.log('Not authenticated or no user data, redirecting to login');
-    return <Navigate to="/auth" />;
+    return <Navigate to="/login" />;
   }
 
   if (user.role !== 'admin') {

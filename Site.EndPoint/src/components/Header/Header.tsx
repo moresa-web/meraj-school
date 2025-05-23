@@ -161,7 +161,7 @@ const Header: React.FC = () => {
               </button>
             ) : (
               <Link
-                to="/auth"
+                to="/login"
                 className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
               >
                 ورود / ثبت‌نام
@@ -275,7 +275,7 @@ const Header: React.FC = () => {
                     </button>
                   ) : (
                     <Link
-                      to="/auth"
+                      to="/login"
                       className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

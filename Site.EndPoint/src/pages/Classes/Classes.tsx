@@ -207,7 +207,7 @@ const Classes: React.FC = () => {
         // ذخیره مسیر فعلی در localStorage
         localStorage.setItem('redirectAfterLogin', window.location.pathname);
         toast.error('لطفاً ابتدا وارد حساب کاربری خود شوید');
-        navigate('/auth', { replace: true });
+        navigate('/login', { replace: true });
         return;
       }
 
