@@ -34,13 +34,24 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-            <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
+            <div className="flex min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
               <Sidebar />
-              <main className="flex-1 overflow-y-auto p-8">
-                {children}
+              <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 w-full lg:w-[calc(100%-16rem)]">
+                <div className="max-w-7xl mx-auto">
+                  {children}
+                </div>
               </main>
             </div>
-            <Toaster position="top-center" />
+            <Toaster 
+              position="top-center"
+              toastOptions={{
+                className: 'rtl',
+                style: {
+                  direction: 'rtl',
+                  textAlign: 'right',
+                },
+              }}
+            />
           </QueryClientProvider>
         </AuthProvider>
       </body>

@@ -29,21 +29,10 @@ const convertToGregorian = (persianDate: string) => {
   if (!persianDate) return '';
   
   try {
-    // تبدیل اعداد فارسی به انگلیسی
     const englishDate = faToEnDigits(persianDate);
-    console.log('English date:', englishDate);
-    
-    // تبدیل تاریخ شمسی به میلادی
     const [jy, jm, jd] = englishDate.split('/').map(Number);
-    console.log('Jalali components:', { jy, jm, jd });
-    
     const { gy, gm, gd } = jalaali.toGregorian(jy, jm, jd);
-    console.log('Gregorian components:', { gy, gm, gd });
-    
-    const result = `${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`;
-    console.log('Final result:', result);
-    
-    return result;
+    return `${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`;
   } catch (error) {
     console.error('Error converting date:', error);
     return '';
@@ -56,9 +45,6 @@ export default function EditClassForm({
   onSubmit,
   isSubmitting
 }: EditClassFormProps) {
-  console.log('EditClassForm received initialData:', initialData);
-  
-  
   const router = useRouter();
   const { updateClass } = useClasses();
   const [formData, setFormData] = useState<ClassFormData>({
@@ -80,10 +66,9 @@ export default function EditClassForm({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('Setting form data from initialData:', initialData);
     if (initialData) {
       setFormData(initialData);
-      if (initialData.image) {
+      if (typeof initialData.image === 'string') {
         setImagePreview(`${API_URL}${initialData.image}`);
       }
     }
@@ -91,7 +76,6 @@ export default function EditClassForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    console.log('Handling change for field:', name, 'with value:', value);
     
     if (type === 'number') {
       setFormData(prev => ({
@@ -107,10 +91,8 @@ export default function EditClassForm({
   };
 
   const handleDateChange = (field: 'startDate' | 'endDate', date: any) => {
-    console.log('Handling date change for field:', field, 'with date:', date);
     if (date) {
       const persianDate = date.format('YYYY/MM/DD');
-      console.log('Converted to Persian date:', persianDate);
       setFormData(prev => ({
         ...prev,
         [field]: persianDate,
@@ -127,6 +109,10 @@ export default function EditClassForm({
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
+      setFormData(prev => ({
+        ...prev,
+        image: file
+      }));
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -149,17 +135,9 @@ export default function EditClassForm({
     setError(null);
     
     try {
-      // تبدیل تاریخ‌ها به فرمت میلادی
       const startDateGregorian = convertToGregorian(formData.startDate);
       const endDateGregorian = convertToGregorian(formData.endDate);
       
-      console.log('Form data before conversion:', formData);
-      console.log('Converted dates:', {
-        startDate: startDateGregorian,
-        endDate: endDateGregorian
-      });
-      
-      // ایجاد یک آبجکت برای ارسال به API
       const dataToSend = {
         title: formData.title,
         teacher: formData.teacher,
@@ -174,7 +152,6 @@ export default function EditClassForm({
         isActive: formData.isActive
       };
 
-      // اگر تصویر جدیدی آپلود شده باشد، آن را به FormData اضافه می‌کنیم
       const formDataToSend = new FormData();
       Object.entries(dataToSend).forEach(([key, value]) => {
         formDataToSend.append(key, value.toString());
@@ -182,35 +159,25 @@ export default function EditClassForm({
 
       if (imageFile) {
         formDataToSend.append('image', imageFile);
-      } else if (formData.image) {
+      } else if (typeof formData.image === 'string') {
         formDataToSend.append('image', formData.image);
       }
-
-      // لاگ کردن داده‌های ارسالی
-      console.log('Sending form data:', {
-        data: dataToSend,
-        hasImageFile: !!imageFile,
-        hasExistingImage: !!formData.image
-      });
 
       await onSubmit(formDataToSend);
       toast.success('کلاس با موفقیت به‌روزرسانی شد');
     } catch (err: any) {
-      console.error('Submit error:', err);
       setError(err.message || 'خطا در به‌روزرسانی کلاس');
     }
   };
 
-  const inputClass = "mt-1 block w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all duration-200";
+  const inputClass = "mt-1 block w-full px-3 md:px-4 py-2 md:py-3 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all duration-200 text-sm md:text-base";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
   const formGroupClass = "relative";
 
-  console.log('Current form data:', formData);
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 p-4 md:p-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-center mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-center text-sm md:text-base">
           {error}
         </div>
       )}
@@ -230,7 +197,7 @@ export default function EditClassForm({
             placeholder="عنوان کلاس را وارد کنید"
             className={`${inputClass} pr-10`}
           />
-          <AcademicCapIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+          <AcademicCapIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
         </div>
       </div>
 
@@ -249,11 +216,11 @@ export default function EditClassForm({
             placeholder="نام مدرس را وارد کنید"
             className={`${inputClass} pr-10`}
           />
-          <UserCircleIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+          <UserCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <div className={formGroupClass}>
           <label htmlFor="level" className={labelClass}>
             سطح کلاس
@@ -272,7 +239,7 @@ export default function EditClassForm({
               <option value="پیشرفته">پیشرفته</option>
             </select>
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-3 h-3 md:w-4 md:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -294,15 +261,15 @@ export default function EditClassForm({
               placeholder="دسته‌بندی کلاس را وارد کنید"
               className={`${inputClass} pr-10`}
             />
-            <TagIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <TagIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <div className={formGroupClass}>
           <label htmlFor="capacity" className={labelClass}>
-            ظرفیت کلاس
+            ظرفیت
           </label>
           <div className="relative">
             <input
@@ -311,12 +278,12 @@ export default function EditClassForm({
               name="capacity"
               value={formData.capacity}
               onChange={handleChange}
+              min={1}
               required
-              min="1"
               placeholder="ظرفیت کلاس را وارد کنید"
               className={`${inputClass} pr-10`}
             />
-            <UserGroupIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <UserGroupIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
 
@@ -331,17 +298,17 @@ export default function EditClassForm({
               name="price"
               value={formData.price}
               onChange={handleChange}
+              min={0}
               required
-              min="0"
               placeholder="قیمت کلاس را وارد کنید"
               className={`${inputClass} pr-10`}
             />
-            <CurrencyDollarIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <CurrencyDollarIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <div className={formGroupClass}>
           <label htmlFor="startDate" className={labelClass}>
             تاریخ شروع
@@ -352,16 +319,13 @@ export default function EditClassForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               value={formData.startDate}
-              onChange={(date) => {
-                handleDateChange('startDate', date);
-                return false;
-              }}
+              onChange={(date) => handleDateChange('startDate', date)}
               format="YYYY/MM/DD"
               inputClass={`${inputClass} pr-10`}
               containerClassName="w-full"
               placeholder="تاریخ شروع را انتخاب کنید"
             />
-            <CalendarIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
 
@@ -375,23 +339,20 @@ export default function EditClassForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               value={formData.endDate}
-              onChange={(date) => {
-                handleDateChange('endDate', date);
-                return false;
-              }}
+              onChange={(date) => handleDateChange('endDate', date)}
               format="YYYY/MM/DD"
               inputClass={`${inputClass} pr-10`}
               containerClassName="w-full"
               placeholder="تاریخ پایان را انتخاب کنید"
             />
-            <CalendarIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
       </div>
 
       <div className={formGroupClass}>
         <label htmlFor="schedule" className={labelClass}>
-          برنامه زمانی
+          زمان کلاس
         </label>
         <div className="relative">
           <input
@@ -401,10 +362,10 @@ export default function EditClassForm({
             value={formData.schedule}
             onChange={handleChange}
             required
-            placeholder="برنامه زمانی کلاس را وارد کنید"
+            placeholder="زمان کلاس را وارد کنید (مثال: دوشنبه و چهارشنبه 16:00-18:00)"
             className={`${inputClass} pr-10`}
           />
-          <CalendarIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+          <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
         </div>
       </div>
 
@@ -417,42 +378,43 @@ export default function EditClassForm({
           name="description"
           value={formData.description}
           onChange={handleChange}
-          required
           rows={4}
-          placeholder="توضیحات کلاس را وارد کنید"
-          className={inputClass}
+          placeholder="توضیحات کلاس را وارد کنید..."
+          className={`${inputClass} resize-none`}
         />
       </div>
 
-      <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+      <div className="border border-dashed border-gray-300 rounded-lg p-4 md:p-6 bg-gray-50">
         <label htmlFor="image" className={`${labelClass} flex items-center gap-2`}>
-          <PhotoIcon className="w-5 h-5 text-gray-600" />
+          <PhotoIcon className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           تصویر کلاس
         </label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+        <div className="mt-1 flex justify-center px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6 border-2 border-gray-300 border-dashed rounded-lg">
           <div className="space-y-1 text-center">
             {imagePreview ? (
-              <div className="relative">
+              <div className="relative w-full h-40 md:h-48 mb-4">
                 <img
                   src={imagePreview}
-                  alt="Preview"
-                  className="mx-auto h-32 w-32 object-cover rounded-lg"
+                  alt="تصویر کلاس"
+                  className="w-full h-full object-cover rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                 >
-                  <FiX className="h-4 w-4" />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             ) : (
               <>
-                <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
+                <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <div className="flex text-sm text-gray-600">
                   <label
                     htmlFor="image"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-emerald-500"
+                    className="relative cursor-pointer rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-emerald-500"
                   >
                     <span>آپلود تصویر</span>
                     <input
@@ -479,34 +441,37 @@ export default function EditClassForm({
           id="isActive"
           name="isActive"
           checked={formData.isActive}
-          onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+          onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
           className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
         />
-        <label htmlFor="isActive" className="mr-2 block text-sm text-gray-900">
-          کلاس فعال است
+        <label htmlFor="isActive" className="mr-2 block text-sm text-gray-700">
+          فعال بودن کلاس
         </label>
       </div>
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end gap-4">
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          className="px-4 py-2 text-sm md:text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
         >
           انصراف
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 text-sm md:text-base font-medium text-white bg-emerald-600 border border-transparent rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
-              در حال به‌روزرسانی...
-            </div>
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4 md:h-5 md:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              در حال ذخیره...
+            </span>
           ) : (
-            'به‌روزرسانی کلاس'
+            'ذخیره تغییرات'
           )}
         </button>
       </div>

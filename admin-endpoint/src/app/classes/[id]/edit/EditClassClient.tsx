@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useClasses } from '@/hooks/useClasses';
 import EditClassForm from '@/components/classes/EditClassForm';
 import { ClassFormData } from '@/types/class';
+import { AcademicCapIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 
 interface EditClassClientProps {
   initialData: any;
@@ -57,16 +58,28 @@ export default function EditClassClient({ initialData }: EditClassClientProps) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">ویرایش کلاس</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center">
+          <AcademicCapIcon className="h-6 w-6 md:h-7 md:w-7 text-emerald-600 ml-2" />
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800">ویرایش کلاس</h1>
+        </div>
+        <button
+          onClick={() => router.push('/classes')}
+          className="flex items-center px-3 py-2 text-sm text-emerald-600 hover:text-emerald-800 transition-colors"
+        >
+          <ArrowUturnLeftIcon className="h-4 w-4 ml-1" />
+          بازگشت به لیست
+        </button>
+      </div>
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="p-3 md:p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm md:text-base">
+          {error}
+        </div>
+      )}
 
+      <div className="bg-white rounded-lg shadow">
         <EditClassForm
           classId={initialData._id}
           initialData={formData}

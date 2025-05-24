@@ -18,6 +18,15 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     try {
+      console.log('API Request:', {
+        url: config.url,
+        method: config.method,
+        headers: {
+          ...config.headers,
+          Authorization: config.headers.Authorization ? 'Bearer [HIDDEN]' : undefined
+        }
+      });
+
       // Check if we have a valid cached token
       const now = Date.now();
       if (tokenCache && (now - tokenCache.timestamp) < TOKEN_CACHE_DURATION) {
@@ -43,21 +52,28 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
 // Add a response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
   (error) => {
-    // Handle 401 Unauthorized errors
-    if (error.response?.status === 401) {
-      // Clear token cache
-      tokenCache = null;
-      // Redirect to login page
-      window.location.href = '/login';
-    }
+    console.error('API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+      data: error.response?.data
+    });
     return Promise.reject(error);
   }
 );

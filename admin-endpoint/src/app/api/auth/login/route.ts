@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       });
 
       // تنظیم کوکی با امنیت مناسب
-      res.cookies.set('admin_token', response.data.token, {
+      res.cookies.set('auth_token', response.data.token, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

@@ -36,7 +36,6 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('خروج با موفقیت انجام شد');
     setIsUserMenuOpen(false);
   };
 

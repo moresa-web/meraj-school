@@ -2,21 +2,16 @@ export interface Class {
   _id: string;
   title: string;
   teacher: string;
-  schedule: string;
-  description: string;
-  price: number;
   level: string;
-  image: string;
   category: string;
-  views: number;
-  likes: number;
   capacity: number;
-  enrolledStudents: number;
+  price: number;
   startDate: string;
   endDate: string;
+  schedule: string;
+  description: string;
+  image: string;
   isActive: boolean;
-  likedBy: string[];
-  registrations: Registration[];
   createdAt: string;
   updatedAt: string;
 }
@@ -33,14 +28,14 @@ export interface Registration {
 export interface ClassFormData {
   title: string;
   teacher: string;
-  schedule: string;
-  description: string;
-  price: number;
   level: string;
   category: string;
   capacity: number;
+  price: number;
   startDate: string;
   endDate: string;
+  schedule: string;
+  description: string;
+  image: string | File;
   isActive: boolean;
-  image?: File;
 } 
