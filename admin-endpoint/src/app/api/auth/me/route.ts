@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('admin_token');
+    const token = cookieStore.get('auth_token');
 
     if (!token) {
       return NextResponse.json(

@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# پنل مدیریت مرجع
 
-## Getting Started
+این پروژه یک پنل مدیریت برای سیستم مرجع است که با استفاده از Next.js و MongoDB ساخته شده است.
 
-First, run the development server:
+## ویژگی‌ها
 
+- مدیریت کلاس‌ها
+- مدیریت دانش‌آموزان
+- احراز هویت کاربران
+- رابط کاربری زیبا و کاربرپسند
+- پشتیبانی از زبان فارسی
+- طراحی واکنش‌گرا
+
+## پیش‌نیازها
+
+- Node.js 18 یا بالاتر
+- MongoDB 6 یا بالاتر
+- npm یا yarn
+
+## نصب
+
+1. کلون کردن مخزن:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/meraj.git
+cd meraj/admin-endpoint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. نصب وابستگی‌ها:
+```bash
+npm install
+# یا
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. ایجاد فایل .env.local:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. ویرایش فایل .env.local و تنظیم متغیرهای محیطی:
+```env
+MONGODB_URI=mongodb://localhost:27017/meraj
+MONGODB_DB=meraj
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key
+```
 
-## Learn More
+5. اجرای پروژه در محیط توسعه:
+```bash
+npm run dev
+# یا
+yarn dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## ساخت
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+برای ساخت پروژه برای محیط تولید:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+# یا
+yarn build
+```
 
-## Deploy on Vercel
+## اجرا در محیط تولید
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run start
+# یا
+yarn start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## تست
+
+```bash
+npm run test
+# یا
+yarn test
+```
+
+## لینت
+
+```bash
+npm run lint
+# یا
+yarn lint
+```
+
+## ساختار پروژه
+
+```
+admin-endpoint/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── auth/
+│   │   ├── classes/
+│   │   └── layout.tsx
+│   ├── components/
+│   │   ├── classes/
+│   │   └── ui/
+│   ├── hooks/
+│   ├── lib/
+│   └── types/
+├── public/
+├── .env.local
+├── .gitignore
+├── package.json
+├── README.md
+└── tsconfig.json
+```
+
+## تکنولوژی‌ها
+
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [MongoDB](https://www.mongodb.com/)
+- [NextAuth.js](https://next-auth.js.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Zod](https://github.com/colinhacks/zod)
+- [React Hook Form](https://react-hook-form.com/)
+
+## مشارکت
+
+1. Fork کردن پروژه
+2. ایجاد branch جدید (`git checkout -b feature/amazing-feature`)
+3. Commit کردن تغییرات (`git commit -m 'Add some amazing feature'`)
+4. Push کردن به branch (`git push origin feature/amazing-feature`)
+5. ایجاد Pull Request
+
+## مجوز
+
+این پروژه تحت مجوز MIT منتشر شده است. برای اطلاعات بیشتر به فایل [LICENSE](LICENSE) مراجعه کنید.
+
+## تماس
+
+- ایمیل: your-email@example.com
+- وب‌سایت: https://your-website.com
+- توییتر: [@your-twitter](https://twitter.com/your-twitter)

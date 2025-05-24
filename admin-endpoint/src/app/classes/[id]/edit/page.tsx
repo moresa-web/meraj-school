@@ -23,9 +23,9 @@ export default async function EditClassPage({ params }: EditClassPageProps) {
   
   if (!classData) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+          <div className="p-3 md:p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm md:text-base">
             خطا در دریافت اطلاعات کلاس
           </div>
         </div>

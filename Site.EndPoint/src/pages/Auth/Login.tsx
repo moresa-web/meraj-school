@@ -27,7 +27,6 @@ const Login: React.FC = () => {
 
     try {
       await login(formData.email, formData.password);
-      toast.success('ورود موفقیت‌آمیز');
       
       // اگر کاربر از صفحه خاصی به لاگین هدایت شده بود، به همان صفحه برمی‌گردد
       const from = (location.state as any)?.from?.pathname || '/';

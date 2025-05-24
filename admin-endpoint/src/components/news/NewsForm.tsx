@@ -129,14 +129,14 @@ const NewsForm: React.FC<NewsFormProps> = ({
   };
 
   // Define input styles
-  const inputClass = "mt-1 block w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all duration-200";
+  const inputClass = "mt-1 block w-full px-3 md:px-4 py-2 md:py-3 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all duration-200 text-sm md:text-base";
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";
   const formGroupClass = "relative";
   
   const isSubmitting = externalIsSubmitting ?? internalIsSubmitting;
   
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" id="news-form">
+    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 p-4 md:p-6" id="news-form">
       <div className={formGroupClass}>
         <label htmlFor="title" className={labelClass}>
           عنوان خبر
@@ -152,7 +152,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
             placeholder="عنوان خبر را وارد کنید"
             className={`${inputClass} pr-10`}
           />
-          <DocumentTextIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+          <DocumentTextIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
         </div>
       </div>
 
@@ -187,7 +187,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         <div className={formGroupClass}>
           <label htmlFor="category" className={labelClass}>
             دسته‌بندی
@@ -208,7 +208,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
               <option value="کلاس‌های تقویتی">کلاس‌های تقویتی</option>
             </select>
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-3 h-3 md:w-4 md:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -229,20 +229,20 @@ const NewsForm: React.FC<NewsFormProps> = ({
               placeholder="نام نویسنده را وارد کنید"
               className={`${inputClass} pr-10`}
             />
-            <UserCircleIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+            <UserCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
         </div>
       </div>
 
-      <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+      <div className="border border-dashed border-gray-300 rounded-lg p-4 md:p-6 bg-gray-50">
         <label htmlFor="image" className={`${labelClass} flex items-center gap-2`}>
-          <PhotoIcon className="w-5 h-5 text-gray-600" />
+          <PhotoIcon className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           تصویر خبر
         </label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+        <div className="mt-1 flex justify-center px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6 border-2 border-gray-300 border-dashed rounded-lg">
           <div className="space-y-1 text-center">
             {previewImage ? (
-              <div className="relative w-full h-48 mb-4">
+              <div className="relative w-full h-40 md:h-48 mb-4">
                 <img
                   src={previewImage}
                   alt="تصویر خبر"
@@ -252,32 +252,22 @@ const NewsForm: React.FC<NewsFormProps> = ({
                   type="button"
                   onClick={() => {
                     setPreviewImage(null);
-                    setFormData(prev => ({ ...prev, image: undefined }));
+                    setFormData((prev) => ({ ...prev, image: undefined }));
                   }}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                 >
-                  ×
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             ) : (
-              <div className="text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <div className="mt-4 flex text-sm text-gray-600">
+              <>
+                <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-600">
                   <label
                     htmlFor="image"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-emerald-500"
+                    className="relative cursor-pointer rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-emerald-500"
                   >
                     <span>آپلود تصویر</span>
                     <input
@@ -292,7 +282,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                   <p className="pr-1">یا فایل را اینجا رها کنید</p>
                 </div>
                 <p className="text-xs text-gray-500">PNG, JPG, GIF تا 10MB</p>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -312,25 +302,29 @@ const NewsForm: React.FC<NewsFormProps> = ({
             placeholder="برچسب را وارد کنید و Enter را بزنید"
             className={`${inputClass} pr-10`}
           />
-          <TagIcon className="absolute right-3 top-[14px] text-gray-400 w-5 h-5" />
+          <TagIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {formData.tags?.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-emerald-50 text-emerald-700"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="mr-1 text-emerald-500 hover:text-emerald-700"
+        {formData.tags && formData.tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {formData.tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs md:text-sm font-medium bg-emerald-100 text-emerald-800"
               >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="text-emerald-600 hover:text-emerald-800"
+                >
+                  <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center">
@@ -339,27 +333,38 @@ const NewsForm: React.FC<NewsFormProps> = ({
           id="isPublished"
           name="isPublished"
           checked={formData.isPublished}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, isPublished: e.target.checked }))
-          }
-          className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+          onChange={(e) => setFormData((prev) => ({ ...prev, isPublished: e.target.checked }))}
+          className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
         />
-        <label htmlFor="isPublished" className="mr-2 text-sm text-gray-700">
+        <label htmlFor="isPublished" className="mr-2 block text-sm text-gray-700">
           انتشار خبر
         </label>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end gap-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-4 py-2 text-sm md:text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+        >
+          انصراف
+        </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`px-6 py-2.5 rounded-lg text-white font-medium ${
-            isSubmitting
-              ? 'bg-emerald-400 cursor-not-allowed'
-              : 'bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow'
-          } transition-colors duration-200`}
+          className="px-4 py-2 text-sm md:text-base font-medium text-white bg-emerald-600 border border-transparent rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'در حال ذخیره...' : isEdit ? 'ویرایش خبر' : 'ذخیره خبر'}
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4 md:h-5 md:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              در حال ذخیره...
+            </span>
+          ) : (
+            'ذخیره خبر'
+          )}
         </button>
       </div>
     </form>

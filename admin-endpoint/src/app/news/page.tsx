@@ -35,12 +35,17 @@ export default function NewsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">مدیریت اخبار</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">مدیریت اخبار</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            مدیریت و ویرایش اخبار سایت
+          </p>
+        </div>
         <Link
           href="/news/new"
-          className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors w-full sm:w-auto justify-center"
         >
           <svg
             className="w-5 h-5 ml-2"
@@ -60,12 +65,14 @@ export default function NewsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+        <div className="p-4 bg-red-100 text-red-700 rounded-lg">
           {error}
         </div>
       )}
 
-      <NewsList news={news} loading={loading} onDelete={handleDelete} />
+      <div className="bg-white rounded-lg shadow">
+        <NewsList news={news} loading={loading} onDelete={handleDelete} />
+      </div>
     </div>
   );
 } 

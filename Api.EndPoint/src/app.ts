@@ -20,7 +20,7 @@ import uploadRoutes from './routes/upload';
 import emailTemplateRoutes from './routes/emailTemplate';
 import dashboard from "./routes/dashboard"
 import classesRouter from './routes/classes';
-import sitemapRoutes from './routes/sitemap';
+import sitemapRoutes from './routes/sitemapRoutes';
 import usersRouter from './routes/users';
 
 // لود کردن متغیرهای محیطی
@@ -98,7 +98,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/dashboard', dashboard);
-app.use('/', sitemapRoutes);
+app.use('/api/sitemap', sitemapRoutes);
 app.use('/api/users', usersRouter);
 
 // مسیر آپلود فایل

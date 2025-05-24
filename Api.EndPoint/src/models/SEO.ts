@@ -1,37 +1,59 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ISEO extends Document {
-  title: string;
-  description: string;
-  keywords: string[];
-  image: string;
-  siteUrl: string;
-  schoolName: string;
-  address: string;
-  phone: string;
-  email: string;
-  socialMedia: {
-    instagram?: string;
-    twitter?: string;
-  };
+    siteUrl: string;
+    siteName: string;
+    siteDescription: string;
+    keywords: string[];
+    googleAnalyticsId?: string;
+    googleTagManagerId?: string;
+    robotsTxt?: string;
+    sitemapUrl?: string;
+    updatedAt: Date;
 }
 
-const SEOSchema: Schema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  keywords: [{ type: String, required: true }],
-  image: { type: String, required: true },
-  siteUrl: { type: String, required: true },
-  schoolName: { type: String, required: true },
-  address: { type: String, required: true },
-  phone: { type: String, required: true },
-  email: { type: String, required: true },
-  socialMedia: {
-    instagram: { type: String },
-    twitter: { type: String }
-  }
+const seoSchema = new Schema<ISEO>({
+    siteUrl: {
+        type: String,
+        required: [true, 'آدرس سایت الزامی است'],
+        trim: true
+    },
+    siteName: {
+        type: String,
+        required: [true, 'نام سایت الزامی است'],
+        trim: true
+    },
+    siteDescription: {
+        type: String,
+        required: [true, 'توضیحات سایت الزامی است'],
+        trim: true
+    },
+    keywords: [{
+        type: String,
+        trim: true
+    }],
+    googleAnalyticsId: {
+        type: String,
+        trim: true
+    },
+    googleTagManagerId: {
+        type: String,
+        trim: true
+    },
+    robotsTxt: {
+        type: String,
+        trim: true
+    },
+    sitemapUrl: {
+        type: String,
+        trim: true
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
 }, {
-  timestamps: true
+    timestamps: true
 });
 
-export default mongoose.model<ISEO>('SEO', SEOSchema); 
+export default mongoose.model<ISEO>('SEO', seoSchema); 
