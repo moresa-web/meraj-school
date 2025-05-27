@@ -15,25 +15,43 @@ declare global {
 }
 
 // میدلور احراز هویت
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+        // دریافت توکن از هدر Authorization
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'لطفاً ابتدا وارد حساب کاربری خود شوید'
+            });
+        }
 
+        const token = authHeader.split(' ')[1];
   if (!token) {
-      throw new Error();
+            return res.status(401).json({
+                status: 'error',
+                message: 'توکن احراز هویت یافت نشد'
+            });
   }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
-    const user = await User.findOne({ _id: decoded._id });
-
-    if (!user) {
-      throw new Error();
+        // بررسی اعتبار توکن
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as TokenPayload;
+        if (!decoded) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'توکن نامعتبر است'
+            });
     }
 
+        // اضافه کردن اطلاعات کاربر به درخواست
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'لطفا وارد حساب کاربری خود شوید' });
+        console.error('Auth middleware error:', error);
+        return res.status(401).json({
+            status: 'error',
+            message: 'خطا در احراز هویت'
+        });
   }
 };
 

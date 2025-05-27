@@ -7,7 +7,7 @@ import {
   deleteTemplate,
   getActiveTemplate
 } from '../controllers/emailTemplateController';
-import { auth, isAdmin } from '../middleware/auth';
+import { authMiddleware as auth, isAdmin } from '../middleware/auth.middleware';
 
 const router = express.Router();
 

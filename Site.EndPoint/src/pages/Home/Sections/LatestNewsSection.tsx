@@ -29,7 +29,7 @@ export const LatestNewsSection: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState<NewsContent>({
     title: 'آخرین اخبار',
-    description: 'جدیدترین اخبار و رویدادهای مدرسه مرج',
+    description: 'جدیدترین اخبار و رویدادهای مدرسه معراج',
     news: []
   });
   const [likedNews, setLikedNews] = useState<Set<string>>(new Set());

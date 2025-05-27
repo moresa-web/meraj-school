@@ -24,7 +24,7 @@ export const useSiteInfo = () => {
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     fetchSiteInfo();
@@ -32,7 +32,7 @@ export const useSiteInfo = () => {
 
   const fetchSiteInfo = async () => {
     try {
-      const response = await fetch(`${API_URL}/seo`);
+      const response = await fetch(`${API_URL}/api/seo`);
       if (!response.ok) {
         throw new Error('خطا در دریافت اطلاعات سایت');
       }
@@ -56,7 +56,7 @@ export const useSiteInfo = () => {
 
       console.log('Sending to server:', data);
 
-      const response = await fetch(`${API_URL}/seo`, {
+      const response = await fetch(`${API_URL}/api/seo`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

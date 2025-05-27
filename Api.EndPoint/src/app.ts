@@ -22,6 +22,9 @@ import dashboard from "./routes/dashboard"
 import classesRouter from './routes/classes';
 import sitemapRoutes from './routes/sitemapRoutes';
 import usersRouter from './routes/users';
+import chatRoutes from './routes/chatRoutes';
+import { errorHandler } from './middleware/errorHandler';
+import faqRoutes from './routes/faqRoutes';
 
 // لود کردن متغیرهای محیطی
 dotenv.config();
@@ -36,23 +39,27 @@ const limiter = rateLimit({
   message: 'تعداد درخواست‌های شما بیش از حد مجاز است. لطفاً کمی صبر کنید.'
 });
 
+// تنظیمات امنیتی
+app.use(helmet());
+
 // تنظیمات CORS
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ['http://mohammadrezasardashti.ir', 'http://admin.mohammadrezasardashti.ir']
-  : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    process.env.FRONTEND_URL
+].filter(Boolean);
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+    origin: function(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 app.use(express.json());
@@ -100,6 +107,8 @@ app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/dashboard', dashboard);
 app.use('/api/sitemap', sitemapRoutes);
 app.use('/api/users', usersRouter);
+app.use('/api/chat', chatRoutes);
+app.use('/api/faq', faqRoutes);
 
 // مسیر آپلود فایل
 app.post('/api/upload', upload.single('image'), (req, res) => {
@@ -121,11 +130,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Meraj School API' });
 });
 
-// مدیریت خطاها
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'خطای سرور' });
-});
+// مدیریت خطا
+app.use(errorHandler);
 
 // اتصال به دیتابیس و شروع سرور
 const PORT = process.env.PORT || 5000;

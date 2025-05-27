@@ -51,7 +51,7 @@ const SEO = () => {
 
   const fetchSEOData = async () => {
     try {
-      const response = await api.get('/seo');
+      const response = await api.get('/api/seo');
       setSeoData(response.data);
     } catch (error) {
       console.error('Error fetching SEO data:', error);
@@ -66,7 +66,7 @@ const SEO = () => {
     setSaving(true);
 
     try {
-      await api.put('/seo', seoData);
+      await api.put('/api/seo', seoData);
       toast.success(t('success.seoUpdated'));
     } catch (error) {
       console.error('Error updating SEO data:', error);

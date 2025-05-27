@@ -1,6 +1,6 @@
 import express from 'express';
 import { getPageContent, updatePageContent, createPageContent } from '../controllers/pageContent.controller';
-import { auth } from '../middleware/auth';
+import { authMiddleware as auth } from '../middleware/auth.middleware';
 
 const router = express.Router();
 

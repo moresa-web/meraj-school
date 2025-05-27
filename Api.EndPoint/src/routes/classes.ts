@@ -11,7 +11,7 @@ import {
   unregisterFromClass,
   getClassStudents
 } from '../controllers/classController';
-import { auth } from '../middleware/auth';
+import { authMiddleware as auth } from '../middleware/auth.middleware';
 import { upload } from '../controllers/upload.controller';
 import { Class } from '../models/Class';
 

@@ -1,48 +1,72 @@
-import Redis from 'ioredis';
-import { promisify } from 'util';
+import { logger } from '../utils/logger';
 
-class SitemapCache {
-    private redis: Redis;
+export class SitemapCache {
+    private static instance: SitemapCache;
+    private cache: Map<string, { content: string; expiry: number }>;
     private readonly CACHE_TTL = 3600; // 1 hour in seconds
 
-    constructor() {
-        this.redis = new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
-            port: parseInt(process.env.REDIS_PORT || '6379'),
-            password: process.env.REDIS_PASSWORD,
-        });
+    private constructor() {
+        this.cache = new Map();
     }
 
-    // ذخیره sitemap در کش
-    async setSitemap(type: string, content: string): Promise<void> {
-        const key = `sitemap:${type}`;
-        await this.redis.set(key, content, 'EX', this.CACHE_TTL);
+    public static getInstance(): SitemapCache {
+        if (!SitemapCache.instance) {
+            SitemapCache.instance = new SitemapCache();
+        }
+        return SitemapCache.instance;
     }
 
-    // دریافت sitemap از کش
-    async getSitemap(type: string): Promise<string | null> {
-        const key = `sitemap:${type}`;
-        return await this.redis.get(key);
-    }
-
-    // پاک کردن کش sitemap
-    async clearSitemap(type?: string): Promise<void> {
-        if (type) {
-            const key = `sitemap:${type}`;
-            await this.redis.del(key);
-        } else {
-            const keys = await this.redis.keys('sitemap:*');
-            if (keys.length > 0) {
-                await this.redis.del(...keys);
-            }
+    public async set(key: string, content: string): Promise<void> {
+        try {
+            const expiry = Date.now() + (this.CACHE_TTL * 1000);
+            this.cache.set(key, { content, expiry });
+        } catch (error) {
+            logger.error('Error setting sitemap cache:', error);
         }
     }
 
-    // به‌روزرسانی TTL کش
-    async refreshTTL(type: string): Promise<void> {
-        const key = `sitemap:${type}`;
-        await this.redis.expire(key, this.CACHE_TTL);
-    }
-}
+    public async get(key: string): Promise<string | null> {
+        try {
+            const cached = this.cache.get(key);
+            if (!cached) return null;
 
-export const sitemapCache = new SitemapCache(); 
+            if (Date.now() > cached.expiry) {
+                this.cache.delete(key);
+                return null;
+            }
+
+            return cached.content;
+        } catch (error) {
+            logger.error('Error getting sitemap cache:', error);
+            return null;
+        }
+    }
+
+    public async delete(key: string): Promise<void> {
+        try {
+            this.cache.delete(key);
+        } catch (error) {
+            logger.error('Error deleting sitemap cache:', error);
+        }
+    }
+
+    public async clear(): Promise<void> {
+        try {
+            this.cache.clear();
+        } catch (error) {
+            logger.error('Error clearing sitemap cache:', error);
+        }
+    }
+
+    public async refresh(key: string): Promise<void> {
+        try {
+            const cached = this.cache.get(key);
+            if (cached) {
+                const expiry = Date.now() + (this.CACHE_TTL * 1000);
+                this.cache.set(key, { ...cached, expiry });
+            }
+        } catch (error) {
+            logger.error('Error refreshing sitemap cache:', error);
+        }
+    }
+} 

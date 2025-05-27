@@ -13,7 +13,7 @@ import {
   loginOrRegister,
   createAdmin
 } from '../controllers/authController';
-import { auth } from '../middleware/auth';
+import { authMiddleware as auth } from '../middleware/auth.middleware';
 
 const router = express.Router();
 

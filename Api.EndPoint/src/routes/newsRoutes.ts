@@ -1,5 +1,5 @@
 import express from 'express';
-import { auth, isAdmin } from '../middleware/auth';
+import { authMiddleware as auth, isAdmin } from '../middleware/auth.middleware';
 import {
   getNews,
   getNewsBySlug,

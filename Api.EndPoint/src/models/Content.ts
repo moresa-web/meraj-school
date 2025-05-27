@@ -52,7 +52,7 @@ const defaultContent: Record<string, Record<string, any>> = {
     },
     news: {
       title: 'آخرین اخبار',
-      description: 'جدیدترین اخبار و رویدادهای مدرسه مرج',
+      description: 'جدیدترین اخبار و رویدادهای مدرسه معراج',
       news: [
         {
           _id: '1',

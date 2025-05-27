@@ -23,6 +23,7 @@ import { I18nextProvider } from 'react-i18next';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Profile from './pages/Profile/Profile';
+import ChatBox from './components/ChatBox';
 
 // کامپوننت اصلی برنامه که از useAuth استفاده می‌کند
 const AppContent: React.FC = () => {
@@ -73,6 +74,7 @@ const AppContent: React.FC = () => {
         </Routes>
       </main>
       <Footer />
+      <ChatBox />
     </div>
   );
 };

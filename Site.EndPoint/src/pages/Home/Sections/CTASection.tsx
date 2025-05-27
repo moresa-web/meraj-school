@@ -18,7 +18,7 @@ interface CTAContent {
 
 const defaultContent: CTAContent = {
   title: 'آماده‌ای برای شروع؟',
-  description: 'همین حالا به خانواده بزرگ مدرسه مرج بپیوندید و از امکانات آموزشی منحصر به فرد ما بهره‌مند شوید.',
+  description: 'همین حالا به خانواده بزرگ مدرسه معراج بپیوندید و از امکانات آموزشی منحصر به فرد ما بهره‌مند شوید.',
   primaryButton: {
     text: 'ثبت‌نام کلاس‌های تقویتی',
     link: '/classes'

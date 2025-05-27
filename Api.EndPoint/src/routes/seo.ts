@@ -1,7 +1,7 @@
 import express from 'express';
 import { Router } from 'express';
 import SEO from '../models/SEO';
-import { auth } from '../middleware/auth';
+import { authMiddleware as auth } from '../middleware/auth.middleware';
 
 const router: Router = express.Router();
 

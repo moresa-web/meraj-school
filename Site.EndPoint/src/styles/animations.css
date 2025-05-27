@@ -54,4 +54,36 @@
 
 .animation-delay-4000 {
   animation-delay: 4000ms;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+
+@keyframes slide-left {
+  from { transform: translateX(40px); opacity: 0.5; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-left {
+  animation: slide-left 0.18s;
+}
+
+@keyframes slide-right {
+  from { transform: translateX(-40px); opacity: 0.5; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-right {
+  animation: slide-right 0.18s;
 } 
