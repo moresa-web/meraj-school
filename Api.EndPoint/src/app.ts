@@ -22,9 +22,10 @@ import dashboard from "./routes/dashboard"
 import classesRouter from './routes/classes';
 import sitemapRoutes from './routes/sitemapRoutes';
 import usersRouter from './routes/users';
-import chatRoutes from './routes/chatRoutes';
+import chatRoutes from './routes/chat.routes';
 import { errorHandler } from './middleware/errorHandler';
 import faqRoutes from './routes/faqRoutes';
+import SignalRService from './services/signalr.service';
 
 // لود کردن متغیرهای محیطی
 dotenv.config();
@@ -138,9 +139,12 @@ const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/meraj-school')
   .then(() => {
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
+
+    // راه‌اندازی SignalR
+    const signalRService = new SignalRService(server);
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error);

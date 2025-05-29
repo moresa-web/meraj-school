@@ -1,44 +1,101 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Message } from '../../types/chat';
+import { format } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
+import { FiClock } from 'react-icons/fi';
 
 interface ChatMessageProps {
-    message: Message;
-    isLastMessage: boolean;
+    message: {
+        id: string;
+        senderId: string;
+        senderName: string;
+        message: string;
+        timestamp: Date | string | number | null | undefined;
+        isRead: boolean;
+        fileUrl?: string;
+        fileName?: string;
+        fileType?: string;
+        isDeleted: boolean;
+        createdAt?: Date;
+    };
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLastMessage }) => {
-    const isUser = message.sender === 'user';
+const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+    const { user } = useAuth();
+    const isCurrentUser = message.senderId === user?._id;
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
-        >
-            <div
-                className={`max-w-[80%] rounded-2xl p-3 ${
-                    isUser
-                        ? 'bg-[#10b981] text-white rounded-br-none'
-                        : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                }`}
-            >
-                <div className="text-sm">{message.text}</div>
-                <div
-                    className={`text-xs mt-1 ${
-                        isUser ? 'text-[#b5ffe1]' : 'text-gray-500'
-                    }`}
-                >
-                    {new Date(message.timestamp).toLocaleTimeString('fa-IR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                    })}
+    // تابع کمکی برای فرمت کردن تاریخ
+    const formatDate = (dateValue: string | Date | undefined) => {
+        if (!dateValue) return '--:--';
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) {
+            console.warn('Invalid date value:', dateValue);
+            return '--:--';
+        }
+        return format(date, 'HH:mm');
+    };
+
+    // مقدار زمان را از timestamp یا createdAt بخوان
+    const dateValue = message.timestamp || message.createdAt;
+    const timeString = formatDate(dateValue);
+
+    if (message.isDeleted) {
+        return (
+            <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
+                <div className="bg-gray-100 rounded-lg px-4 py-2 text-gray-500 italic">
+                    این پیام حذف شده است
                 </div>
             </div>
-        </motion.div>
+        );
+    }
+
+    return (
+        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
+            <div className={`max-w-[70%] ${isCurrentUser ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg px-4 py-2`}>
+                {!isCurrentUser && (
+                    <div className="text-xs font-semibold mb-1">{message.senderName}</div>
+                )}
+                <div className="break-words">{message.message}</div>
+                {message.fileUrl && (
+                    <div className="mt-2">
+                        {message.fileType?.startsWith('image/') ? (
+                            <img
+                                src={message.fileUrl}
+                                alt={message.fileName || 'تصویر'}
+                                className="max-w-full rounded-lg"
+                            />
+                        ) : (
+                            <a
+                                href={message.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:text-blue-700 underline"
+                            >
+                                {message.fileName || 'دانلود فایل'}
+                            </a>
+                        )}
+                    </div>
+                )}
+                <div
+                    className={`flex items-center justify-end mt-2 space-x-1 space-x-reverse ${isCurrentUser ? 'text-white/70' : 'text-gray-500'
+                        }`}
+                >
+                    {isCurrentUser && (
+                        <span className="text-xs flex items-center">
+                            {message.isRead ? (
+                                <span className="ml-1">✓✓</span>
+                            ) : (
+                                <span className="ml-1">✓</span>
+                            )}
+                        </span>
+                    )}
+                    <span className="text-xs flex items-center">
+                        <FiClock className="ml-1" size={13} />
+                        {timeString}
+                    </span>
+                </div>
+            </div>
+        </div>
     );
 };
 
-export default ChatMessage; 
+export default ChatMessage;

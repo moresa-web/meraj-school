@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { FiMessageSquare } from 'react-icons/fi';
 
 const menuItems = [
   {
@@ -59,11 +60,16 @@ const menuItems = [
     href: '/sitemap',
     icon: MapIcon,
   },
+  {
+    name: 'چت آنلاین',
+    icon: FiMessageSquare,
+    href: '/chat',
+  },
 ];
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const { user, loading } = useCurrentUser();
+  const { data: userData, isLoading } = useCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
 
   const getInitials = (name?: string) => {
@@ -83,11 +89,11 @@ const Sidebar = () => {
   const SidebarContent = () => (
     <>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-1">دبیرستان معراج</h1>
+        <h1 className="text-2xl font-bold mb-1 text-white">دبیرستان معراج</h1>
         <p className="text-emerald-200 text-sm">پنل مدیریت</p>
       </div>
 
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -101,8 +107,8 @@ const Sidebar = () => {
                   : 'text-emerald-100 hover:bg-emerald-700/50'
               }`}
             >
-              <item.icon className="h-5 w-5" />
-              {item.name}
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">{item.name}</span>
             </Link>
           );
         })}
@@ -110,17 +116,17 @@ const Sidebar = () => {
 
       <div className="p-4 border-t border-emerald-700">
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-10 w-10 flex-shrink-0">
             <AvatarFallback className="bg-emerald-600 text-white">
-              {loading ? '...' : getInitials(user?.fullName)}
+              {isLoading ? '...' : getInitials(userData?.fullName)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <p className="font-medium">
-              {loading ? 'در حال بارگذاری...' : user?.fullName || 'کاربر'}
+          <div className="min-w-0 flex-1">
+            <p className="font-medium truncate">
+              {isLoading ? 'در حال بارگذاری...' : userData?.fullName || 'کاربر'}
             </p>
-            <p className="text-sm text-emerald-200">
-              {loading ? '...' : user?.email || 'ایمیل نامشخص'}
+            <p className="text-sm text-emerald-200 truncate">
+              {isLoading ? '...' : userData?.email || 'ایمیل نامشخص'}
             </p>
           </div>
         </div>

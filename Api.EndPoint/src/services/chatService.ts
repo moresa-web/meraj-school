@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { ChatMessage, ChatResponse, ConversationContext } from '../types/chat';
 import { SchoolInfo } from '../models/SchoolInfo';
 import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
 import { ChatMessageModel, IChatMessage } from '../models/ChatMessage';
-import { UserModel } from '../models/User';
+import { User } from '../models/User';
 import mongoose from 'mongoose';
 
 // تنظیمات Hugging Face
@@ -18,7 +17,7 @@ const MEMORY_CHECK_INTERVAL = 5 * 60 * 1000; // هر 5 دقیقه
 const MEMORY_THRESHOLD = 0.8; // 80% حافظه
 
 // حافظه موقت برای ذخیره مکالمات با TTL
-const conversationCache = new Map<string, { messages: ChatMessage[], timestamp: number }>();
+const conversationCache = new Map<string, { messages: IChatMessage[], timestamp: number }>();
 
 // پاکسازی خودکار حافظه موقت
 setInterval(() => {
@@ -70,48 +69,6 @@ setInterval(() => {
     }
 }, MEMORY_CHECK_INTERVAL);
 
-// انواع مختلف چت
-export enum ChatType {
-    SUPPORT = 'support',
-    AI = 'ai',
-    FAQ = 'faq',
-    TEAM = 'team'
-}
-
-// ساختار پیام
-export interface Message {
-    id: string;
-    text: string;
-    sender: 'user' | 'bot' | 'ai' | 'support';
-    timestamp: Date;
-    type: ChatType;
-    metadata?: {
-        isRead?: boolean;
-        attachments?: string[];
-        status?: 'sent' | 'delivered' | 'read';
-    };
-}
-
-// درخواست چت
-export interface ChatRequest {
-    message: string;
-    type: ChatType;
-    conversationId?: string;
-    metadata?: {
-        userId?: string;
-        userName?: string;
-        userEmail?: string;
-    };
-}
-
-// پاسخ چت
-export interface ChatResponse {
-    message: Message;
-    conversationId: string;
-    status: 'success' | 'error';
-    error?: string;
-}
-
 export class ChatService {
     private static instance: ChatService;
 
@@ -128,45 +85,18 @@ export class ChatService {
         return ChatService.instance;
     }
 
-    public async processMessage(message: string): Promise<IChatMessage> {
+    public async processMessage(message: string): Promise<string> {
         try {
-            // بررسی اعتبارسنجی ورودی
             if (!message.trim()) {
                 throw new AppError('متن پیام نمی‌تواند خالی باشد', 400);
             }
-
-            // تولید پاسخ هوش مصنوعی با مدیریت منابع
             const aiResponse = await this.generateAIResponse(message);
-
-            // ساخت پیام
-            const chatMessage: IChatMessage = {
-                id: `msg-${Date.now()}`,
-                text: aiResponse,
-                sender: 'ai',
-                timestamp: new Date(),
-                type: 'text',
-                metadata: {
-                    isRead: false,
-                    status: 'sent'
-                }
-            };
-
-            // ذخیره پیام در دیتابیس
-            const savedMessage = await this.saveMessage(chatMessage);
-
-            // پاکسازی منابع
-            if (global.gc) {
-                global.gc();
-            }
-
-            return savedMessage;
+            return aiResponse;
         } catch (error) {
             logger.error('Error in processMessage:', error);
-            
             if (error instanceof AppError) {
                 throw error;
             }
-            
             throw new AppError('خطا در پردازش پیام', 500);
         }
     }
@@ -275,116 +205,84 @@ export class ChatService {
 
     private async saveMessage(messageData: Partial<IChatMessage>): Promise<IChatMessage> {
         try {
-            // بررسی اعتبارسنجی داده‌های ورودی
-            if (!messageData.text || !messageData.sender) {
-                throw new AppError('متن پیام و فرستنده الزامی است', 400);
+            if (!messageData.text || !messageData.senderId) {
+                throw new AppError('متن پیام و شناسه فرستنده الزامی است', 400);
             }
-
-            // ساخت پیام با مقادیر پیش‌فرض
             const message = new ChatMessageModel({
-                id: messageData.id || `msg-${Date.now()}`,
+                chatId: messageData.chatId,
+                senderId: messageData.senderId,
+                senderName: messageData.senderName,
+                message: messageData.text,
                 text: messageData.text,
-                sender: messageData.sender,
-                type: messageData.type || 'text',
-                metadata: {
-                    isRead: false,
-                    status: 'sent',
-                    ...messageData.metadata
-                },
-                timestamp: messageData.timestamp || new Date()
+                timestamp: messageData.timestamp || new Date(),
+                isDeleted: false,
+                fileUrl: messageData.fileUrl,
+                fileName: messageData.fileName,
+                fileType: messageData.fileType,
+                metadata: messageData.metadata
             });
-
-            // اعتبارسنجی قبل از ذخیره
             const validationError = message.validateSync();
             if (validationError) {
                 throw new AppError(`خطا در اعتبارسنجی پیام: ${validationError.message}`, 400);
             }
-
-            // ذخیره پیام
-            const savedMessage = await message.save();
-            return savedMessage;
+            return await message.save();
         } catch (error) {
             logger.error('Error saving message:', error);
-            if (error instanceof AppError) {
-                throw error;
-            }
+            if (error instanceof AppError) throw error;
             throw new AppError('خطا در ذخیره پیام', 500);
         }
     }
 
-    // دریافت تاریخچه مکالمه
-    public async getConversationHistory(userId: string): Promise<ChatMessage[]> {
+    // دریافت تاریخچه مکالمه بر اساس chatId
+    public async getConversationHistory(chatId: string): Promise<IChatMessage[]> {
         try {
-            const messages = await ChatMessageModel.find({ userId })
+            return await ChatMessageModel.find({ chatId, isDeleted: false })
                 .sort({ timestamp: -1 })
                 .limit(50);
-            return messages;
         } catch (error) {
             logger.error('Error getting conversation history:', error);
-            throw new AppError(500, 'خطا در دریافت تاریخچه مکالمات');
+            throw new AppError('خطا در دریافت تاریخچه مکالمات', 500);
         }
     }
 
-    // ارسال پیام به پشتیبانی
-    public async sendSupportMessage(text: string, userId: string): Promise<ChatResponse> {
+    // ارسال پیام به پشتیبانی (اصلاح ساختار پیام)
+    public async sendSupportMessage(text: string, userId: string): Promise<any> {
         try {
-            const user = await UserModel.findById(userId);
-            if (!user) {
-                throw new AppError(404, 'کاربر یافت نشد');
-            }
-
-            const message: ChatMessage = {
-                id: Date.now().toString(),
+            const user = await User.findById(userId);
+            if (!user) throw new AppError('کاربر یافت نشد', 404);
+            const chatId = `support-${userId}`;
+            const message = await this.saveMessage({
+                chatId,
+                senderId: userId,
+                senderName: user.fullName || user.username,
                 text,
-                sender: 'user',
                 timestamp: new Date(),
-                type: 'text',
-                metadata: {
-                    isRead: false,
-                    status: 'sent'
-                }
-            };
-
-            // ذخیره پیام در دیتابیس
-            await ChatMessageModel.create({
-                ...message,
-                userId,
-                type: 'support'
+                metadata: { isAI: false }
             });
-
             return {
                 status: 'success',
-                message: {
-                    id: Date.now().toString(),
-                    text: 'پیام شما با موفقیت به پشتیبانی ارسال شد. به زودی با شما تماس خواهیم گرفت.',
-                    sender: 'bot',
-                    timestamp: new Date(),
-                    type: 'text',
-                    metadata: {
-                        isRead: false,
-                        status: 'sent'
-                    }
-                },
-                conversationId: 'default'
+                message: 'پیام شما با موفقیت به پشتیبانی ارسال شد.',
+                data: message
             };
         } catch (error) {
             logger.error('Error sending support message:', error);
-            throw new AppError(500, 'خطا در ارسال پیام به پشتیبانی');
+            if (error instanceof AppError) throw error;
+            throw new AppError('خطا در ارسال پیام به پشتیبانی', 500);
         }
     }
 
     // تحلیل احساسات متن
     public async analyzeSentiment(text: string): Promise<'positive' | 'negative' | 'neutral'> {
         try {
-            if (!this.HUGGINGFACE_API_KEY) {
+            if (!HUGGINGFACE_API_KEY) {
                 logger.warn('HUGGINGFACE_API_KEY not set, using default sentiment');
                 return 'neutral';
             }
 
-            const response = await fetch(this.HUGGINGFACE_API_URL, {
+            const response = await fetch(HUGGINGFACE_API_URL, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.HUGGINGFACE_API_KEY}`,
+                    'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ inputs: text })
@@ -469,78 +367,47 @@ export class ChatService {
     }
 
     // یادگیری از مکالمه
-    public async learnFromConversation(message: ChatMessage, context: ConversationContext): Promise<void> {
+    public async learnFromConversation(message: IChatMessage): Promise<void> {
         try {
-            // بررسی اعتبارسنجی ورودی
-            if (!message?.text?.trim() || !context) {
-                logger.warn('Missing message text or context in learnFromConversation');
+            if (!message?.text?.trim()) {
+                logger.warn('Missing message text in learnFromConversation');
                 return;
             }
-
-            // بررسی فیلدهای اجباری پیام
-            if (!message.sender) {
+            if (!message.senderId) {
                 logger.warn('Invalid message format in learnFromConversation:', {
                     id: message.id,
                     hasText: !!message.text,
-                    hasSender: !!message.sender,
+                    hasSender: !!message.senderId,
                     metadata: message.metadata
                 });
                 return;
             }
-
-            // ذخیره پیام در تاریخچه با مدیریت خطا
             try {
-                const messageToSave = {
-                    id: message.id || `msg-${Date.now()}`,
+                const messageToSave = new ChatMessageModel({
+                    chatId: message.chatId,
+                    senderId: message.senderId,
+                    senderName: message.senderName,
+                    message: message.text,
                     text: message.text,
-                    sender: message.sender,
-                    type: message.type || 'text',
-                    metadata: {
-                        isRead: false,
-                        status: 'sent',
-                        ...message.metadata,
-                        context: {
-                            lastMessages: context.lastMessages?.slice(-5) || [],
-                            userPreferences: context.userPreferences || {}
-                        }
-                    },
-                    timestamp: message.timestamp || new Date()
-                };
-
-                await this.saveMessage(messageToSave);
+                    timestamp: message.timestamp || new Date(),
+                    isDeleted: false,
+                    fileUrl: message.fileUrl,
+                    fileName: message.fileName,
+                    fileType: message.fileType,
+                    metadata: message.metadata
+                });
+                await messageToSave.save();
             } catch (error) {
                 logger.error('Error saving message in learnFromConversation:', error);
                 return;
             }
-
-            // به‌روزرسانی حافظه موقت
-            const conversationId = `conv-${Date.now()}`;
-            const existingConversation = conversationCache.get(conversationId);
-            
-            if (existingConversation) {
-                existingConversation.messages.push(message);
-                existingConversation.timestamp = Date.now();
-            } else {
-                conversationCache.set(conversationId, {
-                    messages: [message],
-                    timestamp: Date.now()
-                });
-            }
-
-            // بررسی وجود API key قبل از تحلیل
-            if (!HUGGINGFACE_API_KEY) {
-                logger.warn('Skipping sentiment/intent analysis due to missing HUGGINGFACE_API_KEY');
-                return;
-            }
-
+            // حذف کدهای مربوط به conversationContext
             // تحلیل احساسات و منظور پیام با مدیریت خطا
             try {
                 const [sentiment, intent] = await Promise.all([
                     this.analyzeSentiment(message.text),
                     this.detectIntent(message.text)
                 ]);
-
-                // ذخیره تحلیل‌ها در متادیتای پیام
                 if (message.id) {
                     await ChatMessageModel.findByIdAndUpdate(message.id, {
                         $set: {
@@ -549,18 +416,6 @@ export class ChatService {
                             'metadata.confidence': intent.confidence
                         }
                     }).exec();
-
-                    // تولید و ذخیره پیشنهادات مرتبط
-                    if (intent.confidence > 0.7) {
-                        const suggestions = await this.generateSuggestions(message.text, intent.intent);
-                        if (suggestions.length > 0) {
-                            await ChatMessageModel.findByIdAndUpdate(message.id, {
-                                $set: {
-                                    'metadata.suggestions': suggestions
-                                }
-                            }).exec();
-                        }
-                    }
                 }
             } catch (error) {
                 logger.error('Error in sentiment/intent analysis:', error);
@@ -571,9 +426,8 @@ export class ChatService {
     }
 
     // دریافت پاسخ سوالات متداول
-    public async getFAQResponse(question: string): Promise<ChatResponse> {
+    public async getFAQResponse(question: string): Promise<string> {
         try {
-            // پاسخ‌های از پیش تعریف شده برای سوالات متداول
             const faqResponses: { [key: string]: string } = {
                 'ثبت نام': 'برای ثبت نام می‌توانید به بخش ثبت نام در وب‌سایت مراجعه کنید یا با شماره 051-38932030 تماس بگیرید.',
                 'هزینه': 'هزینه‌های تحصیلی در هر سال تحصیلی متفاوت است. برای اطلاع از هزینه‌های دقیق با بخش مالی مدرسه تماس بگیرید.',
@@ -584,47 +438,15 @@ export class ChatService {
                 'تماس': 'شماره تماس مدرسه: 051-38932030',
                 'ایمیل': 'ایمیل مدرسه: info@merajschool.ir'
             };
-
-            // جستجوی پاسخ مناسب
             for (const [key, response] of Object.entries(faqResponses)) {
                 if (question.toLowerCase().includes(key.toLowerCase())) {
-                    return {
-                        status: 'success',
-                        message: {
-                            id: Date.now().toString(),
-                            text: response,
-                            sender: 'bot',
-                            timestamp: new Date(),
-                            type: 'text',
-                            metadata: {
-                                isRead: false,
-                                status: 'sent'
-                            }
-                        },
-                        conversationId: 'default'
-                    };
+                    return response;
                 }
             }
-
-            // اگر پاسخ مناسب پیدا نشد
-            return {
-                status: 'success',
-                message: {
-                    id: Date.now().toString(),
-                    text: 'متأسفانه پاسخ مناسبی برای سوال شما پیدا نشد. لطفاً با پشتیبانی تماس بگیرید.',
-                    sender: 'bot',
-                    timestamp: new Date(),
-                    type: 'text',
-                    metadata: {
-                        isRead: false,
-                        status: 'sent'
-                    }
-                },
-                conversationId: 'default'
-            };
+            return 'متأسفانه پاسخ مناسبی برای سوال شما پیدا نشد. لطفاً با پشتیبانی تماس بگیرید.';
         } catch (error) {
             logger.error('Error getting FAQ response:', error);
-            throw new AppError(500, 'خطا در دریافت پاسخ سوالات متداول');
+            throw new AppError('خطا در دریافت پاسخ سوالات متداول', 500);
         }
     }
 
@@ -638,5 +460,17 @@ export class ChatService {
             'LABEL_2': 'positive'
         };
         return sentimentMap[label.toLowerCase()] || 'neutral';
+    }
+
+    // متد جدید برای بررسی محتوای نامناسب
+    private async checkInappropriateContent(text: string): Promise<boolean> {
+        try {
+            // پیاده‌سازی فیلتر محتوای نامناسب
+            const inappropriateWords = ['کلمه1', 'کلمه2']; // لیست کلمات نامناسب
+            return inappropriateWords.some(word => text.includes(word));
+        } catch (error) {
+            logger.error('Error checking inappropriate content:', error);
+            return false;
+        }
     }
 } 

@@ -1,103 +1,98 @@
-import React, { useState, useRef } from 'react';
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiSend, FiPaperclip, FiX } from 'react-icons/fi';
+import { chatService } from '../../services/chat.service';
 
 interface ChatInputProps {
-    onSendMessage: (message: string) => void;
-    onSendFile: (file: File) => void;
-    disabled?: boolean;
+    onSendMessage: (message: string, fileData?: { name: string; type: string; url: string }) => void;
+    isTyping: boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({
-    onSendMessage,
-    onSendFile,
-    disabled = false
-}) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isTyping }) => {
     const [message, setMessage] = useState('');
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [fileData, setFileData] = useState<{ name: string; type: string; url: string } | null>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (message.trim() && !disabled) {
-            onSendMessage(message.trim());
+        if (message.trim() || fileData) {
+            onSendMessage(message, fileData || undefined);
             setMessage('');
+            setFileData(null);
         }
-    };
-
-    const handleEmojiClick = (emojiData: EmojiClickData) => {
-        setMessage(prev => prev + emojiData.emoji);
-        setShowEmojiPicker(false);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && !disabled) {
-            onSendFile(file);
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setFileData({
+                name: file.name,
+                type: file.type,
+                url
+            });
         }
     };
 
+    const removeFile = () => {
+        if (fileData?.url) {
+            URL.revokeObjectURL(fileData.url);
+        }
+        setFileData(null);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMessage(e.target.value);
+        chatService.emitTyping();
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="relative">
-            <div className="flex items-center gap-2 p-4 bg-white border-t">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-emerald-100">
+            <AnimatePresence>
+                {fileData && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-2 p-2 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-between"
+                    >
+                        <span className="text-sm text-emerald-700 truncate">{fileData.name}</span>
                 <button
                     type="button"
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-500 hover:text-[#10b981] transition-colors duration-200"
-                    disabled={disabled}
+                            onClick={removeFile}
+                            className="text-emerald-600 hover:text-emerald-700"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                            <FiX size={16} />
                 </button>
-
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <div className="flex items-center space-x-2">
+                <label className="cursor-pointer text-emerald-600 hover:text-emerald-700">
+                    <input
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileChange}
+                        accept="image/*,.pdf,.doc,.docx"
+                    />
+                    <FiPaperclip size={20} />
+                </label>
                 <input
                     type="text"
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={handleChange}
                     placeholder="پیام خود را بنویسید..."
-                    className="flex-1 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                    disabled={disabled}
+                    className="flex-1 p-2 rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
-
-                <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-gray-500 hover:text-[#10b981] transition-colors duration-200"
-                    disabled={disabled}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                    </svg>
-                </button>
-
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*,.pdf,.doc,.docx"
-                />
-
                 <button
                     type="submit"
-                    disabled={!message.trim() || disabled}
-                    className={`p-2 rounded-full ${
-                        message.trim() && !disabled
-                            ? 'bg-[#10b981] text-white hover:bg-[#059669]'
-                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    } transition-colors duration-200`}
+                    disabled={!message.trim() && !fileData}
+                    className={`p-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 text-white ${
+                        (!message.trim() && !fileData) ? 'opacity-50 cursor-not-allowed' : 'hover:from-emerald-700 hover:to-teal-600'
+                    }`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
+                    <FiSend size={20} />
                 </button>
             </div>
-
-            {showEmojiPicker && (
-                <div className="absolute bottom-full right-0 mb-2">
-                    <EmojiPicker onEmojiClick={handleEmojiClick} />
-                </div>
-            )}
         </form>
     );
 };

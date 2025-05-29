@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { checkIsAdmin } from '../middleware/auth';
+import { isAdmin } from '../middleware/auth.middleware';
 
 // تنظیم مسیر آپلود فایل‌ها بر اساس محیط
 const UPLOAD_DIR = process.env.NODE_ENV === 'production' 
@@ -42,7 +42,7 @@ export const upload = multer({
 
 export const uploadImage = async (req: Request, res: Response) => {
   try {
-    if (!checkIsAdmin(req)) {
+    if (!isAdmin(req)) {
       return res.status(403).json({ message: 'شما دسترسی لازم را ندارید' });
     }
 

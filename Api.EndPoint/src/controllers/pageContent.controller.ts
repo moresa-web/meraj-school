@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import PageContent, { IPageContent } from '../models/PageContent';
-import { isAdmin } from '../middleware/auth';
+import { isAdmin } from '../middleware/auth.middleware';
 
 export const getPageContent = async (req: Request, res: Response) => {
   try {

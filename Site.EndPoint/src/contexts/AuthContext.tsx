@@ -5,16 +5,9 @@ import { API_URL } from '../constants';
 
 interface User {
   _id: string;
-  username: string;
-  email: string;
-  role: string;
   fullName: string;
-  phone: string;
-  studentPhone?: string;
-  parentPhone?: string;
-  createdAt: string;
-  updatedAt: string;
-  grade?: string;
+  email: string;
+  token: string;
 }
 
 interface AuthContextType {
@@ -48,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (response.data) {
-        setUser(response.data);
+        setUser({ ...response.data, token });
         setIsAuthenticated(true);
       } else {
         localStorage.removeItem('token');
@@ -186,8 +179,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('token');
-    setIsAuthenticated(false);
     setUser(null);
+    setIsAuthenticated(false);
     toast.success('خروج با موفقیت انجام شد');
   };
 
