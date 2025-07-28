@@ -259,13 +259,13 @@ router.get('/stats', async (req, res) => {
         .limit(5)
         .select('title teacher startDate')
         .lean(),
-      News.find({ isPublished: true })
+      News.find({ status: 'published' })
         .sort({ createdAt: -1 })
         .limit(5)
         .select('title createdAt')
         .lean(),
       News.countDocuments(),
-      News.countDocuments({ isPublished: true }),
+      News.countDocuments({ status: 'published' }),
       Class.countDocuments({ isActive: true }),
       Newsletter.countDocuments({ active: true }),
       User.countDocuments({ role: { $in: ['admin', 'student', 'parent', 'user'] } })
