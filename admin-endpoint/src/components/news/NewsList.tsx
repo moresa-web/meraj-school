@@ -5,6 +5,7 @@ import { News } from '@/types/news';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { format } from 'date-fns-jalali';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -16,6 +17,17 @@ interface NewsListProps {
 
 const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
   const [search, setSearch] = useState('');
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'نامشخص';
+    try {
+      const date = new Date(dateString);
+      return format(date, 'dd MMMM yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'نامشخص';
+    }
+  };
 
   if (loading) {
     return (
@@ -97,8 +109,10 @@ const NewsList: React.FC<NewsListProps> = ({ news, loading, onDelete }) => {
                 {item.title}
               </h3>
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="badge badge-success text-xs md:text-sm">{item.category}</span>
-                <span className="text-xs md:text-sm text-gray-500">{item.date}</span>
+                {item.category && (
+                  <span className="badge badge-success text-xs md:text-sm">{item.category}</span>
+                )}
+                <span className="text-xs md:text-sm text-gray-500">{formatDate(item.date)}</span>
               </div>
               <p className="text-sm md:text-base text-gray-600 mb-4 line-clamp-3">
                 {item.description || item.content}

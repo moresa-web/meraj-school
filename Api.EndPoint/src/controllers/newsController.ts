@@ -17,7 +17,7 @@ export const getNews = async (req: Request, res: Response) => {
     // Only show published news for regular users,
     // admins can see all news when showAll=true is passed
     if (showAll !== 'true') {
-      query.isPublished = true;
+      query.status = 'published';
     }
     
     // Apply category filter
@@ -29,7 +29,7 @@ export const getNews = async (req: Request, res: Response) => {
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { summary: { $regex: search, $options: 'i' } }
       ];
     }
     
@@ -110,14 +110,15 @@ export const createNews = async (req: Request, res: Response) => {
 
     const news = new News({
       title,
-      description,
+      summary: description || content.substring(0, 200) + '...', // استفاده از description یا 200 کاراکتر اول content
       content,
       category,
       tags: parsedTags,
       author,
-      date: new Date().toLocaleDateString('fa-IR'),
+      date: new Date(),
+      publishDate: new Date(),
       image,
-      isPublished: isPublished === 'true',
+      status: isPublished === 'true' ? 'published' : 'draft',
       views: 0,
       likes: 0,
       likedBy: [],
@@ -160,11 +161,11 @@ export const updateNews = async (req: Request, res: Response) => {
     const { title, description, content, category, tags, author, isPublished, slug } = req.body;
     const updateData: any = {
       title,
-      description,
+      summary: description || content.substring(0, 200) + '...',
       content,
       category,
       author,
-      isPublished: isPublished === 'true'
+      status: isPublished === 'true' ? 'published' : 'draft'
     };
 
     // Parse tags safely
