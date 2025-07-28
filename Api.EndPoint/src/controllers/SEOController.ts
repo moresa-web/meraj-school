@@ -53,24 +53,38 @@ export const updateSEO = async (req: Request, res: Response) => {
     // If no SEO document exists, create one
     if (!seo) {
       seo = new SEO();
+      // Initialize socialMedia object if it doesn't exist
+      if (!seo.socialMedia) {
+        seo.socialMedia = {
+          instagram: '',
+          twitter: ''
+        };
+      }
     }
 
     // Update fields if they are provided
-    if (title) seo.title = title;
-    if (description) seo.description = description;
-    if (keywords) {
+    if (title !== undefined) seo.title = title;
+    if (description !== undefined) seo.description = description;
+    if (keywords !== undefined) {
       // اگر keywords یک رشته است، آن را به آرایه تبدیل می‌کنیم
-      seo.keywords = Array.isArray(keywords) ? keywords : keywords.split(',').map(k => k.trim());
+      seo.keywords = Array.isArray(keywords) ? keywords : keywords.split(',').map(k => k.trim()).filter(Boolean);
     }
-    if (image) seo.image = image;
-    if (siteUrl) seo.siteUrl = siteUrl;
-    if (schoolName) seo.schoolName = schoolName;
-    if (address) seo.address = address;
-    if (phone) seo.phone = phone;
-    if (email) seo.email = email;
-    if (socialMedia) {
-      if (socialMedia.instagram) seo.socialMedia.instagram = socialMedia.instagram;
-      if (socialMedia.twitter) seo.socialMedia.twitter = socialMedia.twitter;
+    if (image !== undefined) seo.image = image;
+    if (siteUrl !== undefined) seo.siteUrl = siteUrl;
+    if (schoolName !== undefined) seo.schoolName = schoolName;
+    if (address !== undefined) seo.address = address;
+    if (phone !== undefined) seo.phone = phone;
+    if (email !== undefined) seo.email = email;
+    if (socialMedia !== undefined) {
+      // Initialize socialMedia object if it doesn't exist
+      if (!seo.socialMedia) {
+        seo.socialMedia = {
+          instagram: '',
+          twitter: ''
+        };
+      }
+      if (socialMedia.instagram !== undefined) seo.socialMedia.instagram = socialMedia.instagram;
+      if (socialMedia.twitter !== undefined) seo.socialMedia.twitter = socialMedia.twitter;
     }
 
     await seo.save();

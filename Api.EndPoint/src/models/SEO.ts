@@ -1,10 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ISEO extends Document {
-    siteUrl: string;
-    siteName: string;
-    siteDescription: string;
+    title: string;
+    description: string;
     keywords: string[];
+    image: string;
+    siteUrl: string;
+    schoolName: string;
+    address: string;
+    phone: string;
+    email: string;
+    socialMedia: {
+        instagram?: string;
+        twitter?: string;
+    };
     googleAnalyticsId?: string;
     googleTagManagerId?: string;
     robotsTxt?: string;
@@ -13,17 +22,12 @@ export interface ISEO extends Document {
 }
 
 const seoSchema = new Schema<ISEO>({
-    siteUrl: {
+    title: {
         type: String,
-        required: [true, 'آدرس سایت الزامی است'],
+        required: [true, 'عنوان سایت الزامی است'],
         trim: true
     },
-    siteName: {
-        type: String,
-        required: [true, 'نام سایت الزامی است'],
-        trim: true
-    },
-    siteDescription: {
+    description: {
         type: String,
         required: [true, 'توضیحات سایت الزامی است'],
         trim: true
@@ -32,6 +36,45 @@ const seoSchema = new Schema<ISEO>({
         type: String,
         trim: true
     }],
+    image: {
+        type: String,
+        trim: true
+    },
+    siteUrl: {
+        type: String,
+        required: [true, 'آدرس سایت الزامی است'],
+        trim: true
+    },
+    schoolName: {
+        type: String,
+        required: [true, 'نام مدرسه الزامی است'],
+        trim: true
+    },
+    address: {
+        type: String,
+        required: [true, 'آدرس الزامی است'],
+        trim: true
+    },
+    phone: {
+        type: String,
+        required: [true, 'شماره تماس الزامی است'],
+        trim: true
+    },
+    email: {
+        type: String,
+        required: [true, 'ایمیل الزامی است'],
+        trim: true
+    },
+    socialMedia: {
+        instagram: {
+            type: String,
+            trim: true
+        },
+        twitter: {
+            type: String,
+            trim: true
+        }
+    },
     googleAnalyticsId: {
         type: String,
         trim: true
