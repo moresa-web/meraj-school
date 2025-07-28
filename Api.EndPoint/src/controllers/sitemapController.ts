@@ -96,7 +96,7 @@ export class SitemapController {
         try {
             const seo = await SEO.findOne();
             const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
-            const news = await (await import('../models/News')).default.find({ isPublished: true }).lean();
+            const news = await (await import('../models/News')).default.find({ status: 'published' }).lean();
 
             let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
             xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n';
@@ -270,7 +270,7 @@ export class SitemapController {
             
             // دریافت تمام کلاس‌ها و اخبار
             const classes = await Class.find({ isActive: true }).lean();
-            const news = await (await import('../models/News')).default.find({ isPublished: true }).lean();
+            const news = await (await import('../models/News')).default.find({ status: 'published' }).lean();
 
             console.log('Found classes:', classes.length);
             console.log('Found news:', news.length);

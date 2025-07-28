@@ -2,26 +2,23 @@ import mongoose from 'mongoose';
 import { User } from '../models/User';
 import { config } from '../config';
 
-const createAdmin = async () => {
+const recreateAdmin = async () => {
   try {
     // اتصال به دیتابیس
     await mongoose.connect(config.database.url);
     console.log('اتصال به دیتابیس برقرار شد.');
 
-    // بررسی وجود کاربر
-    const existingUser = await User.findOne({
+    // حذف کاربر موجود
+    await User.deleteMany({
       $or: [
         { username: 'moresa-web' },
-        { email: 'info@moresa-web.ir' }
+        { email: 'info@moresa-web.ir' },
+        { phone: '09123456789' }
       ]
     });
+    console.log('کاربران قبلی حذف شدند.');
 
-    if (existingUser) {
-      console.log('کاربر با این مشخصات قبلاً وجود دارد.');
-      process.exit(0);
-    }
-
-    // ایجاد کاربر admin
+    // ایجاد کاربر admin جدید
     const adminUser = new User({
       username: 'moresa-web',
       email: 'info@moresa-web.ir',
@@ -41,4 +38,4 @@ const createAdmin = async () => {
   }
 };
 
-createAdmin(); 
+recreateAdmin(); 

@@ -150,6 +150,10 @@ class MemoryManager extends EventEmitter {
     return item.value;
   }
 
+  public delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+
   public cleanup(): void {
     const now = Date.now();
     for (const [key, item] of this.cache.entries()) {

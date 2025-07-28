@@ -33,6 +33,45 @@ export const getAllClasses = async (req: Request, res: Response) => {
   }
 };
 
+// دریافت همه کلاس‌ها برای ادمین
+export const getAllClassesForAdmin = async (req: Request, res: Response) => {
+  try {
+    // بررسی دسترسی ادمین
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ message: 'شما دسترسی لازم برای مشاهده این اطلاعات را ندارید' });
+    }
+
+    const { category, level, sortBy, search } = req.query;
+    
+    // ساخت فیلتر - برای ادمین همه کلاس‌ها را نشان می‌دهیم
+    const filter: any = {};
+    if (category) filter.category = category;
+    if (level) filter.level = level;
+    if (search) {
+      filter.$text = { $search: search as string };
+    }
+
+    // ساخت سورت
+    let sort: any = { createdAt: -1 }; // پیش‌فرض: جدیدترین
+    if (sortBy === 'views') sort = { views: -1 };
+    if (sortBy === 'likes') sort = { likes: -1 };
+    if (sortBy === 'price-asc') sort = { price: 1 };
+    if (sortBy === 'price-desc') sort = { price: -1 };
+
+    const classes = await Class.find(filter).sort(sort);
+    res.json({
+      success: true,
+      data: classes
+    });
+  } catch (error) {
+    console.error('Get all classes for admin error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'خطا در دریافت لیست کلاس‌ها' 
+    });
+  }
+};
+
 // دریافت یک کلاس با ID
 export const getClassById = async (req: Request, res: Response) => {
   try {

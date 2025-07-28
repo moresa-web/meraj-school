@@ -16,7 +16,7 @@ export async function GET() {
       );
     }
 
-    const response = await axios.get(`${API_URL}/api/classes`, {
+    const response = await axios.get(`${API_URL}/api/classes/admin/all`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -24,7 +24,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: response.data
+      data: response.data.data
     });
   } catch (error: any) {
     console.error('Error fetching classes:', {

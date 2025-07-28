@@ -222,6 +222,13 @@ router.get('/stats', async (req, res) => {
     
     // استفاده از cache برای آمار داشبورد
     const cacheKey = 'dashboard_stats'
+    
+    // اگر پارامتر refresh ارسال شده باشد، cache را پاک می‌کنیم
+    if (req.query.refresh === 'true') {
+      memoryManager.delete(cacheKey)
+      console.log('Cache cleared for dashboard stats')
+    }
+    
     const cachedStats = memoryManager.get(cacheKey)
     
     if (cachedStats) {

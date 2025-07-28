@@ -6,6 +6,7 @@ import fs from 'fs';
 import slugify from 'slugify';
 import { sendEmail } from '../utils/mailer';
 import { getActiveTemplateByType, sendTemplatedEmail } from '../utils/emailTemplate';
+import { memoryManager } from '../utils/memoryManager';
 
 // Get all news with filtering and sorting
 export const getNews = async (req: Request, res: Response) => {
@@ -161,6 +162,9 @@ export const createNews = async (req: Request, res: Response) => {
 
     await news.save();
 
+    // پاک کردن cache داشبورد
+    memoryManager.delete('dashboard_stats');
+
     // ارسال ایمیل به مشترکین خبرنامه
     try {
       const subscribers = await Newsletter.find({ active: true });
@@ -249,6 +253,10 @@ export const updateNews = async (req: Request, res: Response) => {
     if (!updatedNews) {
       return res.status(404).json({ message: 'News not found' });
     }
+
+    // پاک کردن cache داشبورد
+    memoryManager.delete('dashboard_stats');
+
     res.json(updatedNews);
   } catch (error) {
     console.error('Error updating news:', error);
@@ -273,6 +281,10 @@ export const deleteNews = async (req: Request, res: Response) => {
     }
 
     await news.deleteOne();
+    
+    // پاک کردن cache داشبورد
+    memoryManager.delete('dashboard_stats');
+    
     res.json({ message: 'News deleted successfully' });
   } catch (error) {
     console.error('Error deleting news:', error);
