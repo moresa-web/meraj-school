@@ -43,7 +43,7 @@ export function useDashboardStats() {
     queryKey: ['dashboardStats'],
     queryFn: async () => {
       try {
-        console.log('Fetching dashboard stats...')
+        console.log('Fetching dashboard stats directly from backend...')
         const response = await api.get<DashboardStats>('/api/dashboard/stats')
         console.log('Dashboard stats raw response:', response)
         console.log('Response headers:', response.headers)

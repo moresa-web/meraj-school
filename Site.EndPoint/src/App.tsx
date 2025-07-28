@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
@@ -12,12 +12,10 @@ import Contact from './pages/Contact/Contact';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import NotFound from './pages/NotFound/NotFound';
-import Dashboard from './pages/Dashboard/Dashboard';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import { motion, useScroll } from "motion/react"
 import './App.css';
 import { HelmetProvider } from 'react-helmet-async';
-import AppRoutes from './routes';
 import i18n from './i18n';
 import { I18nextProvider } from 'react-i18next';
 import { Toaster } from 'react-hot-toast';
@@ -28,7 +26,6 @@ import ChatButton from './components/Chat/ChatButton';
 // کامپوننت اصلی برنامه که از useAuth استفاده می‌کند
 const AppContent: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  const { isAuthenticated } = useAuth();
 
   return (
     <div className="app">
@@ -58,11 +55,7 @@ const AppContent: React.FC = () => {
               <Profile />
             </PrivateRoute>
           } />
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } />
+
           <Route path="/" element={<Home />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:slug" element={<NewsDetail />} />

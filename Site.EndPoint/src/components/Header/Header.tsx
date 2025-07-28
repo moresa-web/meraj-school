@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { toast } from 'react-hot-toast';
 import { useSiteInfo } from '../../hooks/useSiteInfo';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import {
-  Menu,
-  X,
-  User,
-  LogOut,
-  ChevronDown,
-  Globe
-} from 'lucide-react';
 import { getImageUrl } from '../../utils/format';
-import type { User as UserType } from '../../types/index';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -145,8 +135,8 @@ const Header: React.FC = () => {
             </Link>
             {user?.role === 'admin' ? (
               <Link
-                to="/dashboard"
-                onClick={() => handleNavigation('/dashboard')}
+                to="http://localhost:3001"
+                onClick={() => handleNavigation('http://localhost:3001')}
                 className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
               >
                 {t('nav.dashboard')}
@@ -284,7 +274,7 @@ const Header: React.FC = () => {
                   )}
                   {user?.role === 'admin' ? (
                     <Link
-                      to="/dashboard"
+                      to="http://localhost:3001"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-md hover:shadow-lg text-lg"
                     >
