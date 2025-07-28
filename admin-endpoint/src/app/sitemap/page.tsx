@@ -8,28 +8,37 @@ import axios from 'axios';
 import { format } from 'date-fns-jalali';
 
 interface SitemapStatus {
-    mainSitemap: {
+    main: {
         urlCount: number;
-        fileSize: string;
+        fileSize: number;
         lastUpdated: string;
+        type: string;
     };
-    newsSitemap: {
+    news: {
         urlCount: number;
-        fileSize: string;
+        fileSize: number;
         lastUpdated: string;
+        type: string;
     };
-    classesSitemap: {
+    classes: {
         urlCount: number;
-        fileSize: string;
+        fileSize: number;
         lastUpdated: string;
+        type: string;
+    };
+    index: {
+        urlCount: number;
+        fileSize: number;
+        lastUpdated: string;
+        type: string;
     };
 }
 
 interface SitemapUrl {
-    loc: string;
-    lastmod: string;
+    url: string;
     changefreq: string;
     priority: number;
+    lastmod?: string;
 }
 
 export default function SitemapPage() {
@@ -38,20 +47,28 @@ export default function SitemapPage() {
     const [mainUrls, setMainUrls] = useState<SitemapUrl[]>([]);
     const [editingUrl, setEditingUrl] = useState<SitemapUrl | null>(null);
 
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
     const fetchStatus = async () => {
         try {
-            const response = await axios.get('/api/sitemap/status');
+            console.log('Fetching sitemap status...');
+            const response = await axios.get(`${API_URL}/api/sitemap/status`);
+            console.log('Status response:', response.data);
             setStatus(response.data);
         } catch (error) {
+            console.error('Error fetching status:', error);
             toast.error('خطا در دریافت وضعیت sitemap');
         }
     };
 
     const fetchMainUrls = async () => {
         try {
-            const response = await axios.get('/api/sitemap/main-urls');
-            setMainUrls(response.data);
+            console.log('Fetching main URLs...');
+            const response = await axios.get(`${API_URL}/api/sitemap/main-urls`);
+            console.log('Main URLs response:', response.data);
+            setMainUrls(response.data.urls || []);
         } catch (error) {
+            console.error('Error fetching main URLs:', error);
             toast.error('خطا در دریافت لینک‌های sitemap اصلی');
         }
     };
@@ -59,11 +76,12 @@ export default function SitemapPage() {
     const handleRefresh = async () => {
         setLoading(true);
         try {
-            await axios.post('/api/sitemap/refresh');
+            await axios.post(`${API_URL}/api/sitemap/refresh/main`);
             await fetchStatus();
             await fetchMainUrls();
             toast.success('Sitemap با موفقیت به‌روزرسانی شد');
         } catch (error) {
+            console.error('Error refreshing sitemap:', error);
             toast.error('خطا در به‌روزرسانی sitemap');
         } finally {
             setLoading(false);
@@ -78,11 +96,12 @@ export default function SitemapPage() {
         if (!editingUrl) return;
 
         try {
-            await axios.put('/api/sitemap/main-urls', editingUrl);
+            await axios.put(`${API_URL}/api/sitemap/main-urls`, editingUrl);
             await fetchMainUrls();
             setEditingUrl(null);
             toast.success('لینک با موفقیت به‌روزرسانی شد');
         } catch (error) {
+            console.error('Error updating URL:', error);
             toast.error('خطا در به‌روزرسانی لینک');
         }
     };
@@ -91,6 +110,14 @@ export default function SitemapPage() {
         if (!dateString) return 'نامشخص';
         const date = new Date(dateString);
         return format(date, 'dd MMMM yyyy ساعت HH:mm');
+    };
+
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     useEffect(() => {
@@ -114,70 +141,27 @@ export default function SitemapPage() {
                 </Button>
             </div>
 
+            {/* وضعیت Sitemap‌ها */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="hover:shadow-lg transition-shadow duration-300">
-                    <CardHeader className="bg-emerald-50 border-b">
-                        <CardTitle className="text-emerald-700">Sitemap اصلی</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        {status ? (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">تعداد URL:</span>
-                                    <span className="font-semibold">{status.mainSitemap.urlCount}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">حجم فایل:</span>
-                                    <span className="font-semibold">{status.mainSitemap.fileSize}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">آخرین به‌روزرسانی:</span>
-                                    <span className="font-semibold">{formatDate(status.mainSitemap.lastUpdated)}</span>
-                                </div>
-                                <a
-                                    href="https://mohammadrezasardashti.ir/sitemap.xml"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block text-center mt-4 text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                    مشاهده فایل XML
-                                </a>
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-center h-32">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="bg-blue-50 border-b">
-                        <CardTitle className="text-blue-700">Sitemap اخبار</CardTitle>
+                        <CardTitle className="text-blue-900">Sitemap اصلی</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        {status ? (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
+                        {status?.main ? (
+                            <div className="space-y-3">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">تعداد URL:</span>
-                                    <span className="font-semibold">{status.newsSitemap.urlCount}</span>
+                                    <span className="font-semibold">{status.main.urlCount}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">حجم فایل:</span>
-                                    <span className="font-semibold">{status.newsSitemap.fileSize}</span>
+                                    <span className="font-semibold">{formatFileSize(status.main.fileSize)}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">آخرین به‌روزرسانی:</span>
-                                    <span className="font-semibold">{formatDate(status.newsSitemap.lastUpdated)}</span>
+                                    <span className="font-semibold text-sm">{formatDate(status.main.lastUpdated)}</span>
                                 </div>
-                                <a
-                                    href="https://mohammadrezasardashti.ir/news-sitemap.xml"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block text-center mt-4 text-blue-600 hover:text-blue-700 font-medium"
-                                >
-                                    مشاهده فایل XML
-                                </a>
                             </div>
                         ) : (
                             <div className="flex items-center justify-center h-32">
@@ -188,32 +172,52 @@ export default function SitemapPage() {
                 </Card>
 
                 <Card className="hover:shadow-lg transition-shadow duration-300">
-                    <CardHeader className="bg-purple-50 border-b">
-                        <CardTitle className="text-purple-700">Sitemap کلاس‌ها</CardTitle>
+                    <CardHeader className="bg-green-50 border-b">
+                        <CardTitle className="text-green-900">Sitemap اخبار</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        {status ? (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
+                        {status?.news ? (
+                            <div className="space-y-3">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">تعداد URL:</span>
-                                    <span className="font-semibold">{status.classesSitemap.urlCount}</span>
+                                    <span className="font-semibold">{status.news.urlCount}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">حجم فایل:</span>
-                                    <span className="font-semibold">{status.classesSitemap.fileSize}</span>
+                                    <span className="font-semibold">{formatFileSize(status.news.fileSize)}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
+                                <div className="flex justify-between">
                                     <span className="text-gray-600">آخرین به‌روزرسانی:</span>
-                                    <span className="font-semibold">{formatDate(status.classesSitemap.lastUpdated)}</span>
+                                    <span className="font-semibold text-sm">{formatDate(status.news.lastUpdated)}</span>
                                 </div>
-                                <a
-                                    href="https://mohammadrezasardashti.ir/classes-sitemap.xml"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block text-center mt-4 text-purple-600 hover:text-purple-700 font-medium"
-                                >
-                                    مشاهده فایل XML
-                                </a>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center h-32">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow duration-300">
+                    <CardHeader className="bg-purple-50 border-b">
+                        <CardTitle className="text-purple-900">Sitemap کلاس‌ها</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        {status?.classes ? (
+                            <div className="space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">تعداد URL:</span>
+                                    <span className="font-semibold">{status.classes.urlCount}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">حجم فایل:</span>
+                                    <span className="font-semibold">{formatFileSize(status.classes.fileSize)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">آخرین به‌روزرسانی:</span>
+                                    <span className="font-semibold text-sm">{formatDate(status.classes.lastUpdated)}</span>
+                                </div>
                             </div>
                         ) : (
                             <div className="flex items-center justify-center h-32">
@@ -232,16 +236,16 @@ export default function SitemapPage() {
                     <div className="space-y-6">
                         {mainUrls.map((url, index) => (
                             <div key={index} className="border rounded-lg p-6 hover:shadow-md transition-shadow duration-300">
-                                {editingUrl?.loc === url.loc ? (
-                                    <div className="space-y-6">
+                                {editingUrl?.url === url.url ? (
+                                    <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 آدرس
                                             </label>
                                             <input
                                                 type="text"
-                                                value={editingUrl.loc}
-                                                onChange={(e) => setEditingUrl({ ...editingUrl, loc: e.target.value })}
+                                                value={editingUrl.url}
+                                                onChange={(e) => setEditingUrl({ ...editingUrl, url: e.target.value })}
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                             />
                                         </div>
@@ -301,69 +305,30 @@ export default function SitemapPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-lg font-semibold text-gray-900">{url.loc}</p>
-                                            <Button 
-                                                onClick={() => handleEditUrl(url)} 
-                                                variant="outline"
-                                                className="text-emerald-600 hover:text-emerald-700 border-emerald-200 hover:border-emerald-300"
-                                            >
-                                                ویرایش
-                                            </Button>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <span className="text-gray-600">تغییرات:</span>
-                                                <span className="mr-2 font-medium">{url.changefreq}</span>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center space-x-4 space-x-reverse">
+                                                <div className="flex-1">
+                                                    <h3 className="font-medium text-gray-900">{url.url}</h3>
+                                                    <div className="flex items-center space-x-4 space-x-reverse mt-2 text-sm text-gray-500">
+                                                        <span>تغییر: {url.changefreq}</span>
+                                                        <span>اولویت: {url.priority}</span>
+                                                        {url.lastmod && <span>آخرین تغییر: {formatDate(url.lastmod)}</span>}
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    onClick={() => handleEditUrl(url)}
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
+                                                    ویرایش
+                                                </Button>
                                             </div>
-                                            <div>
-                                                <span className="text-gray-600">اولویت:</span>
-                                                <span className="mr-2 font-medium">{url.priority}</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-600">آخرین به‌روزرسانی:</span>
-                                            <span className="mr-2 font-medium">{formatDate(url.lastmod)}</span>
                                         </div>
                                     </div>
                                 )}
                             </div>
                         ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="bg-gray-50 border-b">
-                    <CardTitle className="text-gray-900">راهنمای Sitemap</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-4 bg-emerald-50 rounded-lg">
-                            <h3 className="font-semibold text-emerald-700 mb-2">Sitemap اصلی</h3>
-                            <p className="text-gray-600">
-                                این sitemap شامل تمام صفحات اصلی سایت است و به صورت خودکار به‌روزرسانی می‌شود.
-                            </p>
-                        </div>
-                        <div className="p-4 bg-blue-50 rounded-lg">
-                            <h3 className="font-semibold text-blue-700 mb-2">Sitemap اخبار</h3>
-                            <p className="text-gray-600">
-                                این sitemap شامل تمام صفحات اخبار سایت است و با انتشار یا ویرایش اخبار جدید به‌روزرسانی می‌شود.
-                            </p>
-                        </div>
-                        <div className="p-4 bg-purple-50 rounded-lg">
-                            <h3 className="font-semibold text-purple-700 mb-2">Sitemap کلاس‌ها</h3>
-                            <p className="text-gray-600">
-                                این sitemap شامل تمام صفحات کلاس‌های سایت است و با اضافه یا ویرایش کلاس‌ها به‌روزرسانی می‌شود.
-                            </p>
-                        </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                            <h3 className="font-semibold text-gray-700 mb-2">به‌روزرسانی خودکار</h3>
-                            <p className="text-gray-600">
-                                Sitemap‌ها به صورت خودکار در زمان‌های مشخص به‌روزرسانی می‌شوند. همچنین می‌توانید به صورت دستی آن‌ها را به‌روزرسانی کنید.
-                            </p>
-                        </div>
                     </div>
                 </CardContent>
             </Card>

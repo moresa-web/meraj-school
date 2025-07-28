@@ -10,7 +10,7 @@ import fsPromises from 'fs/promises';
 
 export class SitemapService {
     private newsService: NewsService;
-    private readonly SITEMAP_DIR = path.join(process.cwd(), 'public');
+    private readonly SITEMAP_DIR = path.join(process.cwd(), '..', 'Site.EndPoint', 'public');
     private readonly SITEMAP_FILES = {
         main: 'sitemap.xml',
         news: 'news-sitemap.xml',
@@ -72,7 +72,26 @@ export class SitemapService {
 
     public async refreshSitemap(type: SitemapType): Promise<void> {
         try {
-            const response = await axios.get(`http://localhost:5000/api/sitemap/${type}`);
+            let endpoint: string;
+            
+            switch (type) {
+                case 'main':
+                    endpoint = 'http://localhost:5000/api/sitemap/';
+                    break;
+                case 'news':
+                    endpoint = 'http://localhost:5000/api/sitemap/news.xml';
+                    break;
+                case 'classes':
+                    endpoint = 'http://localhost:5000/api/sitemap/classes.xml';
+                    break;
+                case 'index':
+                    endpoint = 'http://localhost:5000/api/sitemap/index.xml';
+                    break;
+                default:
+                    throw new Error(`Unknown sitemap type: ${type}`);
+            }
+            
+            const response = await axios.get(endpoint);
             const xml = response.data;
             const filePath = path.join(this.SITEMAP_DIR, this.SITEMAP_FILES[type]);
             await fsPromises.writeFile(filePath, xml, 'utf-8');

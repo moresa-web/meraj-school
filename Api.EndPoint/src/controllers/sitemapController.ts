@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Class } from '../models/Class';
 import { INews } from '../models/News';
 import SEO from '../models/SEO';
+import SitemapUrl from '../models/SitemapUrl';
 import { SitemapService } from '../services/sitemapService';
 import { logger } from '../utils/logger';
 import { SitemapType } from '../types/sitemap';
@@ -271,43 +272,53 @@ export class SitemapController {
             const classes = await Class.find({ isActive: true }).lean();
             const news = await (await import('../models/News')).default.find({ isPublished: true }).lean();
 
-            console.log('Found classes:', classes.length); // اضافه کردن لاگ برای دیباگ
-            console.log('Found news:', news.length); // اضافه کردن لاگ برای دیباگ
+            console.log('Found classes:', classes.length);
+            console.log('Found news:', news.length);
 
-            // ایجاد لیست URLها
+            // دریافت تنظیمات ذخیره شده URLها
+            const savedUrls = await SitemapUrl.find().lean();
+            const urlConfigs = new Map(savedUrls.map(url => [url.url, url]));
+
+            // ایجاد لیست URLها با تنظیمات ذخیره شده
             const urls = [
                 // صفحه اصلی
-                { url: '/', changefreq: 'daily', priority: 1.0 },
+                this.getUrlWithConfig('/', 'daily', 1.0, urlConfigs),
                 
                 // صفحات ثابت
-                { url: '/about', changefreq: 'weekly', priority: 0.8 },
-                { url: '/contact', changefreq: 'weekly', priority: 0.8 },
-                { url: '/register', changefreq: 'monthly', priority: 0.7 },
-                { url: '/login', changefreq: 'monthly', priority: 0.7 },
+                this.getUrlWithConfig('/about', 'weekly', 0.8, urlConfigs),
+                this.getUrlWithConfig('/contact', 'weekly', 0.8, urlConfigs),
+                this.getUrlWithConfig('/register', 'monthly', 0.7, urlConfigs),
+                this.getUrlWithConfig('/login', 'monthly', 0.7, urlConfigs),
 
                 // صفحات اصلی اخبار و کلاس‌ها
-                { url: '/news', changefreq: 'daily', priority: 0.9 },
-                { url: '/classes', changefreq: 'daily', priority: 0.9 },
+                this.getUrlWithConfig('/news', 'daily', 0.9, urlConfigs),
+                this.getUrlWithConfig('/classes', 'daily', 0.9, urlConfigs),
 
                 // صفحات جزئیات کلاس‌ها
-                ...classes.map((classItem: any) => ({
-                    url: `/classes/${classItem.slug}`,
-                    changefreq: 'weekly',
-                    priority: 0.7,
-                    lastmod: new Date(classItem.updatedAt).toISOString()
-                })),
+                ...classes.map((classItem: any) => 
+                    this.getUrlWithConfig(
+                        `/classes/${classItem.slug}`, 
+                        'weekly', 
+                        0.7, 
+                        urlConfigs,
+                        new Date(classItem.updatedAt).toISOString()
+                    )
+                ),
 
                 // صفحات جزئیات اخبار
-                ...news.map((newsItem: any) => ({
-                    url: `/news/${newsItem.slug}`,
-                    changefreq: 'weekly',
-                    priority: 0.6,
-                    lastmod: new Date(newsItem.updatedAt).toISOString(),
-                    title: newsItem.title
-                }))
+                ...news.map((newsItem: any) => 
+                    this.getUrlWithConfig(
+                        `/news/${newsItem.slug}`, 
+                        'weekly', 
+                        0.6, 
+                        urlConfigs,
+                        new Date(newsItem.updatedAt).toISOString(),
+                        newsItem.title
+                    )
+                )
             ];
 
-            console.log('Total URLs:', urls.length); // اضافه کردن لاگ برای دیباگ
+            console.log('Total URLs:', urls.length);
 
             res.json({
                 baseUrl,
@@ -316,6 +327,94 @@ export class SitemapController {
         } catch (error) {
             logger.error('Error getting sitemap URLs:', error);
             res.status(500).json({ message: 'خطا در دریافت URLهای sitemap' });
+        }
+    };
+
+    // متد کمکی برای دریافت URL با تنظیمات ذخیره شده
+    private getUrlWithConfig(
+        url: string, 
+        defaultChangefreq: string, 
+        defaultPriority: number, 
+        urlConfigs: Map<string, any>,
+        lastmod?: string,
+        title?: string
+    ) {
+        const savedConfig = urlConfigs.get(url);
+        
+        if (savedConfig) {
+            return {
+                url,
+                changefreq: savedConfig.changefreq,
+                priority: savedConfig.priority,
+                lastmod: savedConfig.lastmod || lastmod,
+                title: savedConfig.title || title
+            };
+        }
+        
+        return {
+            url,
+            changefreq: defaultChangefreq,
+            priority: defaultPriority,
+            lastmod,
+            title
+        };
+    }
+
+    // به‌روزرسانی URLهای sitemap
+    public updateSitemapUrl = async (req: Request, res: Response) => {
+        try {
+            const { url, changefreq, priority, lastmod, title } = req.body;
+            
+            // اعتبارسنجی داده‌های ورودی
+            if (!url || !changefreq || priority === undefined) {
+                return res.status(400).json({ 
+                    message: 'تمام فیلدهای ضروری باید پر شوند' 
+                });
+            }
+
+            // اعتبارسنجی priority
+            if (priority < 0 || priority > 1) {
+                return res.status(400).json({ 
+                    message: 'اولویت باید بین 0 و 1 باشد' 
+                });
+            }
+
+            // اعتبارسنجی changefreq
+            const validChangefreqs = ['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'];
+            if (!validChangefreqs.includes(changefreq)) {
+                return res.status(400).json({ 
+                    message: 'نوع تغییرات نامعتبر است' 
+                });
+            }
+
+            // ذخیره یا به‌روزرسانی تنظیمات URL در database
+            const updateData = {
+                changefreq,
+                priority,
+                lastmod,
+                title,
+                isCustom: true
+            };
+
+            const savedUrl = await SitemapUrl.findOneAndUpdate(
+                { url },
+                updateData,
+                { 
+                    new: true, 
+                    upsert: true, 
+                    runValidators: true 
+                }
+            );
+
+            logger.info(`Sitemap URL updated: ${url} - changefreq: ${changefreq}, priority: ${priority}`);
+
+            res.json({ 
+                message: 'URL با موفقیت به‌روزرسانی شد',
+                url: savedUrl
+            });
+        } catch (error) {
+            logger.error('Error updating sitemap URL:', error);
+            res.status(500).json({ message: 'خطا در به‌روزرسانی URL' });
         }
     };
 } 
