@@ -45,18 +45,6 @@ const HeroSection: React.FC = () => {
     fetchContent();
   }, []);
 
-  if (loading) {
-    return <div className="hero-section loading">در حال بارگذاری...</div>;
-  }
-
-  if (error) {
-    return <div className="hero-section error">{error}</div>;
-  }
-
-  if (!content) {
-    return <div className="hero-section error">محتوا یافت نشد</div>;
-  }
-
   const handleSave = async (field: keyof HeroContent, newValue: string) => {
     try {
       // If it's an image field, handle the upload first
@@ -94,7 +82,6 @@ const HeroSection: React.FC = () => {
 
       if (!response.ok) throw new Error('خطا در ذخیره تغییرات');
 
-      const updatedData = await response.json();
       setContent(prev => prev ? { ...prev, [field]: newValue } : prev);
     } catch (err) {
       console.error(`Error saving ${field}:`, err);
@@ -102,11 +89,69 @@ const HeroSection: React.FC = () => {
     }
   };
 
+  const scrollToNextSection = () => {
+    const nextSection = document.querySelector('section:nth-of-type(2)');
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="hero-section loading" role="status" aria-live="polite">
+        در حال بارگذاری...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="hero-section error" role="alert">
+        <div>
+          <h2>خطا در بارگذاری</h2>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="hero-cta-button primary-button"
+            style={{ marginTop: '1rem' }}
+          >
+            تلاش مجدد
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!content) {
+    return (
+      <div className="hero-section error" role="alert">
+        <div>
+          <h2>محتوا یافت نشد</h2>
+          <p>متأسفانه محتوای صفحه اصلی در دسترس نیست.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="hero-cta-button primary-button"
+            style={{ marginTop: '1rem' }}
+          >
+            بارگذاری مجدد
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <section className="hero-section">
+    <section className="hero-section" role="banner" aria-label="صفحه اصلی">
       <div className="hero-content">
-        <div className="hero-logo">
-          <Suspense fallback={<img src={content.logo} alt="لوگو" className="w-full h-full object-contain" />}>
+        <div className="hero-logo" role="img" aria-label="لوگوی دبیرستان معراج">
+          <Suspense fallback={
+            <img 
+              src={content.logo} 
+              alt="لوگوی دبیرستان معراج" 
+              className="w-full h-full object-contain"
+              loading="lazy"
+            />
+          }>
             <EditableContent
               type="image"
               value={content.logo}
@@ -115,6 +160,7 @@ const HeroSection: React.FC = () => {
             />
           </Suspense>
         </div>
+        
         <div className="hero-title">
           <Suspense fallback={
             <div className="editable-fallback text-fallback">
@@ -129,6 +175,7 @@ const HeroSection: React.FC = () => {
             />
           </Suspense>
         </div>
+        
         <div className="hero-description">
           <Suspense fallback={
             <div className="editable-fallback text-fallback">
@@ -143,16 +190,48 @@ const HeroSection: React.FC = () => {
             />
           </Suspense>
         </div>
+        
         <div className="hero-cta">
-          <Link to="/contact" className="hero-cta-button primary-button">
+          <Link 
+            to="/contact" 
+            className="hero-cta-button primary-button"
+            aria-label="تماس با دبیرستان معراج"
+          >
             تماس با ما
           </Link>
-          <Link to="/about" className="hero-cta-button secondary-button">
+          <Link 
+            to="/about" 
+            className="hero-cta-button secondary-button"
+            aria-label="درباره دبیرستان معراج"
+          >
             درباره ما
           </Link>
         </div>
       </div>
-    </section >
+      
+      {/* Scroll indicator */}
+      <button 
+        className="scroll-indicator" 
+        onClick={scrollToNextSection}
+        aria-label="اسکرول به بخش بعدی"
+        title="اسکرول به بخش بعدی"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+          />
+        </svg>
+      </button>
+    </section>
   );
 };
 

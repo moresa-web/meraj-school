@@ -1,15 +1,16 @@
 .hero-section {
   position: relative;
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #064e3b 0%, #115e59 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
   overflow: hidden;
   padding: 2rem;
   z-index: 1;
 }
 
+/* Animated background elements */
 .hero-section::before {
   content: '';
   position: absolute;
@@ -19,7 +20,30 @@
   bottom: 0;
   background: 
     radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 50%);
+    radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+  animation: backgroundShift 20s ease-in-out infinite;
+}
+
+/* Floating particles */
+.hero-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.2), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: float 6s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
 }
@@ -35,109 +59,187 @@
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  animation: fadeInUp 1s ease-out;
 }
 
 .hero-logo {
-  width: 180px;
-  height: 180px;
-  margin-bottom: 2.5rem;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 3rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  padding: 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: logoFloat 3s ease-in-out infinite;
 }
 
 .hero-logo:hover {
-  transform: scale(1.05);
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .hero-logo img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  transition: filter 0.3s ease;
+}
+
+.hero-logo:hover img {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
 }
 
 .hero-title {
-  font-size: 3.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  margin-bottom: 2rem;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(16, 185, 129, 0.3);
   position: relative;
   z-index: 2;
   line-height: 1.2;
-  animation: fadeInUp 0.8s ease-out;
+  letter-spacing: -0.02em;
+  animation: titleGlow 2s ease-in-out infinite alternate;
 }
 
 .hero-title textarea {
-  color: #064e3b !important;
-  background-color: #ffffff !important;
+  color: #0f172a !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
   font-size: 1.5rem !important;
   font-weight: 600;
   line-height: 1.4;
-  padding: 1rem;
+  padding: 1.5rem;
   border: 2px solid #10b981;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   min-height: 80px;
   resize: vertical;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hero-title textarea:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .hero-description {
-  font-size: 1.25rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
   line-height: 1.8;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
   color: rgba(255, 255, 255, 0.9);
   max-width: 800px;
-  animation: fadeInUp 1s ease-out;
+  font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 1.2s ease-out 0.2s both;
 }
 
 .hero-cta {
   display: flex;
-  gap: 1rem;
-  animation: fadeInUp 1.2s ease-out;
+  gap: 1.5rem;
+  animation: fadeInUp 1.4s ease-out 0.4s both;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hero-cta-button {
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  min-width: 160px;
+  text-align: center;
+}
+
+.hero-cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.hero-cta-button:hover::before {
+  left: 100%;
 }
 
 .primary-button {
-  background: #10b981;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
+  box-shadow: 
+    0 4px 12px rgba(16, 185, 129, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .primary-button:hover {
-  background: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 20px rgba(16, 185, 129, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .secondary-button {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .secondary-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  animation: bounce 2s infinite;
+}
+
+.scroll-indicator svg {
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
+}
+
+.scroll-indicator:hover svg {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -145,40 +247,61 @@
   }
 }
 
-@media (max-width: 768px) {
-  .hero-section {
-    min-height: 80vh;
-    padding: 1rem;
+@keyframes backgroundShift {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
   }
-
-  .hero-logo {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 2rem;
-    padding: 1.2rem;
-  }
-
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-description {
-    font-size: 1.1rem;
-    padding: 0 1rem;
-  }
-
-  .hero-cta {
-    flex-direction: column;
-    width: 100%;
-    padding: 0 1rem;
-  }
-
-  .hero-cta-button {
-    width: 100%;
-    text-align: center;
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes titleGlow {
+  from {
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  to {
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(16, 185, 129, 0.5);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* Loading and error states */
 .loading {
   display: flex;
   justify-content: center;
@@ -186,6 +309,18 @@
   min-height: 100vh;
   font-size: 1.2rem;
   color: #ffffff;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .error {
@@ -195,4 +330,106 @@
   min-height: 100vh;
   font-size: 1.2rem;
   color: #ef4444;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  text-align: center;
+  padding: 2rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 90vh;
+    padding: 1rem;
+  }
+
+  .hero-logo {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+    padding: 0 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .hero-cta-button {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 2rem;
+  }
+
+  .scroll-indicator {
+    bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 0.5rem;
+  }
+
+  .hero-logo {
+    width: 120px;
+    height: 120px;
+    padding: 1rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .hero-section {
+    background: #000000;
+  }
+  
+  .hero-title {
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+  }
+  
+  .hero-description {
+    color: #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .hero-section::before,
+  .hero-section::after,
+  .hero-logo,
+  .hero-title,
+  .scroll-indicator {
+    animation: none;
+  }
+  
+  .hero-cta-button:hover {
+    transform: none;
+  }
 } 
