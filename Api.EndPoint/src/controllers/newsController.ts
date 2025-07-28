@@ -50,7 +50,15 @@ export const getNews = async (req: Request, res: Response) => {
     }
     
     const news = await News.find(query).sort(sort);
-    res.json(news);
+    
+    // تبدیل فیلدها برای frontend
+    const transformedNews = news.map(item => ({
+      ...item.toObject(),
+      description: item.summary, // تبدیل summary به description
+      isPublished: item.status === 'published' // تبدیل status به isPublished
+    }));
+    
+    res.json(transformedNews);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching news', error });
   }
@@ -68,7 +76,14 @@ export const getNewsBySlug = async (req: Request, res: Response) => {
     news.views += 1;
     await news.save();
     
-    res.json(news);
+    // تبدیل فیلدها برای frontend
+    const transformedNews = {
+      ...news.toObject(),
+      description: news.summary, // تبدیل summary به description
+      isPublished: news.status === 'published' // تبدیل status به isPublished
+    };
+    
+    res.json(transformedNews);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching news', error });
   }

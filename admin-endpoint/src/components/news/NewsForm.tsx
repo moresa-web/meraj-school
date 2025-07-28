@@ -50,7 +50,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
       if (initialData.image) {
         const imageUrl = initialData.image.startsWith('http') 
           ? initialData.image 
-          : `${process.env.NEXT_PUBLIC_API_URL}${initialData.image}`;
+          : `http://localhost:5000${initialData.image}`;
         setPreviewImage(imageUrl);
       }
     }
