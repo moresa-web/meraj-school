@@ -146,7 +146,9 @@ export default function NewsletterList() {
         setDeactivatingId(id);
         const response = await axios.patch(`/api/newsletter/subscribers/${id}/activate`);
         if (response.data.success) {
-          await fetchSubscribers();
+          setSubscribers(prev => prev.map(sub => 
+            sub._id === id ? { ...sub, active: true } : sub
+          ));
           toast.success('مشترک با موفقیت فعال شد');
         } else {
           toast.error(response.data.message || 'خطا در فعال‌سازی مشترک');
@@ -166,7 +168,9 @@ export default function NewsletterList() {
         setDeactivatingId(id);
         const response = await axios.patch(`/api/newsletter/subscribers/${id}/deactivate`);
         if (response.data.success) {
-          setSubscribers(prev => prev.filter(sub => sub._id !== id));
+          setSubscribers(prev => prev.map(sub => 
+            sub._id === id ? { ...sub, active: false } : sub
+          ));
           toast.success('مشترک با موفقیت غیرفعال شد');
         } else {
           toast.error(response.data.message || 'خطا در غیرفعال‌سازی مشترک');
