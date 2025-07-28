@@ -5,7 +5,13 @@ import { authMiddleware } from '../middleware/auth.middleware';
 const router = Router();
 const chatController = new ChatController();
 
-// مسیرهای مربوط به چت
+// مسیرهای عمومی (بدون احراز هویت)
+router.get('/list/:userId', chatController.getUserChats.bind(chatController));
+router.get('/messages/:chatId', chatController.getChatMessages.bind(chatController));
+router.post('/create', chatController.createChat.bind(chatController));
+router.post('/send', chatController.sendMessage.bind(chatController));
+
+// مسیرهای مربوط به چت (با احراز هویت)
 router.post('/', authMiddleware, chatController.createChat.bind(chatController));
 router.get('/user/:userId', authMiddleware, chatController.getUserChats.bind(chatController));
 router.get('/open', authMiddleware, chatController.getOpenChats.bind(chatController));

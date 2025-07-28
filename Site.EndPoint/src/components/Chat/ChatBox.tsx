@@ -40,76 +40,139 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
     const typingTimeoutRef = useRef<NodeJS.Timeout>();
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
     const [activeChat, setActiveChat] = useState<ChatMessageType | null>(null);
+    const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
-    useEffect(() => {
-        const initializeChat = async () => {
-            try {
-                setIsLoading(true);
-                if (!user?._id || !user?.username) {
-                    toast.error('اطلاعات کاربر یافت نشد');
-                    setIsLoading(false);
-                    return;
+    const initializeChat = async () => {
+        try {
+            setIsLoading(true);
+            
+            // اگر user از AuthContext موجود نیست، از localStorage دریافت کن
+            let currentUser = user;
+            if (!currentUser?._id || !currentUser?.username) {
+                const storedUser = localStorage.getItem('user');
+                if (storedUser) {
+                    currentUser = JSON.parse(storedUser);
                 }
-                const chatList = await chatService.getChatList(user._id);
-                console.log('Chat List:', chatList);
+            }
+            
+            if (!currentUser?._id || !currentUser?.username) {
+                // اگر هنوز user موجود نیست، یک user موقت ایجاد کن
+                currentUser = {
+                    _id: 'guest-' + Date.now(),
+                    username: 'کاربر مهمان',
+                    email: 'guest@example.com'
+                };
+            }
+            
+            const chatList = await chatService.getChatList(currentUser._id);
+            console.log('Chat List:', chatList);
+            
+            if (chatList && chatList.length > 0) {
+                const activeChat = chatList[0];
+                console.log('Active Chat:', activeChat);
                 
-                if (chatList && chatList.length > 0) {
-                    const activeChat = chatList[0];
-                    console.log('Active Chat:', activeChat);
-                    
-                    chatIdRef.current = activeChat._id;
-                    setActiveChatId(activeChat._id);
+                chatIdRef.current = activeChat._id;
+                setActiveChatId(activeChat._id);
+                setOnlineStatus('online');
+                
+                // دریافت پیام‌های چت
+                const messages = await chatService.getChatMessages(activeChat._id);
+                console.log('Raw Chat Messages:', messages);
+                
+                if (messages && messages.length > 0) {
+                    const formattedMessages = messages.map((msg: any) => {
+                        return {
+                            _id: msg._id,
+                            chatId: msg.chatId,
+                            message: msg.message,
+                            senderId: msg.senderId,
+                            senderName: msg.senderName,
+                            isRead: msg.isRead,
+                            isDeleted: msg.isDeleted,
+                            timestamp: new Date(msg.timestamp),
+                            createdAt: new Date(msg.createdAt),
+                            updatedAt: new Date(msg.updatedAt),
+                            fileUrl: msg.fileUrl,
+                            fileName: msg.fileName,
+                            fileType: msg.fileType,
+                        };
+                    });
+                    console.log('Formatted Messages:', formattedMessages);
+                    setMessages(formattedMessages.reverse());
+                    setHasShownWelcome(true);
+                } else if (!hasShownWelcome) {
+                    // اگر هیچ پیامی وجود ندارد و هنوز پیام پیشفرض نمایش داده نشده، پیام پیشفرض نمایش بده
+                    const welcomeMessage: ChatMessageType = {
+                        _id: 'welcome-message',
+                        chatId: activeChat._id,
+                        message: 'سلام! 👋 به پشتیبانی آنلاین دبیرستان معراج خوش آمدید. چطور می‌تونم کمکتون کنم؟',
+                        senderId: 'admin-welcome',
+                        senderName: 'پشتیبانی آنلاین',
+                        isRead: false,
+                        isDeleted: false,
+                        timestamp: new Date(),
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    };
+                    setMessages([welcomeMessage]);
+                    setHasShownWelcome(true);
+                }
+            } else {
+                const newChat = await chatService.createChat(currentUser._id, currentUser.username);
+                if (newChat) {
+                    chatIdRef.current = newChat._id;
+                    setActiveChatId(newChat._id);
                     setOnlineStatus('online');
                     
-                    // دریافت پیام‌های چت
-                    const messages = await chatService.getChatMessages(activeChat._id);
-                    console.log('Raw Chat Messages:', messages);
-                    
-                    if (messages && messages.length > 0) {
-                        const formattedMessages = messages.map((msg: any) => {
-                            return {
-                                _id: msg._id,
-                                chatId: msg.chatId,
-                                message: msg.message,
-                                senderId: msg.senderId,
-                                senderName: msg.senderName,
-                                isRead: msg.isRead,
-                                isDeleted: msg.isDeleted,
-                                timestamp: new Date(msg.timestamp),
-                                createdAt: new Date(msg.createdAt),
-                                updatedAt: new Date(msg.updatedAt),
-                                fileUrl: msg.fileUrl,
-                                fileName: msg.fileName,
-                                fileType: msg.fileType,
-                            };
-                        });
-                        console.log('Formatted Messages:', formattedMessages);
-                        setMessages(formattedMessages.reverse());
-                    }
-                } else {
-                    const newChat = await chatService.createChat(user._id, user.username);
-                    if (newChat) {
-                        chatIdRef.current = newChat._id;
-                        setActiveChatId(newChat._id);
-                        setOnlineStatus('online');
-                    }
+                    // پیام پیشفرض برای چت جدید
+                    const welcomeMessage: ChatMessageType = {
+                        _id: 'welcome-message',
+                        chatId: newChat._id,
+                        message: 'سلام! 👋 به پشتیبانی آنلاین دبیرستان معراج خوش آمدید. چطور می‌تونم کمکتون کنم؟',
+                        senderId: 'admin-welcome',
+                        senderName: 'پشتیبانی آنلاین',
+                        isRead: false,
+                        isDeleted: false,
+                        timestamp: new Date(),
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    };
+                    setMessages([welcomeMessage]);
+                    setHasShownWelcome(true);
                 }
-            } catch (error) {
-                console.error('Error initializing chat:', error);
-                toast.error('خطا در راه‌اندازی چت');
-            } finally {
-                setIsLoading(false);
             }
-        };
-
-        initializeChat();
-
-        return () => {
-            if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
+        } catch (error) {
+            console.error('Error initializing chat:', error);
+            toast.error('خطا در راه‌اندازی چت');
+            
+            // در صورت خطا، پیام پیشفرض نمایش بده
+            if (!hasShownWelcome) {
+                const errorWelcomeMessage: ChatMessageType = {
+                    _id: 'error-welcome-message',
+                    chatId: 'error-chat',
+                    message: 'سلام! 👋 به پشتیبانی آنلاین دبیرستان معراج خوش آمدید. در حال حاضر در حال اتصال به سرور هستیم...',
+                    senderId: 'admin-welcome',
+                    senderName: 'پشتیبانی آنلاین',
+                    isRead: false,
+                    isDeleted: false,
+                    timestamp: new Date(),
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                };
+                setMessages([errorWelcomeMessage]);
+                setHasShownWelcome(true);
             }
-        };
-    }, [user?._id, user?.username]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            setHasShownWelcome(false);
+            initializeChat();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (activeTab === 'faq') {
@@ -143,6 +206,159 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
             }, 3000);
         };
 
+        // وقتی چت باز می‌شود، پیام‌های جدید را فوراً دریافت کن
+        const fetchLatestMessages = async () => {
+            if (activeChatId && isOpen) {
+                try {
+                    const messages = await chatService.getChatMessages(activeChatId);
+                    if (messages && messages.length > 0) {
+                        const formattedMessages = messages.map((msg: any) => ({
+                            _id: msg._id,
+                            chatId: msg.chatId,
+                            message: msg.message,
+                            senderId: msg.senderId,
+                            senderName: msg.senderName,
+                            isRead: msg.isRead,
+                            isDeleted: msg.isDeleted,
+                            timestamp: new Date(msg.timestamp),
+                            createdAt: new Date(msg.createdAt),
+                            updatedAt: new Date(msg.updatedAt),
+                            fileUrl: msg.fileUrl,
+                            fileName: msg.fileName,
+                            fileType: msg.fileType,
+                        }));
+
+                        setMessages(prevMessages => {
+                            const existingIds = new Set(prevMessages.map(m => m._id));
+                            const newMessages = formattedMessages.filter(msg => !existingIds.has(msg._id));
+                            
+                            if (newMessages.length > 0) {
+                                console.log('New messages found on chat open:', newMessages);
+                                // اگر پیام جدید از پشتیبان است، notification نمایش بده
+                                const adminMessages = newMessages.filter(msg => 
+                                    msg.senderId?.includes('admin') ||
+                                    msg.senderName?.includes('پشتیبان')
+                                );
+                                if (adminMessages.length > 0 && !isOpen) {
+                                    toast.success('پیام جدید از پشتیبان دریافت شد', {
+                                        icon: '👨‍💼',
+                                        style: {
+                                            background: '#1e40af',
+                                            color: '#fff',
+                                        },
+                                    });
+                                }
+                                
+                                // اگر پیام‌های واقعی دریافت شد، پیام پیشفرض را حذف کن
+                                const realMessages = newMessages.filter(msg => 
+                                    !msg._id.includes('welcome-message') && 
+                                    !msg._id.includes('error-welcome-message')
+                                );
+                                
+                                if (realMessages.length > 0) {
+                                    const updatedMessages = prevMessages.filter(msg => 
+                                        !msg._id.includes('welcome-message') && 
+                                        !msg._id.includes('error-welcome-message')
+                                    );
+                                    return [...updatedMessages, ...newMessages];
+                                } else {
+                                    return [...prevMessages, ...newMessages];
+                                }
+                            }
+                            return prevMessages;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching latest messages:', error);
+                }
+            }
+        };
+
+        // Polling برای دریافت پیام‌های جدید
+        let pollingInterval: NodeJS.Timeout;
+        if (activeChatId && isOpen) {
+            console.log('Starting polling for chat:', activeChatId);
+            
+            // فوراً پیام‌های جدید را دریافت کن
+            fetchLatestMessages();
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    const messages = await chatService.getChatMessages(activeChatId);
+                    if (messages && messages.length > 0) {
+                        const formattedMessages = messages.map((msg: any) => ({
+                            _id: msg._id,
+                            chatId: msg.chatId,
+                            message: msg.message,
+                            senderId: msg.senderId,
+                            senderName: msg.senderName,
+                            isRead: msg.isRead,
+                            isDeleted: msg.isDeleted,
+                            timestamp: new Date(msg.timestamp),
+                            createdAt: new Date(msg.createdAt),
+                            updatedAt: new Date(msg.updatedAt),
+                            fileUrl: msg.fileUrl,
+                            fileName: msg.fileName,
+                            fileType: msg.fileType,
+                        }));
+
+                        // فقط پیام‌های جدید را اضافه کن
+                        setMessages(prevMessages => {
+                            const existingIds = new Set(prevMessages.map(m => m._id));
+                            const newMessages = formattedMessages.filter(msg => !existingIds.has(msg._id));
+                            
+                            if (newMessages.length > 0) {
+                                console.log('New messages found:', newMessages);
+                                // اگر پیام جدید از کاربر دیگری است، notification نمایش بده
+                                const otherUserMessages = newMessages.filter(msg => 
+                                    msg.senderId !== 'current-user' && 
+                                    msg.senderId !== user?._id &&
+                                    !msg.senderId?.includes('admin') &&
+                                    !msg.senderName?.includes('پشتیبان')
+                                );
+                                if (otherUserMessages.length > 0 && !isOpen) {
+                                    toast.success('پیام جدید دریافت شد', {
+                                        icon: '📬',
+                                        style: {
+                                            background: '#064e3b',
+                                            color: '#fff',
+                                        },
+                                    });
+                                }
+                                
+                                // اگر پیام‌های واقعی دریافت شد، پیام پیشفرض را حذف کن
+                                const realMessages = newMessages.filter(msg => 
+                                    !msg._id.includes('welcome-message') && 
+                                    !msg._id.includes('error-welcome-message')
+                                );
+                                
+                                if (realMessages.length > 0) {
+                                    const updatedMessages = prevMessages.filter(msg => 
+                                        !msg._id.includes('welcome-message') && 
+                                        !msg._id.includes('error-welcome-message')
+                                    );
+                                    const finalMessages = [...updatedMessages, ...newMessages];
+                                    // بعد از به‌روزرسانی پیام‌ها، scroll به پایین
+                                    setTimeout(() => scrollToBottom(), 100);
+                                    return finalMessages;
+                                } else {
+                                    const updatedMessages = [...prevMessages, ...newMessages];
+                                    // بعد از به‌روزرسانی پیام‌ها، scroll به پایین
+                                    setTimeout(() => scrollToBottom(), 100);
+                                    return updatedMessages;
+                                }
+                            }
+                            return prevMessages;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error polling for new messages:', error);
+                }
+            }, 2000); // هر 2 ثانیه چک کن (کمتر از قبل برای real-time بهتر)
+        } else {
+            console.log('Stopping polling - chat not open or no active chat');
+        }
+
         chatService.onNewMessage(handleNewMessage);
         chatService.onTyping(handleTyping);
 
@@ -152,8 +368,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
             if (typingTimeoutRef.current) {
                 clearTimeout(typingTimeoutRef.current);
             }
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
         };
-    }, [isOpen]);
+    }, [isOpen, activeChatId]);
 
     const fetchFaqs = async () => {
         try {
@@ -182,8 +401,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                 return;
             }
 
+            const tempMessageId = Date.now().toString();
             const newMessage: ChatMessageType = {
-                _id: Date.now().toString(),
+                _id: tempMessageId,
                 chatId: chatIdRef.current,
                 message,
                 senderId: 'current-user',
@@ -196,8 +416,37 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                 ...(fileData && { fileUrl: fileData.url, fileName: fileData.name, fileType: fileData.type }),
             };
 
+            // فوراً پیام را در UI نمایش بده
             setMessages(prev => [...prev, newMessage]);
+            scrollToBottom();
+
+            // پیام را به سرور ارسال کن
             await chatService.sendMessage(chatIdRef.current, message, fileData);
+
+            // بعد از ارسال موفق، پیام موقت را با پیام واقعی از سرور جایگزین کن
+            setTimeout(async () => {
+                try {
+                    const messages = await chatService.getChatMessages(chatIdRef.current!);
+                    if (messages && messages.length > 0) {
+                        const latestMessage = messages[messages.length - 1];
+                        if (latestMessage && latestMessage.message === message) {
+                            setMessages(prev => prev.map(msg => 
+                                msg._id === tempMessageId 
+                                    ? {
+                                        ...msg,
+                                        _id: latestMessage._id,
+                                        timestamp: new Date(latestMessage.timestamp),
+                                        createdAt: new Date(latestMessage.createdAt),
+                                        updatedAt: new Date(latestMessage.updatedAt),
+                                    }
+                                    : msg
+                            ));
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error updating message with server response:', error);
+                }
+            }, 1000);
 
             if (activeChatId) {
                 localStorage.setItem('activeChatId', activeChatId);
@@ -205,6 +454,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('خطا در ارسال پیام');
+            
+            // در صورت خطا، پیام موقت را حذف کن
+            setMessages(prev => prev.filter(msg => msg._id !== Date.now().toString()));
         }
     };
 
@@ -299,7 +551,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                             ) : (
                                                 <>
                                                     {messages.map((message) => {
-                                                        const isOwnMessage = message.senderId === 'current-user';
+                                                        const isOwnMessage = message.senderId === 'current-user' || message.senderId === user?._id;
                                                         return (
                                                             <ChatMessage
                                                                 key={message._id}

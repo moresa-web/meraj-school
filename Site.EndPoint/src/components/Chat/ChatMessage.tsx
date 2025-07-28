@@ -12,7 +12,16 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
     const { user } = useAuth();
-    const isCurrentUser = message.senderId === user?._id;
+    
+    // تشخیص پیام‌های کاربر: اگر senderId برابر 'current-user' باشد یا برابر user._id باشد
+    const isCurrentUser = message.senderId === 'current-user' || message.senderId === user?._id;
+    
+    // تشخیص پیام‌های پشتیبان: اگر senderId برابر 'admin' باشد یا شامل 'admin' باشد
+    const isAdminMessage = message.senderId === 'admin' || 
+                          message.senderId?.includes('admin') || 
+                          message.senderName?.includes('پشتیبان') ||
+                          message.senderName?.includes('Admin') ||
+                          message.senderId === 'admin-welcome';
 
     // تابع کمکی برای فرمت کردن تاریخ
     const formatDate = (dateValue: string | Date | undefined) => {
@@ -43,9 +52,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
 
     return (
         <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-            <div className={`max-w-[70%] ${isCurrentUser ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg px-4 py-2`}>
+            <div className={`max-w-[70%] ${
+                isCurrentUser 
+                    ? 'bg-emerald-500 text-white' 
+                    : isAdminMessage 
+                        ? 'bg-blue-100 text-blue-800 border-l-4 border-blue-500' 
+                        : 'bg-gray-100 text-gray-800'
+            } rounded-lg px-4 py-2`}>
                 {!isCurrentUser && (
-                    <div className="text-xs font-semibold mb-1">{message.senderName}</div>
+                    <div className={`text-xs font-semibold mb-1 ${
+                        isAdminMessage ? 'text-blue-600' : 'text-emerald-600'
+                    }`}>
+                        {message.senderName}
+                        {isAdminMessage && <span className="ml-1">👨‍💼</span>}
+                    </div>
                 )}
                 <div className="break-words">{message.message}</div>
                 {message.fileUrl && (
@@ -69,8 +89,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
                     </div>
                 )}
                 <div
-                    className={`flex items-center justify-end mt-2 space-x-1 space-x-reverse ${isCurrentUser ? 'text-white/70' : 'text-gray-500'
-                        }`}
+                    className={`flex items-center justify-end mt-2 space-x-1 space-x-reverse ${
+                        isCurrentUser 
+                            ? 'text-white/70' 
+                            : isAdminMessage 
+                                ? 'text-blue-500' 
+                                : 'text-gray-500'
+                    }`}
                 >
                     {isCurrentUser && (
                         <span className="text-xs flex items-center">

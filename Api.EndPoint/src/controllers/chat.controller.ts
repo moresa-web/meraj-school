@@ -38,10 +38,24 @@ export class ChatController {
     async sendMessage(req: Request, res: Response) {
         try {
             const { chatId, senderId, senderName, message, fileData } = req.body;
+            console.log('SendMessage request body:', req.body);
+            
+            if (!chatId || !senderId || !senderName || !message) {
+                return res.status(400).json({ 
+                    error: 'خطا در ارسال پیام: فیلدهای الزامی موجود نیستند',
+                    required: { chatId, senderId, senderName, message },
+                    received: req.body
+                });
+            }
+            
             const chatMessage = await chatService.sendMessage(chatId, senderId, senderName, message, fileData);
             res.status(201).json(chatMessage);
         } catch (error) {
-            res.status(500).json({ error: 'خطا در ارسال پیام' });
+            console.error('Error in sendMessage controller:', error);
+            res.status(500).json({ 
+                error: 'خطا در ارسال پیام',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            });
         }
     }
 
@@ -50,6 +64,12 @@ export class ChatController {
         try {
             const { chatId } = req.params;
             const { limit, before } = req.query;
+            console.log('GetChatMessages request:', { chatId, limit, before });
+            
+            if (!chatId) {
+                return res.status(400).json({ error: 'شناسه چت الزامی است' });
+            }
+            
             const messages = await chatService.getChatMessages(
                 chatId,
                 limit ? parseInt(limit as string) : undefined,
@@ -57,7 +77,11 @@ export class ChatController {
             );
             res.json(messages);
         } catch (error) {
-            res.status(500).json({ error: 'خطا در دریافت پیام‌ها' });
+            console.error('Error in getChatMessages controller:', error);
+            res.status(500).json({ 
+                error: 'خطا در دریافت پیام‌ها',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            });
         }
     }
 

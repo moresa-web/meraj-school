@@ -75,6 +75,9 @@ class ChatService {
     public async getChatList(userId: string): Promise<any[]> {
         try {
             const response = await fetch(`${API_URL}/api/chat/list/${userId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch chat list');
+            }
             const data = await response.json();
             return data;
         } catch (error) {
@@ -86,6 +89,9 @@ class ChatService {
     public async getChatMessages(chatId: string): Promise<ChatMessage[]> {
         try {
             const response = await fetch(`${API_URL}/api/chat/messages/${chatId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch chat messages');
+            }
             const data = await response.json();
             return data;
         } catch (error) {
@@ -103,6 +109,9 @@ class ChatService {
                 },
                 body: JSON.stringify({ userId, userName }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to create chat');
+            }
             const data = await response.json();
             return data;
         } catch (error) {
@@ -112,29 +121,31 @@ class ChatService {
     }
 
     public async sendMessage(chatId: string, message: string, fileData?: { url: string; name: string; type: string }): Promise<void> {
-        if (!this.socket) {
-            throw new Error('Socket not initialized');
+        try {
+            const response = await fetch(`${API_URL}/api/chat/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chatId,
+                    senderId: 'current-user',
+                    senderName: 'شما',
+                    message,
+                    fileData
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send message');
+            }
+
+            const data = await response.json();
+            console.log('Message sent successfully:', data);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            throw error;
         }
-
-        const messageData: ChatMessage = {
-            _id: Date.now().toString(),
-            chatId,
-            message,
-            senderId: 'current-user',
-            senderName: 'شما',
-            isRead: false,
-            isDeleted: false,
-            timestamp: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            ...(fileData && {
-                fileUrl: fileData.url,
-                fileName: fileData.name,
-                fileType: fileData.type,
-            }),
-        };
-
-        this.socket.emit('send_message', messageData);
     }
 
     public onNewMessage(handler: (message: ChatMessage) => void): void {
