@@ -377,10 +377,34 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
     const fetchFaqs = async () => {
         try {
             setIsLoadingFaqs(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/faq`);
-            setFaqs(response.data.data.data);
+            // استفاده از URL مستقیم backend
+            const apiUrl = 'http://localhost:5000'; // Hardcoded برای تست
+            const response = await axios.get(`${apiUrl}/api/faq`);
+            console.log('FAQ Response:', response.data);
+            console.log('API URL used:', `${apiUrl}/api/faq`);
+            
+            // بررسی ساختار response و استخراج داده‌ها
+            let faqData;
+            if (response.data && response.data.data) {
+                // اگر response.data.data موجود است
+                faqData = response.data.data;
+                console.log('FAQ data from response.data.data:', faqData);
+            } else if (response.data && Array.isArray(response.data)) {
+                // اگر response.data مستقیماً آرایه است
+                faqData = response.data;
+                console.log('FAQ data from response.data (array):', faqData);
+            } else {
+                // اگر هیچ‌کدام نباشد، آرایه خالی
+                faqData = [];
+                console.log('No FAQ data found, using empty array');
+            }
+            
+            const finalFaqs = Array.isArray(faqData) ? faqData : [];
+            console.log('Final FAQs to set:', finalFaqs);
+            setFaqs(finalFaqs);
         } catch (error) {
             console.error('Error fetching FAQs:', error);
+            console.error('Error details:', error.response?.data || error.message);
             toast.error('خطا در دریافت سوالات متداول', {
                 icon: '❌',
                 style: {
@@ -388,6 +412,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                     color: '#fff',
                 },
             });
+            setFaqs([]);
         } finally {
             setIsLoadingFaqs(false);
         }
@@ -519,7 +544,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                         چت آنلاین
                                     </button>
                                     <button
-                                        onClick={() => setActiveTab('faq')}
+                                        onClick={() => {
+                                            setActiveTab('faq');
+                                            // فوراً FAQ ها را بارگذاری کن
+                                            if (faqs.length === 0) {
+                                                fetchFaqs();
+                                            }
+                                        }}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                             activeTab === 'faq'
                                                 ? 'bg-white text-emerald-600 shadow-md scale-105'
@@ -583,19 +614,48 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
                                                 </div>
                                             ) : (
-                                                faqs
-                                                    .filter(faq => faq.isActive)
-                                                    .sort((a, b) => a.order - b.order)
-                                                    .map((faq) => (
-                                                        <div
-                                                            key={faq._id}
-                                                            className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
-                                                        >
-                                                            <h3 className="font-semibold text-gray-800 mb-2">{faq.question}</h3>
-                                                            <p className="text-gray-600">{faq.answer}</p>
-                                                            <span className="text-xs text-gray-400 mt-2 block">{faq.category}</span>
+                                                (() => {
+                                                    console.log('All FAQs:', faqs);
+                                                    const activeFaqs = faqs.filter(faq => faq.isActive);
+                                                    console.log('Active FAQs:', activeFaqs);
+                                                    const sortedFaqs = activeFaqs.sort((a, b) => a.order - b.order);
+                                                    console.log('Sorted FAQs:', sortedFaqs);
+                                                    
+                                                    return sortedFaqs.length === 0 ? (
+                                                        <div className="flex flex-col items-center justify-center h-full text-center">
+                                                            <div className="text-gray-400 mb-4">
+                                                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </div>
+                                                            <h3 className="text-lg font-semibold text-gray-600 mb-2">سوالات متداول</h3>
+                                                            <p className="text-gray-500">در حال حاضر سوالات متداول در دسترس نیستند.</p>
+                                                            <p className="text-gray-400 text-sm mt-2">لطفاً از طریق چت آنلاین با ما در تماس باشید.</p>
                                                         </div>
-                                                    ))
+                                                    ) : (
+                                                        sortedFaqs.map((faq) => (
+                                                            <div
+                                                                key={faq._id}
+                                                                className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+                                                                onClick={() => {
+                                                                    // اضافه کردن سوال FAQ به چت
+                                                                    if (chatIdRef.current) {
+                                                                        handleSendMessage(`سوال: ${faq.question}`);
+                                                                        // تغییر به tab چت
+                                                                        setActiveTab('chat');
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <h3 className="font-semibold text-gray-800 mb-2">{faq.question}</h3>
+                                                                <p className="text-gray-600">{faq.answer}</p>
+                                                                <span className="text-xs text-gray-400 mt-2 block">{faq.category}</span>
+                                                                <div className="text-xs text-emerald-600 mt-2">
+                                                                    کلیک کنید تا در چت ارسال شود
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    );
+                                                })()
                                             )}
                                         </div>
                                     )}
