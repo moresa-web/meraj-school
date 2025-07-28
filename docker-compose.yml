@@ -5,28 +5,52 @@ services:
     build:
       context: ./Api.EndPoint
       dockerfile: Dockerfile.backend
-      target: prod
+      args:
+        - NODE_ENV=production
     ports:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb:27017/meraj-school
-      - CORS_ORIGIN=http://mohammadrezasardashti.ir
-    depends_on:
-      - mongodb
     networks:
       - app-network
+    dns:
+      - 178.22.122.100
+      - 185.51.200.2
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./Site.EndPoint
       dockerfile: Dockerfile.frontend
+      args:
+        - NODE_ENV=production
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - api
     networks:
       - app-network
+    dns:
+      - 178.22.122.100
+      - 185.51.200.2
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: ./admin-endpoint
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    ports:
+      - "3001:3000"
+    depends_on:
+      - api
+    networks:
+      - app-network
+    dns:
+      - 178.22.122.100
+      - 185.51.200.2
+    restart: unless-stopped
 
   mongodb:
     image: mongo:latest
@@ -36,6 +60,7 @@ services:
       - mongodb_data:/data/db
     networks:
       - app-network
+    restart: unless-stopped
 
 networks:
   app-network:

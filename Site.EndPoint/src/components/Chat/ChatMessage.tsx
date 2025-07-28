@@ -1,25 +1,16 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { FiClock } from 'react-icons/fi';
+import moment from 'moment';
+import type { ChatMessage as ChatMessageType } from '../../types/chat';
 
 interface ChatMessageProps {
-    message: {
-        id: string;
-        senderId: string;
-        senderName: string;
-        message: string;
-        timestamp: Date | string | number | null | undefined;
-        isRead: boolean;
-        fileUrl?: string;
-        fileName?: string;
-        fileType?: string;
-        isDeleted: boolean;
-        createdAt?: Date;
-    };
+    message: ChatMessageType;
+    isOwnMessage: boolean;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
     const { user } = useAuth();
     const isCurrentUser = message.senderId === user?._id;
 
@@ -37,6 +28,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     // مقدار زمان را از timestamp یا createdAt بخوان
     const dateValue = message.timestamp || message.createdAt;
     const timeString = formatDate(dateValue);
+
+    const formattedTime = moment(message.timestamp).format('HH:mm');
 
     if (message.isDeleted) {
         return (
@@ -90,7 +83,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                     )}
                     <span className="text-xs flex items-center">
                         <FiClock className="ml-1" size={13} />
-                        {timeString}
+                        {formattedTime}
                     </span>
                 </div>
             </div>

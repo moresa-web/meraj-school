@@ -1,14 +1,17 @@
 export interface ChatMessage {
-    id: string;
-    text: string;
-    sender: 'user' | 'bot';
+    _id: string;
+    chatId: string;
+    senderId: string;
+    senderName: string;
+    message: string;
+    isRead: boolean;
+    isDeleted: boolean;
     timestamp: Date;
-    type: 'text' | 'file' | 'faq';
-    metadata: {
-        isRead: boolean;
-        status: 'sent' | 'delivered' | 'read';
-        isAI?: boolean;
-    };
+    createdAt: Date;
+    updatedAt: Date;
+    fileUrl?: string;
+    fileName?: string;
+    fileType?: string;
 }
 
 export interface ChatResponse {

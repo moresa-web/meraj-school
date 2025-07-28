@@ -1,7 +1,15 @@
 # === مرحله‌ی Build ===
 FROM node:18-alpine AS builder
 
+# Set DNS servers
+RUN echo "nameserver 178.22.122.100" > /etc/resolv.conf && \
+    echo "nameserver 185.51.200.2" >> /etc/resolv.conf
+
 WORKDIR /usr/src/app
+
+# Set npm config to use DNS
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set strict-ssl false
 
 # ۱) کپی پکیج‌ها و نصب (با --legacy-peer-deps)
 COPY package*.json tsconfig.json ./
@@ -23,7 +31,8 @@ RUN npm run build
 # === مرحله‌ی Serve با Nginx ===
 FROM nginx:stable-alpine
 
-COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

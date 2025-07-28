@@ -3,7 +3,7 @@ export const config = {
     port: process.env.PORT || 3000,
     environment: process.env.NODE_ENV || 'development',
     database: {
-        url: process.env.DATABASE_URL || 'mongodb://localhost:27017/news',
+        url: process.env.DATABASE_URL || 'mongodb://localhost:27017/meraj-school',
         options: {
             useNewUrlParser: true,
             useUnifiedTopology: true

@@ -14,6 +14,7 @@ import {
   Globe
 } from 'lucide-react';
 import { getImageUrl } from '../../utils/format';
+import type { User as UserType } from '../../types/index';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();

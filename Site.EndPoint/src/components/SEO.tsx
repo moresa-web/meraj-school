@@ -119,8 +119,8 @@ const SEO = ({
           telephone: seoData.phone,
           email: seoData.email,
           sameAs: [
-            seoData.socialMedia.instagram,
-            `https://twitter.com/${seoData.socialMedia.twitter}`
+            seoData.socialMedia?.instagram,
+            `https://twitter.com/${seoData.socialMedia?.twitter}`
           ]
         })}
       </script>

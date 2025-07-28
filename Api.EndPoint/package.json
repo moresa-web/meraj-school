@@ -9,6 +9,7 @@
     "build": "tsc",
     "test": "jest",
     "seed:faq": "ts-node src/scripts/seedFAQs.ts",
+    "seed": "ts-node src/scripts/seed.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },

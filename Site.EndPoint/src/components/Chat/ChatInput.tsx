@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSend, FiPaperclip, FiX } from 'react-icons/fi';
 import { chatService } from '../../services/chat.service';
@@ -56,13 +56,13 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isTyping }) => {
                         className="mb-2 p-2 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-between"
                     >
                         <span className="text-sm text-emerald-700 truncate">{fileData.name}</span>
-                <button
-                    type="button"
+                        <button
+                            type="button"
                             onClick={removeFile}
                             className="text-emerald-600 hover:text-emerald-700"
-                >
+                        >
                             <FiX size={16} />
-                </button>
+                        </button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -86,8 +86,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isTyping }) => {
                 <button
                     type="submit"
                     disabled={!message.trim() && !fileData}
-                    className={`p-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 text-white ${
-                        (!message.trim() && !fileData) ? 'opacity-50 cursor-not-allowed' : 'hover:from-emerald-700 hover:to-teal-600'
+                    className={`p-2 rounded-full ${
+                        message.trim() || fileData
+                            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                 >
                     <FiSend size={20} />

@@ -16,11 +16,20 @@ CMD ["npm", "run", "dev"]
 # === مرحله‌ی تولید (اختیاری) ===
 FROM node:18-alpine AS prod
 
+# Set DNS servers
+RUN echo "nameserver 178.22.122.100" > /etc/resolv.conf && \
+    echo "nameserver 185.51.200.2" >> /etc/resolv.conf
+
 WORKDIR /usr/src/app
+
+# Set npm config to use DNS
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set strict-ssl false
+
 COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY . .
 ENV NODE_ENV=production
-EXPOSE 3001
-CMD ["node", "dist/index.js"]
+EXPOSE 5000
+CMD ["npm", "start"]

@@ -52,7 +52,7 @@ const Footer = () => {
               {loading ? '...' : siteInfo?.description}
             </p>
             <div className="flex space-x-4">
-              {!loading && siteInfo?.socialMedia.instagram && (
+              {!loading && siteInfo?.socialMedia?.instagram && (
                 <a
                   href={siteInfo.socialMedia.instagram}
                   target="_blank"
@@ -62,7 +62,7 @@ const Footer = () => {
                   <Instagram className="w-6 h-6" />
                 </a>
               )}
-              {!loading && siteInfo?.socialMedia.twitter && (
+              {!loading && siteInfo?.socialMedia?.twitter && (
                 <a
                   href={`https://twitter.com/${siteInfo.socialMedia.twitter}`}
                   target="_blank"

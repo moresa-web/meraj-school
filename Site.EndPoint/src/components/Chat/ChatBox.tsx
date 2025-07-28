@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import ChatInput from './ChatInput';
 import ChatMessage from './ChatMessage';
-import { chatService, ChatMessage as ChatMessageType } from '../../services/chat.service';
+import { chatService } from '../../services/chat.service';
+import type { ChatMessage as ChatMessageType } from '../../types/chat';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface FAQ {
@@ -44,7 +45,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
         const initializeChat = async () => {
             try {
                 setIsLoading(true);
-                if (!user?._id || !user?.fullName) {
+                if (!user?._id || !user?.username) {
                     toast.error('اطلاعات کاربر یافت نشد');
                     setIsLoading(false);
                     return;
@@ -66,25 +67,27 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                     
                     if (messages && messages.length > 0) {
                         const formattedMessages = messages.map((msg: any) => {
-                            console.log('Processing message:', msg);
                             return {
-                                id: msg._id,
+                                _id: msg._id,
                                 chatId: msg.chatId,
                                 message: msg.message,
                                 senderId: msg.senderId,
                                 senderName: msg.senderName,
                                 isRead: msg.isRead,
                                 isDeleted: msg.isDeleted,
-                                timestamp: msg.timestamp,
-                                createdAt: msg.createdAt,
-                                updatedAt: msg.updatedAt
+                                timestamp: new Date(msg.timestamp),
+                                createdAt: new Date(msg.createdAt),
+                                updatedAt: new Date(msg.updatedAt),
+                                fileUrl: msg.fileUrl,
+                                fileName: msg.fileName,
+                                fileType: msg.fileType,
                             };
                         });
                         console.log('Formatted Messages:', formattedMessages);
                         setMessages(formattedMessages.reverse());
                     }
                 } else {
-                    const newChat = await chatService.createChat(user._id, user.fullName);
+                    const newChat = await chatService.createChat(user._id, user.username);
                     if (newChat) {
                         chatIdRef.current = newChat._id;
                         setActiveChatId(newChat._id);
@@ -106,7 +109,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                 clearTimeout(typingTimeoutRef.current);
             }
         };
-    }, [user?._id, user?.fullName]);
+    }, [user?._id, user?.username]);
 
     useEffect(() => {
         if (activeTab === 'faq') {
@@ -117,20 +120,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
     useEffect(() => {
         const handleNewMessage = (message: ChatMessageType) => {
             console.log('New message received:', message);
-            const formattedMessage = {
-                id: message._id,
-                chatId: message.chatId,
-                message: message.message,
-                senderId: message.senderId,
-                senderName: message.senderName,
-                isRead: message.isRead,
-                isDeleted: message.isDeleted,
-                timestamp: message.timestamp,
-                createdAt: message.createdAt,
-                updatedAt: message.updatedAt
-            };
-            console.log('Formatted new message:', formattedMessage);
-            setMessages(prev => [...prev, formattedMessage]);
+            setMessages(prev => [...prev, message]);
             if (!isOpen) {
                 toast.success('پیام جدید دریافت شد', {
                     icon: '📬',
@@ -193,16 +183,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
             }
 
             const newMessage: ChatMessageType = {
-                id: Date.now().toString(),
+                _id: Date.now().toString(),
                 chatId: chatIdRef.current,
                 message,
                 senderId: 'current-user',
                 senderName: 'شما',
                 isRead: false,
                 isDeleted: false,
-                timestamp: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                timestamp: new Date(),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                ...(fileData && { fileUrl: fileData.url, fileName: fileData.name, fileType: fileData.type }),
             };
 
             setMessages(prev => [...prev, newMessage]);
@@ -250,13 +241,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                     onClick={() => setIsMinimized(!isMinimized)}
                                     className="text-white hover:text-emerald-100 transition-colors"
                                 >
-                                    {isMinimized ? <FiMaximize2 /> : <FiMinimize2 />}
+                                    <FiMaximize2 className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={onClose}
                                     className="text-white hover:text-emerald-100 transition-colors"
                                 >
-                                    <FiX />
+                                    <FiX className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -311,7 +302,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                         const isOwnMessage = message.senderId === 'current-user';
                                                         return (
                                                             <ChatMessage
-                                                                key={message.id}
+                                                                key={message._id}
                                                                 message={message}
                                                                 isOwnMessage={isOwnMessage}
                                                             />
@@ -365,7 +356,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                 rel="noopener noreferrer"
                                                 className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 transition-colors"
                                             >
-                                                <FiInstagram size={24} />
+                                                <FiInstagram className="w-5 h-5" />
                                                 <span>اینستاگرام</span>
                                             </a>
                                             <a
@@ -374,7 +365,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                 rel="noopener noreferrer"
                                                 className="flex items-center space-x-2 text-blue-400 hover:text-blue-500 transition-colors"
                                             >
-                                                <FiTwitter size={24} />
+                                                <FiTwitter className="w-5 h-5" />
                                                 <span>توییتر</span>
                                             </a>
                                         </div>

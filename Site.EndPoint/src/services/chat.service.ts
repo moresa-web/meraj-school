@@ -1,3 +1,4 @@
+import type { ChatMessage } from '../types/chat';
 import io from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import axios from 'axios';
@@ -15,19 +16,6 @@ axios.interceptors.request.use((config) => {
     return config;
 });
 
-export interface ChatMessage {
-    id: string;
-    chatId: string;
-    senderId: string;
-    senderName: string;
-    message: string;
-    isRead: boolean;
-    isDeleted: boolean;
-    timestamp: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
 export interface Chat {
     id?: string;
     _id?: string;
@@ -39,10 +27,16 @@ export interface Chat {
     updatedAt: string;
 }
 
+interface MessageStatus {
+    isRead: boolean;
+    status: 'sent' | 'delivered' | 'read';
+    isAI?: boolean;
+}
+
 class ChatService {
-    private socket: Socket | null = null;
-    private messageCallbacks: ((message: ChatMessage) => void)[] = [];
-    private typingCallbacks: (() => void)[] = [];
+    private socket: typeof Socket | null = null;
+    private messageHandlers: ((message: ChatMessage) => void)[] = [];
+    private typingHandlers: (() => void)[] = [];
     private user: any;
 
     constructor() {
@@ -52,18 +46,16 @@ class ChatService {
 
     private initializeSocket() {
         this.socket = io(API_URL, {
-            path: '/socket.io',
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000
+            transports: ['websocket'],
+            autoConnect: true,
         });
 
         this.socket.on('connect', () => {
-            console.log('Socket connected');
+            console.log('Connected to chat server');
         });
 
         this.socket.on('disconnect', () => {
-            console.log('Socket disconnected');
+            console.log('Disconnected from chat server');
         });
 
         this.socket.on('error', (error: Error) => {
@@ -71,69 +63,94 @@ class ChatService {
             toast.error('خطا در اتصال به سرور چت');
         });
 
-        this.socket.on('newMessage', (message: ChatMessage) => {
-            this.messageCallbacks.forEach(callback => callback(message));
+        this.socket.on('new_message', (message: ChatMessage) => {
+            this.messageHandlers.forEach(handler => handler(message));
         });
 
-        this.socket.on('userTyping', () => {
-            this.typingCallbacks.forEach(callback => callback());
+        this.socket.on('typing', () => {
+            this.typingHandlers.forEach(handler => handler());
         });
     }
 
-    async getChatList(userId: string) {
+    public async getChatList(userId: string): Promise<any[]> {
         try {
-            const response = await axios.get(`${API_URL}/api/chat/user/${userId}`);
-            console.log(response);
-            return response.data || [];
+            const response = await fetch(`${API_URL}/api/chat/list/${userId}`);
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Error fetching chat list:', error);
-            toast.error('خطا در دریافت لیست چت‌ها');
             return [];
         }
     }
 
-    async createChat(userId: string, userName: string) {
+    public async getChatMessages(chatId: string): Promise<ChatMessage[]> {
         try {
-            const response = await axios.post(`${API_URL}/api/chat`, { userId, userName });
-            return response.data;
+            const response = await fetch(`${API_URL}/api/chat/messages/${chatId}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching chat messages:', error);
+            return [];
+        }
+    }
+
+    public async createChat(userId: string, userName: string): Promise<any> {
+        try {
+            const response = await fetch(`${API_URL}/api/chat/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId, userName }),
+            });
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Error creating chat:', error);
-            toast.error('خطا در ایجاد چت جدید');
             return null;
         }
     }
 
-    async sendMessage(chatId: string, message: string, fileData?: { url: string; type: string; name: string }) {
-        try {
-            const response = await axios.post(`${API_URL}/api/chat/${chatId}/messages`, {
-                chatId,
-                senderId: this.user?._id || 'current-user',
-                senderName: this.user?.fullName || 'شما',
-                message,
-                fileData
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error sending message:', error);
-            toast.error('خطا در ارسال پیام');
-            throw error;
+    public async sendMessage(chatId: string, message: string, fileData?: { url: string; name: string; type: string }): Promise<void> {
+        if (!this.socket) {
+            throw new Error('Socket not initialized');
         }
+
+        const messageData: ChatMessage = {
+            _id: Date.now().toString(),
+            chatId,
+            message,
+            senderId: 'current-user',
+            senderName: 'شما',
+            isRead: false,
+            isDeleted: false,
+            timestamp: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ...(fileData && {
+                fileUrl: fileData.url,
+                fileName: fileData.name,
+                fileType: fileData.type,
+            }),
+        };
+
+        this.socket.emit('send_message', messageData);
     }
 
-    onNewMessage(callback: (message: ChatMessage) => void) {
-        this.messageCallbacks.push(callback);
+    public onNewMessage(handler: (message: ChatMessage) => void): void {
+        this.messageHandlers.push(handler);
     }
 
-    offNewMessage(callback: (message: ChatMessage) => void) {
-        this.messageCallbacks = this.messageCallbacks.filter(cb => cb !== callback);
+    public offNewMessage(handler: (message: ChatMessage) => void): void {
+        this.messageHandlers = this.messageHandlers.filter(h => h !== handler);
     }
 
-    onTyping(callback: () => void) {
-        this.typingCallbacks.push(callback);
+    public onTyping(handler: () => void): void {
+        this.typingHandlers.push(handler);
     }
 
-    offTyping(callback: () => void) {
-        this.typingCallbacks = this.typingCallbacks.filter(cb => cb !== callback);
+    public offTyping(handler: () => void): void {
+        this.typingHandlers = this.typingHandlers.filter(h => h !== handler);
     }
 
     emitTyping() {
@@ -151,17 +168,6 @@ class ChatService {
         } catch (error) {
             console.error('Error fetching chat by id:', error);
             return null;
-        }
-    }
-
-    async getChatMessages(chatId: string) {
-        try {
-            const response = await axios.get(`${API_URL}/api/chat/${chatId}/messages`);
-            console.log(response);
-            return response.data || [];
-        } catch (error) {
-            console.error('Error fetching chat messages:', error);
-            return [];
         }
     }
 }
