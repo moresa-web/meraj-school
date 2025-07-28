@@ -21,7 +21,11 @@ interface NewsItem {
   views: number;
   likes: number;
   content: string;
-  author: string;
+  author?: {
+    userId: string;
+    fullName: string;
+    email: string;
+  };
   tags: string[];
   likedBy: string[];
   slug: string;
@@ -196,12 +200,14 @@ const NewsDetail: React.FC = () => {
                     {news.description}
                   </p>
                   <div className="flex items-center gap-6">
-                    <div className="flex items-center text-white/80">
-                      <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>{news.author}</span>
-                    </div>
+                    {news.author && (
+                      <div className="flex items-center text-white/80">
+                        <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>{news.author.fullName}</span>
+                      </div>
+                    )}
                     <div className="flex items-center text-white/80">
                       <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

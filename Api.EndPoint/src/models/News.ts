@@ -5,6 +5,12 @@ export interface INews extends Document {
   slug: string;
   content: string;
   summary: string;
+  category: string;
+  author: {
+    userId: string;
+    fullName: string;
+    email: string;
+  };
   image: string;
   publishDate: Date;
   updatedAt: Date;
@@ -37,6 +43,27 @@ const newsSchema = new Schema<INews>({
     type: String,
     required: [true, 'خلاصه خبر الزامی است'],
     trim: true
+  },
+  category: {
+    type: String,
+    required: [true, 'دسته‌بندی خبر الزامی است'],
+    trim: true
+  },
+  author: {
+    userId: {
+      type: String,
+      required: [true, 'شناسه نویسنده الزامی است']
+    },
+    fullName: {
+      type: String,
+      required: [true, 'نام کامل نویسنده الزامی است'],
+      trim: true
+    },
+    email: {
+      type: String,
+      required: [true, 'ایمیل نویسنده الزامی است'],
+      trim: true
+    }
   },
   image: {
     type: String,

@@ -12,6 +12,11 @@ interface NewsItem {
   image: string;
   date: string;
   category: string;
+  author?: {
+    userId: string;
+    fullName: string;
+    email: string;
+  };
   views: number;
   likes: number;
   likedBy: string[];
@@ -225,11 +230,21 @@ export const LatestNewsSection: React.FC = () => {
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 ml-2 text-emerald-600 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>{newsItem.date}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 ml-2 text-emerald-600 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>{newsItem.date}</span>
+                    </div>
+                    {newsItem.author && (
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 ml-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>{newsItem.author.fullName}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center">

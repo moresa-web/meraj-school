@@ -55,7 +55,12 @@ export const getNews = async (req: Request, res: Response) => {
     const transformedNews = news.map(item => ({
       ...item.toObject(),
       description: item.summary, // تبدیل summary به description
-      isPublished: item.status === 'published' // تبدیل status به isPublished
+      isPublished: item.status === 'published', // تبدیل status به isPublished
+      author: item.author ? {
+        userId: item.author.userId,
+        fullName: item.author.fullName,
+        email: item.author.email
+      } : undefined
     }));
     
     res.json(transformedNews);
@@ -80,7 +85,12 @@ export const getNewsBySlug = async (req: Request, res: Response) => {
     const transformedNews = {
       ...news.toObject(),
       description: news.summary, // تبدیل summary به description
-      isPublished: news.status === 'published' // تبدیل status به isPublished
+      isPublished: news.status === 'published', // تبدیل status به isPublished
+      author: news.author ? {
+        userId: news.author.userId,
+        fullName: news.author.fullName,
+        email: news.author.email
+      } : undefined
     };
     
     res.json(transformedNews);
@@ -92,13 +102,18 @@ export const getNewsBySlug = async (req: Request, res: Response) => {
 // Create new news
 export const createNews = async (req: Request, res: Response) => {
   try {
-    const { title, description, content, category, tags, author, isPublished, slug } = req.body;
+    const { title, description, content, category, tags, isPublished, slug } = req.body;
     let image = '';
 
     if (req.file) {
       image = `/uploads/${req.file.filename}`;
     } else {
       return res.status(400).json({ message: 'تصویر خبر الزامی است' });
+    }
+
+    // بررسی احراز هویت کاربر
+    if (!req.user) {
+      return res.status(401).json({ message: 'احراز هویت الزامی است' });
     }
 
     // Create slug from title if not provided
@@ -129,7 +144,11 @@ export const createNews = async (req: Request, res: Response) => {
       content,
       category,
       tags: parsedTags,
-      author,
+      author: {
+        userId: req.user.userId,
+        fullName: req.user.fullName,
+        email: req.user.email
+      },
       date: new Date(),
       publishDate: new Date(),
       image,
@@ -173,13 +192,12 @@ export const createNews = async (req: Request, res: Response) => {
 // Update news
 export const updateNews = async (req: Request, res: Response) => {
   try {
-    const { title, description, content, category, tags, author, isPublished, slug } = req.body;
+    const { title, description, content, category, tags, isPublished, slug } = req.body;
     const updateData: any = {
       title,
       summary: description || content.substring(0, 200) + '...',
       content,
       category,
-      author,
       status: isPublished === 'true' ? 'published' : 'draft'
     };
 

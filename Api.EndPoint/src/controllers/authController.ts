@@ -104,7 +104,14 @@ export const register = async (req: Request, res: Response) => {
 
     // ایجاد توکن
     const token = jwt.sign(
-      { _id: user._id, username: user.username, email: user.email, role: user.role },
+      { 
+        _id: user._id, 
+        userId: user._id.toString(), 
+        username: user.username, 
+        email: user.email, 
+        fullName: user.fullName,
+        role: user.role 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -163,7 +170,14 @@ export const login = async (req: Request, res: Response) => {
 
     // ایجاد توکن
     const token = jwt.sign(
-      { _id: user._id, username: user.username, email: user.email, role: user.role },
+      { 
+        _id: user._id, 
+        userId: user._id.toString(), 
+        username: user.username, 
+        email: user.email, 
+        fullName: user.fullName,
+        role: user.role 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );

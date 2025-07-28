@@ -20,6 +20,11 @@ interface NewsItem {
   date: string;
   image: string;
   category: string;
+  author?: {
+    userId: string;
+    fullName: string;
+    email: string;
+  };
   views: number;
   likes: number;
   likedBy: string[];
@@ -359,7 +364,17 @@ const News: React.FC = () => {
                             {newsItem.description}
                           </p>
                           <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>{newsItem.date}</span>
+                            <div className="flex items-center gap-4">
+                              <span>{newsItem.date}</span>
+                              {newsItem.author && (
+                                <span className="flex items-center">
+                                  <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                  </svg>
+                                  {newsItem.author.fullName}
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-4">
                               <span className="flex items-center">
                                 <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

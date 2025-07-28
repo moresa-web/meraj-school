@@ -5,7 +5,11 @@ export interface News {
   content: string;
   category: string;
   description?: string;
-  author?: string;
+  author?: {
+    userId: string;
+    fullName: string;
+    email: string;
+  };
   image?: string;
   date: string;
   tags?: string[];

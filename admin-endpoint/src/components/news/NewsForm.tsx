@@ -216,21 +216,16 @@ const NewsForm: React.FC<NewsFormProps> = ({
         </div>
 
         <div className={formGroupClass}>
-          <label htmlFor="author" className={labelClass}>
+          <label className={labelClass}>
             نویسنده
           </label>
           <div className="relative">
-            <input
-              type="text"
-              id="author"
-              name="author"
-              value={formData.author}
-              onChange={handleChange}
-              placeholder="نام نویسنده را وارد کنید"
-              className={`${inputClass} pr-10`}
-            />
+            <div className={`${inputClass} pr-10 bg-gray-100 cursor-not-allowed`}>
+              {initialData?.author?.fullName || 'کاربر فعلی'}
+            </div>
             <UserCircleIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
           </div>
+          <p className="text-xs text-gray-500 mt-1">نویسنده به صورت خودکار از حساب کاربری شما انتخاب می‌شود</p>
         </div>
       </div>
 
