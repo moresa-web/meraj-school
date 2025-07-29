@@ -5,6 +5,7 @@ import { useSiteInfo } from '../../hooks/useSiteInfo';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '../../utils/format';
+import { Menu, X, Home, Info, BookOpen, Newspaper, Phone, LogOut, LogIn, Settings } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -18,12 +19,28 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+      // Only update scroll state if mobile menu is closed
+      if (!isMobileMenuOpen) {
+        setIsScrolled(window.scrollY > 0);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -47,6 +64,10 @@ const Header: React.FC = () => {
 
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   const toggleUserMenu = () => {
@@ -198,118 +219,169 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300 z-50">
-            <div className="fixed top-0 right-0 w-80 h-full bg-gray-900 shadow-2xl transform transition-transform duration-300 border-l border-gray-800">
-              <div className="p-6 h-full flex flex-col">
-                <div className="flex justify-between items-center mb-8">
-                  <button
-                    onClick={toggleMenu}
-                    className="p-2 rounded-lg hover:bg-gray-800 transition-all duration-200 text-gray-300 hover:text-emerald-400"
-                    aria-label="بستن منو"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                  <span className="text-xl font-semibold text-emerald-400">منو</span>
-                </div>
+        <div className={`md:hidden fixed inset-0 z-[9999] transition-all duration-700 ease-out ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}>
+          {/* Backdrop */}
+          <div 
+            className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700 ease-out ${
+              isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={closeMenu}
+          />
+          
+          {/* Menu Panel */}
+          <div className={`absolute top-0 right-0 w-80 h-full bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 shadow-2xl border-l border-gray-700 transition-all duration-700 ease-out transform ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}>
+            <div className="p-6 h-full flex flex-col relative overflow-hidden">
+              {/* Background Pattern */}
+              <div className={`absolute inset-0 opacity-5 transition-all duration-1000 ease-out ${
+                isMobileMenuOpen ? 'opacity-5' : 'opacity-0'
+              }`}>
+                <div className="absolute top-10 right-10 w-32 h-32 bg-emerald-500 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-20 left-10 w-24 h-24 bg-blue-500 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              </div>
 
-                <div className="flex-1 flex flex-col justify-center space-y-8">
-                  <Link
-                    to="/"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-right text-xl font-medium transition-all duration-200 py-3 px-4 rounded-lg ${isActive('/') 
-                      ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20' 
-                      : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800'
-                      }`}
-                  >
-                    خانه
-                  </Link>
-                  <Link
-                    to="/about"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-right text-xl font-medium transition-all duration-200 py-3 px-4 rounded-lg ${isActive('/about') 
-                      ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20' 
-                      : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800'
-                      }`}
-                  >
-                    درباره ما
-                  </Link>
-                  <Link
-                    to="/classes"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-right text-xl font-medium transition-all duration-200 py-3 px-4 rounded-lg ${isActive('/classes') 
-                      ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20' 
-                      : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800'
-                      }`}
-                  >
-                    کلاس‌های تقویتی
-                  </Link>
-                  <Link
-                    to="/news"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-right text-xl font-medium transition-all duration-200 py-3 px-4 rounded-lg ${isActive('/news') 
-                      ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20' 
-                      : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800'
-                      }`}
-                  >
-                    اخبار
-                  </Link>
-                  <Link
-                    to="/contact"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-right text-xl font-medium transition-all duration-200 py-3 px-4 rounded-lg ${isActive('/contact') 
-                      ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20' 
-                      : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800'
-                      }`}
-                  >
-                    تماس با ما
-                  </Link>
+              {/* Header */}
+              <div className={`flex justify-between items-center mb-8 relative z-10 transition-all duration-700 ease-out transform ${
+                isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`} style={{ transitionDelay: '200ms' }}>
+                <button
+                  onClick={toggleMenu}
+                  className="p-3 rounded-xl hover:bg-gray-800/50 transition-all duration-300 text-gray-300 hover:text-emerald-400 hover:scale-110 group"
+                  aria-label="بستن منو"
+                >
+                  <X
+                    className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90"
+                  />
+                </button>
+                <div className="text-center">
+                  <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
+                    منو
+                  </span>
+                  <div className="w-8 h-0.5 bg-gradient-to-r from-emerald-400 to-emerald-300 mx-auto mt-1 rounded-full"></div>
                 </div>
+                <div className="w-10"></div> {/* Spacer for centering */}
+              </div>
 
-                <div className="mt-auto pt-8 space-y-4">
-                  {isAuthenticated ? (
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMobileMenuOpen(false);
+              {/* Navigation Links */}
+              <div className="flex-1 flex flex-col justify-center space-y-2 relative z-10">
+                {[
+                  { path: '/', label: 'خانه', icon: Home },
+                  { path: '/about', label: 'درباره ما', icon: Info },
+                  { path: '/classes', label: 'کلاس‌های تقویتی', icon: BookOpen },
+                  { path: '/news', label: 'اخبار', icon: Newspaper },
+                  { path: '/contact', label: 'تماس با ما', icon: Phone }
+                ].map((item, index) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={closeMenu}
+                      className={`group flex items-center justify-between w-full text-right text-lg font-medium transition-all duration-500 ease-out py-4 px-6 rounded-2xl relative overflow-hidden transform ${
+                        isActive(item.path)
+                          ? 'text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 shadow-lg shadow-emerald-500/10'
+                          : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-800/50'
+                      } ${
+                        isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                      }`}
+                      style={{ 
+                        transitionDelay: `${400 + index * 100}ms`,
+                        transitionDuration: '600ms'
                       }}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:from-red-700 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-red-500/25 text-lg border border-red-500/20"
                     >
-                      خروج
-                    </button>
-                  ) : (
-                    <Link
-                      to="/login"
-                      className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-lg hover:shadow-emerald-500/25 text-lg border border-emerald-500/20"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      ورود / ثبت‌نام
+                      {/* Background glow for active item */}
+                      {isActive(item.path) && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent rounded-2xl"></div>
+                      )}
+                      
+                      {/* Content */}
+                      <div className="flex items-center space-x-3 space-x-reverse relative z-10">
+                        <div className="p-2 rounded-xl bg-gray-800/50 group-hover:bg-emerald-500/20 transition-all duration-300">
+                          <IconComponent className="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                        <span className="group-hover:translate-x-1 transition-transform duration-300">
+                          {item.label}
+                        </span>
+                      </div>
+                      
+                      {/* Arrow indicator */}
+                      <div className={`transition-all duration-300 ${
+                        isActive(item.path) 
+                          ? 'text-emerald-400 translate-x-1' 
+                          : 'text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1'
+                      }`}>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </Link>
-                  )}
-                  {user?.role === 'admin' ? (
-                    <Link
-                      to="http://localhost:3001"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 text-center shadow-lg hover:shadow-emerald-500/25 text-lg border border-emerald-500/20"
-                    >
-                      داشبورد
-                    </Link>
-                  ) : (<></>)}
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons */}
+              <div className={`mt-auto pt-8 space-y-4 relative z-10 transition-all duration-700 ease-out transform ${
+                isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`} style={{ transitionDelay: '800ms' }}>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      closeMenu();
+                    }}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-2xl hover:from-red-700 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/25 text-lg font-medium border border-red-500/20 hover:scale-105 group"
+                  >
+                    <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                      <LogOut className="w-5 h-5" />
+                      <span>خروج</span>
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="block w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-2xl hover:from-emerald-700 hover:to-emerald-600 transition-all duration-300 text-center shadow-lg hover:shadow-emerald-500/25 text-lg font-medium border border-emerald-500/20 hover:scale-105 group"
+                    onClick={closeMenu}
+                  >
+                    <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                      <LogIn className="w-5 h-5" />
+                      <span>ورود / ثبت‌نام</span>
+                    </div>
+                  </Link>
+                )}
+                
+                {user?.role === 'admin' && (
+                  <Link
+                    to="http://localhost:3001"
+                    onClick={closeMenu}
+                    className="block w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 text-center shadow-lg hover:shadow-blue-500/25 text-lg font-medium border border-blue-500/20 hover:scale-105 group"
+                  >
+                    <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                      <Settings className="w-5 h-5" />
+                      <span>داشبورد</span>
+                    </div>
+                  </Link>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className={`mt-6 pt-6 border-t border-gray-700 relative z-10 transition-all duration-700 ease-out transform ${
+                isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`} style={{ transitionDelay: '900ms' }}>
+                <div className="text-center text-gray-400 text-sm">
+                  <p className="mb-2">دبیرستان معراج</p>
+                  <div className="flex justify-center space-x-2 space-x-reverse">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
