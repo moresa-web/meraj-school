@@ -1,0 +1,963 @@
+/* CTA Section Styles */
+.cta-section {
+  position: relative;
+  padding: 8rem 2rem;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #93c5fd 75%, #dbeafe 100%);
+  overflow: hidden;
+  min-height: 100vh;
+  transition: opacity 0.6s ease-in-out;
+}
+
+.cta-section--visible {
+  opacity: 1;
+}
+
+.cta-section:not(.cta-section--visible) {
+  opacity: 0;
+}
+
+/* Enhanced animated background elements */
+.cta-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cta-floating-element {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+  animation: ctaFloat 20s ease-in-out infinite;
+}
+
+.cta-element-1 {
+  width: 400px;
+  height: 400px;
+  top: -200px;
+  right: -200px;
+  animation-delay: 0s;
+}
+
+.cta-element-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -150px;
+  left: -150px;
+  animation-delay: 7s;
+}
+
+.cta-element-3 {
+  width: 350px;
+  height: 350px;
+  top: 30%;
+  left: 5%;
+  animation-delay: 14s;
+}
+
+.cta-element-4 {
+  width: 250px;
+  height: 250px;
+  top: 20%;
+  right: 20%;
+  animation-delay: 3s;
+}
+
+/* Particle effects */
+.cta-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.cta-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: ctaParticleFloat var(--particle-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--particle-delay, 0s);
+}
+
+.cta-particle:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.4);
+  width: 6px;
+  height: 6px;
+}
+
+.cta-particle:nth-child(3n) {
+  background: rgba(255, 255, 255, 0.8);
+  width: 3px;
+  height: 3px;
+}
+
+/* Main container - Fixed layout */
+.cta-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* CTA content - Better spacing */
+.cta-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.cta-title {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  line-height: 1.2;
+}
+
+.cta-title::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #dbeafe 100%);
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cta-description {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  color: #e0f2fe;
+  margin-bottom: 2rem;
+  line-height: 1.8;
+  font-weight: 400;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* CTA buttons container */
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Primary CTA button */
+.cta-primary-button {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #1e40af;
+  border: none;
+  padding: 1.25rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cta-primary-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.cta-primary-button:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  color: #1e3a8a;
+}
+
+.cta-primary-button:hover::before {
+  left: 100%;
+}
+
+.cta-primary-button:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.cta-primary-button:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.cta-primary-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.cta-primary-button:hover .cta-primary-icon {
+  transform: translateX(4px) scale(1.1);
+}
+
+/* Secondary CTA button */
+.cta-secondary-button {
+  background: transparent;
+  color: #ffffff;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  padding: 1.25rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cta-secondary-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.cta-secondary-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.cta-secondary-button:hover::before {
+  left: 100%;
+}
+
+.cta-secondary-button:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.cta-secondary-button:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.cta-secondary-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.cta-secondary-button:hover .cta-secondary-icon {
+  transform: translateX(4px) scale(1.1);
+}
+
+/* CTA features - Fixed to display in one row on desktop */
+.cta-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cta-feature {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cta-feature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.cta-feature:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px) scale(1.02);
+}
+
+.cta-feature:hover::before {
+  left: 100%;
+}
+
+.cta-feature:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.cta-feature-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-feature-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform 0.3s ease;
+}
+
+.cta-feature-icon svg {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.cta-feature:hover .cta-feature-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+.cta-feature:hover .cta-feature-icon::before {
+  transform: scale(1);
+}
+
+.cta-feature:hover .cta-feature-icon svg {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.cta-feature-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: color 0.3s ease;
+}
+
+.cta-feature:hover .cta-feature-title {
+  color: #f8fafc;
+}
+
+.cta-feature-description {
+  font-size: 1.1rem;
+  color: #e0f2fe;
+  line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: color 0.3s ease;
+  flex-grow: 1;
+}
+
+.cta-feature:hover .cta-feature-description {
+  color: #f1f5f9;
+}
+
+/* Trust indicators - Completely redesigned */
+.cta-trust-indicators {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-trust-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cta-trust-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.cta-trust-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cta-trust-item:hover::before {
+  left: 100%;
+}
+
+.cta-trust-item:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.cta-trust-number {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.cta-trust-label {
+  font-size: 1rem;
+  color: #e0f2fe;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced decorative elements */
+.cta-decoration {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
+}
+
+.cta-decoration-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  opacity: 0.3;
+}
+
+.cta-decoration-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+}
+
+.cta-decoration-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: ctaDotPulse 2s ease-in-out infinite;
+}
+
+.cta-decoration-dot:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.cta-decoration-dot:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.cta-decoration-dot:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+.cta-decoration-dot:nth-child(5) {
+  animation-delay: 1.6s;
+}
+
+/* Skip link for accessibility */
+.cta-skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #1e40af;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  transition: top 0.3s;
+}
+
+.cta-skip-link:focus {
+  top: 6px;
+}
+
+/* Loading state */
+.cta-section.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.cta-loading-content {
+  text-align: center;
+  color: #ffffff;
+}
+
+.cta-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.cta-retry-info {
+  font-size: 0.9rem;
+  color: #e0f2fe;
+  margin-top: 0.5rem;
+}
+
+/* Error state */
+.cta-section.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.cta-error-content {
+  text-align: center;
+  color: #ef4444;
+  max-width: 500px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cta-error-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.cta-error-content p {
+  margin-bottom: 1.5rem;
+  color: #fecaca;
+}
+
+.cta-error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-retry-button {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #1e40af;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cta-retry-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cta-retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cta-reload-button {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cta-reload-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes ctaFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-30px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(15px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(-20px) rotate(270deg);
+  }
+}
+
+@keyframes ctaParticleFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes ctaDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .cta-features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .cta-trust-indicators {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cta-section {
+    padding: 6rem 1rem;
+  }
+
+  .cta-container {
+    padding: 0 0.5rem;
+  }
+
+  .cta-content {
+    gap: 2rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .cta-primary-button,
+  .cta-secondary-button {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .cta-features {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .cta-feature {
+    padding: 2rem 1.5rem;
+  }
+
+  .cta-trust-indicators {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .cta-trust-item {
+    padding: 1.5rem 1rem;
+  }
+
+  .cta-trust-number {
+    font-size: 2.5rem;
+  }
+
+  .cta-trust-label {
+    font-size: 0.9rem;
+  }
+
+  .cta-floating-element {
+    display: none;
+  }
+
+  .cta-particles {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-section {
+    padding: 4rem 1rem;
+  }
+
+  .cta-title {
+    font-size: 2.5rem;
+  }
+
+  .cta-description {
+    font-size: 1.1rem;
+  }
+
+  .cta-primary-button,
+  .cta-secondary-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  .cta-feature-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cta-feature-title {
+    font-size: 1.25rem;
+  }
+
+  .cta-feature-description {
+    font-size: 1rem;
+  }
+
+  .cta-trust-number {
+    font-size: 2rem;
+  }
+
+  .cta-trust-label {
+    font-size: 0.85rem;
+  }
+
+  .cta-error-actions {
+    flex-direction: column;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .cta-section {
+    background: #1e40af;
+  }
+  
+  .cta-primary-button {
+    background: #ffffff;
+    border: 2px solid #000000;
+  }
+  
+  .cta-secondary-button {
+    border: 2px solid #ffffff;
+  }
+  
+  .cta-feature {
+    border: 2px solid #ffffff;
+  }
+
+  .cta-trust-item {
+    border: 2px solid #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .cta-floating-element {
+    animation: none;
+  }
+
+  .cta-particles {
+    display: none;
+  }
+  
+  .cta-primary-button:hover,
+  .cta-secondary-button:hover {
+    transform: none;
+  }
+  
+  .cta-primary-button::before,
+  .cta-secondary-button::before {
+    display: none;
+  }
+  
+  .cta-feature:hover {
+    transform: none;
+  }
+  
+  .cta-feature::before {
+    display: none;
+  }
+  
+  .cta-feature-icon {
+    transition: none;
+  }
+  
+  .cta-feature:hover .cta-feature-icon {
+    transform: none;
+  }
+  
+  .cta-primary-icon,
+  .cta-secondary-icon {
+    transition: none;
+  }
+  
+  .cta-primary-button:hover .cta-primary-icon,
+  .cta-secondary-button:hover .cta-secondary-icon {
+    transform: none;
+  }
+
+  .cta-decoration-dot {
+    animation: none;
+  }
+
+  .cta-trust-item:hover {
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+  }
+  
+  .cta-primary-button {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #0f172a;
+  }
+  
+  .cta-primary-button:hover {
+    color: #020617;
+  }
+  
+  .cta-secondary-button {
+    border-color: rgba(248, 250, 252, 0.8);
+    color: #f8fafc;
+  }
+  
+  .cta-secondary-button:hover {
+    background: rgba(248, 250, 252, 0.1);
+    border-color: #f8fafc;
+  }
+}
+
+/* Print styles */
+@media print {
+  .cta-section {
+    background: white !important;
+    color: black !important;
+    padding: 2rem 1rem;
+  }
+
+  .cta-title,
+  .cta-feature-title {
+    color: black !important;
+  }
+
+  .cta-description,
+  .cta-feature-description {
+    color: #333 !important;
+  }
+
+  .cta-buttons,
+  .cta-background,
+  .cta-decoration {
+    display: none !important;
+  }
+}
