@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
 import CountUp from 'react-countup';
+import './StatsSection.css';
 
 interface StatItem {
   number: string;
   text: string;
+  icon?: string;
 }
 
 interface StatsContent {
@@ -16,15 +18,110 @@ interface StatsContent {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// SVG Icons as components
+const GraduationIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </svg>
+);
+
+const TeacherIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+    <path d="M12 11v4"/>
+    <path d="M8 15h8"/>
+  </svg>
+);
+
+const StudentIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const TrophyIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+    <path d="M4 22h16"/>
+    <path d="M10 14.66V17c0 1.1.9 2 2 2s2-.9 2-2v-2.34"/>
+    <path d="M12 2v8"/>
+  </svg>
+);
+
+const BookIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </svg>
+);
+
+const AwardIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="8" r="6"/>
+    <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const TargetIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="6"/>
+    <circle cx="12" cy="12" r="2"/>
+  </svg>
+);
+
+// Icon mapping
+const iconComponents: { [key: string]: React.ComponentType } = {
+  'graduation': GraduationIcon,
+  'teacher': TeacherIcon,
+  'student': StudentIcon,
+  'trophy': TrophyIcon,
+  'book': BookIcon,
+  'award': AwardIcon,
+  'users': UsersIcon,
+  'target': TargetIcon,
+};
+
 const defaultContent: StatsContent = {
   stats: [
-    { number: '۲۰+', text: 'سال تجربه آموزشی' },
-    { number: '۵۰+', text: 'معلم مجرب' },
-    { number: '۱۰۰۰+', text: 'دانش‌آموز موفق' },
-    { number: '۹۵٪', text: 'قبولی در دانشگاه' }
+    { 
+      number: '۲۰+', 
+      text: 'سال تجربه آموزشی',
+      icon: 'graduation'
+    },
+    { 
+      number: '۵۰+', 
+      text: 'معلم مجرب',
+      icon: 'teacher'
+    },
+    { 
+      number: '۱۰۰۰+', 
+      text: 'دانش‌آموز موفق',
+      icon: 'student'
+    },
+    { 
+      number: '۹۵٪', 
+      text: 'قبولی در دانشگاه',
+      icon: 'trophy'
+    }
   ],
-  title: 'آمار',
-  description: 'این بخش به آمارهای مربوط به مدرسه خود می‌پردازد.'
+  title: 'آمار و دستاوردهای ما',
+  description: 'در طول سال‌های فعالیت، افتخار خدمت به هزاران دانش‌آموز و خانواده‌های محترم را داشته‌ایم.'
 };
 
 export const StatsSection: React.FC = () => {
@@ -33,6 +130,7 @@ export const StatsSection: React.FC = () => {
   const [inView, setInView] = useState(false);
   const [content, setContent] = useState<StatsContent>(defaultContent);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // تابع برای تبدیل اعداد فارسی به انگلیسی
   const persianToEnglish = (num: string) => {
@@ -69,19 +167,28 @@ export const StatsSection: React.FC = () => {
     return englishStr.replace(/[0-9\s]/g, '');
   };
 
+  // تابع برای رندر آیکون
+  const renderIcon = (iconName: string) => {
+    const IconComponent = iconComponents[iconName] || GraduationIcon;
+    return <IconComponent />;
+  };
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        setError(null);
         const response = await fetch(`${API_URL}/api/content/home/stats`);
         if (response.ok) {
           const data = await response.json();
-          // فقط اگر داده‌ها با مقادیر پیش‌فرض متفاوت باشند، آنها را به‌روزرسانی می‌کنیم
           if (JSON.stringify(data) !== JSON.stringify(defaultContent)) {
             setContent(data);
           }
+        } else {
+          throw new Error('خطا در دریافت اطلاعات');
         }
       } catch (error) {
         console.error('Error fetching stats content:', error);
+        setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
       } finally {
         setIsLoading(false);
       }
@@ -99,7 +206,10 @@ export const StatsSection: React.FC = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+      }
     );
 
     if (sectionRef.current) {
@@ -113,7 +223,7 @@ export const StatsSection: React.FC = () => {
     };
   }, []);
 
-  const handleSave = async (field: 'title' | 'description' | 'stats', value: string | StatItem[], index?: number, statField?: 'number' | 'text') => {
+  const handleSave = async (field: 'title' | 'description' | 'stats', value: string | StatItem[], index?: number, statField?: 'number' | 'text' | 'icon') => {
     try {
       let updatedContent = { ...content };
 
@@ -137,7 +247,7 @@ export const StatsSection: React.FC = () => {
       if (response.ok) {
         setContent(updatedContent);
       } else {
-        throw new Error('Failed to update stats');
+        throw new Error('خطا در به‌روزرسانی آمار');
       }
     } catch (error) {
       console.error('Error updating stats:', error);
@@ -146,36 +256,69 @@ export const StatsSection: React.FC = () => {
   };
 
   if (isLoading) {
-    return null; // یا یک کامپوننت loading نمایش دهید
+    return (
+      <section className="stats-section loading" role="status" aria-live="polite">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <p>در حال بارگذاری آمار...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="stats-section error" role="alert">
+        <div className="error-content">
+          <h3>خطا در بارگذاری</h3>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="retry-button"
+          >
+            تلاش مجدد
+          </button>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section ref={sectionRef} className="py-20 bg-gradient-to-b from-emerald-50 to-white relative overflow-hidden">
+    <section 
+      ref={sectionRef} 
+      className="stats-section" 
+      role="region" 
+      aria-label="آمار و دستاوردها"
+    >
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-100 rounded-full opacity-50 animate-blob"></div>
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-200 rounded-full opacity-50 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-300 rounded-full opacity-50 animate-blob animation-delay-4000"></div>
+      <div className="stats-background">
+        <div className="floating-shape shape-1"></div>
+        <div className="floating-shape shape-2"></div>
+        <div className="floating-shape shape-3"></div>
+        <div className="floating-shape shape-4"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4">
-        <h2 className="text-4xl font-bold text-gray-900 mb-6 animate-fade-in-up">
-          <EditableContent
-            type="text"
-            value={content.title}
-            isAdmin={user?.role === 'admin'}
-            onSave={(newValue) => handleSave('title', newValue)}
-          />
-        </h2>
-        <div className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up animation-delay-200">
-          <EditableContent
-            type="text"
-            value={content.description}
-            isAdmin={user?.role === 'admin'}
-            onSave={(newValue) => handleSave('description', newValue)}
-          />
+      <div className="stats-container">
+        <div className="stats-header">
+          <h2 className="stats-title animate-fade-in-up">
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
+          </h2>
+          <div className="stats-description animate-fade-in-up animation-delay-200">
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
+          </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
+
+        <div className="stats-grid">
           {content.stats.map((stat, index) => {
             const number = extractNumber(stat.number);
             const suffix = extractSuffix(stat.number);
@@ -183,40 +326,73 @@ export const StatsSection: React.FC = () => {
             return (
               <div
                 key={index}
-                className="text-center transform hover:scale-105 transition-all duration-500 animate-fade-in-up group"
-                style={{ animationDelay: `${index * 200}ms` }}
+                className="stat-card"
+                style={{ animationDelay: `${index * 150}ms` }}
+                role="article"
+                aria-label={`${stat.text}: ${stat.number}`}
               >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-emerald-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform scale-150"></div>
-                  <div className="relative text-5xl font-bold text-emerald-600 mb-3 group-hover:text-emerald-700 transition-colors duration-300">
-                    {user?.role === 'admin' ? (
-                      <EditableContent
-                        type="text"
-                        value={stat.number}
-                        isAdmin={true}
-                        onSave={(newValue) => handleSave('stats', newValue, index, 'number')}
-                      />
-                    ) : inView ? (
-                      <CountUp
-                        start={0}
-                        end={number}
-                        duration={2.5}
-                        useEasing={true}
-                        enableScrollSpy={false}
-                        easingFn={(t, b, c, d) => {
-                          t /= d;
-                          return c * t * t * t + b;
-                        }}
-                        separator=","
-                        suffix={suffix}
-                        formattingFn={(value) => englishToPersian(value.toString())}
-                        preserveValue={false}
-                        redraw={true}
-                      />
-                    ) : englishToPersian(number.toString()) + suffix}
-                  </div>
+                <div className="stat-icon">
+                  {user?.role === 'admin' ? (
+                    <div className="admin-icon-editor">
+                      <div className="current-icon">
+                        {renderIcon(stat.icon || 'graduation')}
+                      </div>
+                      <select
+                        value={stat.icon || 'graduation'}
+                        onChange={(e) => handleSave('stats', e.target.value, index, 'icon')}
+                        className="icon-selector"
+                        aria-label="انتخاب آیکون"
+                      >
+                        <option value="graduation">🎓 تجربه آموزشی</option>
+                        <option value="teacher">👨‍🏫 معلم</option>
+                        <option value="student">👥 دانش‌آموز</option>
+                        <option value="trophy">🏆 دستاورد</option>
+                        <option value="book">📚 کتاب</option>
+                        <option value="award">🏅 جایزه</option>
+                        <option value="users">👥 کاربران</option>
+                        <option value="target">🎯 هدف</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="icon-svg">
+                      {renderIcon(stat.icon || 'graduation')}
+                    </div>
+                  )}
                 </div>
-                <div className="text-gray-600 text-lg group-hover:text-gray-800 transition-colors duration-300">
+                
+                <div className="stat-number">
+                  {user?.role === 'admin' ? (
+                    <EditableContent
+                      type="text"
+                      value={stat.number}
+                      isAdmin={true}
+                      onSave={(newValue) => handleSave('stats', newValue, index, 'number')}
+                    />
+                  ) : inView ? (
+                    <CountUp
+                      start={0}
+                      end={number}
+                      duration={2.5}
+                      useEasing={true}
+                      enableScrollSpy={false}
+                      easingFn={(t, b, c, d) => {
+                        t /= d;
+                        return c * t * t * t + b;
+                      }}
+                      separator=","
+                      suffix={suffix}
+                      formattingFn={(value) => englishToPersian(value.toString())}
+                      preserveValue={false}
+                      redraw={true}
+                    />
+                  ) : (
+                    <span className="number-placeholder">
+                      {englishToPersian(number.toString()) + suffix}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="stat-text">
                   <EditableContent
                     type="text"
                     value={stat.text}
@@ -224,9 +400,21 @@ export const StatsSection: React.FC = () => {
                     onSave={(newValue) => handleSave('stats', newValue, index, 'text')}
                   />
                 </div>
+
+                {/* Decorative elements */}
+                <div className="stat-decoration">
+                  <div className="decoration-line"></div>
+                  <div className="decoration-dot"></div>
+                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Bottom decoration */}
+        <div className="stats-footer">
+          <div className="footer-line"></div>
+          <div className="footer-accent"></div>
         </div>
       </div>
     </section>

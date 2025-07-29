@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import './FeaturesSection.css';
 
 interface Feature {
   icon: string;
@@ -16,9 +17,79 @@ interface FeaturesContent {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// SVG Icons as components
+const BookIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </svg>
+);
+
+const BuildingIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9,22 9,12 15,12 15,22"/>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const GraduationIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </svg>
+);
+
+const AwardIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="8" r="6"/>
+    <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
+const TargetIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="6"/>
+    <circle cx="12" cy="12" r="2"/>
+  </svg>
+);
+
+const HeartIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+  </svg>
+);
+
+const StarIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+  </svg>
+);
+
+// Icon mapping
+const iconComponents: { [key: string]: React.ComponentType } = {
+  'book': BookIcon,
+  'building': BuildingIcon,
+  'users': UsersIcon,
+  'graduation': GraduationIcon,
+  'award': AwardIcon,
+  'target': TargetIcon,
+  'heart': HeartIcon,
+  'star': StarIcon,
+};
+
 const defaultFeatures: Feature[] = [
   {
-    icon: 'book',
+    icon: 'graduation',
     title: 'آموزش با کیفیت',
     description: 'استفاده از روش‌های نوین آموزشی و اساتید مجرب برای یادگیری بهتر دانش‌آموزان'
   },
@@ -40,38 +111,24 @@ const defaultContent: FeaturesContent = {
   features: defaultFeatures
 };
 
-const getIcon = (iconName: string) => {
-  switch (iconName) {
-    case 'book':
-      return (
-        <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      );
-    case 'building':
-      return (
-        <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-      );
-    case 'users':
-      return (
-        <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-};
-
 export const FeaturesSection: React.FC = () => {
   const { user } = useAuth();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
   const [content, setContent] = useState<FeaturesContent>(defaultContent);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // تابع برای رندر آیکون
+  const renderIcon = (iconName: string) => {
+    const IconComponent = iconComponents[iconName] || BookIcon;
+    return <IconComponent />;
+  };
 
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        setError(null);
         const response = await fetch(`${API_URL}/api/content/home/features`);
         if (response.ok) {
           const data = await response.json();
@@ -79,7 +136,8 @@ export const FeaturesSection: React.FC = () => {
             const updatedFeatures = data.features.map((feature: Feature, index: number) => ({
               ...defaultFeatures[index],
               title: feature.title,
-              description: feature.description
+              description: feature.description,
+              icon: feature.icon || defaultFeatures[index]?.icon || 'book'
             }));
             setContent({
               title: data.title || defaultContent.title,
@@ -87,20 +145,55 @@ export const FeaturesSection: React.FC = () => {
               features: updatedFeatures
             });
           }
+        } else {
+          throw new Error('خطا در دریافت اطلاعات');
         }
       } catch (error) {
         console.error('Error fetching features content:', error);
+        setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchContent();
   }, []);
 
-  const handleSave = async (field: keyof FeaturesContent | 'feature', newValue: any, index?: number) => {
+  // استفاده از Intersection Observer برای تشخیص زمانی که کاربر به این بخش می‌رسد
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { 
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  const handleSave = async (field: keyof FeaturesContent | 'feature', newValue: any, index?: number, featureField?: keyof Feature) => {
     try {
       let updatedContent = { ...content };
 
-      if (field === 'feature' && typeof index === 'number') {
+      if (field === 'feature' && typeof index === 'number' && featureField) {
+        const updatedFeatures = [...content.features];
+        updatedFeatures[index] = { ...updatedFeatures[index], [featureField]: newValue };
+        updatedContent = { ...content, features: updatedFeatures };
+      } else if (field === 'feature' && typeof index === 'number') {
         const updatedFeatures = [...content.features];
         updatedFeatures[index] = { ...updatedFeatures[index], ...newValue };
         updatedContent = { ...content, features: updatedFeatures };
@@ -108,7 +201,7 @@ export const FeaturesSection: React.FC = () => {
         updatedContent = { ...content, [field]: newValue };
       }
 
-      const response = await fetch(`${API_URL}/content/home/features`, {
+      const response = await fetch(`${API_URL}/api/content/home/features`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +213,7 @@ export const FeaturesSection: React.FC = () => {
       if (response.ok) {
         setContent(updatedContent);
       } else {
-        throw new Error('Failed to update features');
+        throw new Error('خطا در به‌روزرسانی ویژگی‌ها');
       }
     } catch (error) {
       console.error('Error updating features:', error);
@@ -128,11 +221,51 @@ export const FeaturesSection: React.FC = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <section className="features-section loading" role="status" aria-live="polite">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <p>در حال بارگذاری ویژگی‌ها...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="features-section error" role="alert">
+        <div className="error-content">
+          <h3>خطا در بارگذاری</h3>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="retry-button"
+          >
+            تلاش مجدد
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-emerald-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-emerald-600">
+    <section 
+      ref={sectionRef} 
+      className="features-section" 
+      role="region" 
+      aria-label="ویژگی‌های برتر"
+    >
+      {/* Animated background elements */}
+      <div className="features-background">
+        <div className="floating-element element-1"></div>
+        <div className="floating-element element-2"></div>
+        <div className="floating-element element-3"></div>
+      </div>
+
+      <div className="features-container">
+        <div className="features-header">
+          <h2 className="features-title animate-fade-in-up">
             <EditableContent
               type="text"
               value={content.title}
@@ -140,7 +273,7 @@ export const FeaturesSection: React.FC = () => {
               onSave={(newValue) => handleSave('title', newValue)}
             />
           </h2>
-          <div className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <div className="features-description animate-fade-in-up animation-delay-200">
             <EditableContent
               type="text"
               value={content.description}
@@ -149,13 +282,46 @@ export const FeaturesSection: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <div className="features-grid">
           {content.features.map((feature, index) => (
-            <div key={index} className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-200 transition-colors duration-300">
-                {getIcon(feature.icon)}
+            <div
+              key={index}
+              className="feature-card"
+              style={{ animationDelay: `${index * 200}ms` }}
+              role="article"
+              aria-label={`ویژگی: ${feature.title}`}
+            >
+              <div className="feature-icon">
+                {user?.role === 'admin' ? (
+                  <div className="admin-icon-editor">
+                    <div className="current-icon">
+                      {renderIcon(feature.icon)}
+                    </div>
+                    <select
+                      value={feature.icon}
+                      onChange={(e) => handleSave('feature', e.target.value, index, 'icon')}
+                      className="icon-selector"
+                      aria-label="انتخاب آیکون"
+                    >
+                      <option value="graduation">🎓 آموزش</option>
+                      <option value="building">🏢 امکانات</option>
+                      <option value="users">👥 مشاوره</option>
+                      <option value="book">📚 کتاب</option>
+                      <option value="award">🏅 جایزه</option>
+                      <option value="target">🎯 هدف</option>
+                      <option value="heart">❤️ علاقه</option>
+                      <option value="star">⭐ ستاره</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="icon-container">
+                    {renderIcon(feature.icon)}
+                  </div>
+                )}
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              
+              <h3 className="feature-title">
                 <EditableContent
                   type="text"
                   value={feature.title}
@@ -163,7 +329,8 @@ export const FeaturesSection: React.FC = () => {
                   onSave={(newValue) => handleSave('feature', { title: newValue }, index)}
                 />
               </h3>
-              <div className="text-gray-600 leading-relaxed">
+              
+              <div className="feature-description">
                 <EditableContent
                   type="text"
                   value={feature.description}
@@ -171,8 +338,20 @@ export const FeaturesSection: React.FC = () => {
                   onSave={(newValue) => handleSave('feature', { description: newValue }, index)}
                 />
               </div>
+
+              {/* Decorative elements */}
+              <div className="feature-decoration">
+                <div className="decoration-line"></div>
+                <div className="decoration-dot"></div>
+              </div>
             </div>
           ))}
+        </div>
+
+        {/* Bottom decoration */}
+        <div className="features-footer">
+          <div className="footer-line"></div>
+          <div className="footer-accent"></div>
         </div>
       </div>
     </section>
