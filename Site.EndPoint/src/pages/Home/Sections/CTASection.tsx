@@ -364,7 +364,6 @@ export const CTASection: React.FC = () => {
         overflow: 'hidden'
       }}
     >
-
         {/* Enhanced animated background elements */}
       <div className="cta-background">
         <div className="cta-floating-element cta-element-1"></div>
