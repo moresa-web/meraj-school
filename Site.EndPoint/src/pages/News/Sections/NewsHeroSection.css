@@ -1,0 +1,212 @@
+.news-hero-section {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1rem;
+}
+
+.news-hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.news-hero-container {
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.news-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.news-hero-icon {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.news-hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.news-hero-description {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0;
+  line-height: 1.6;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.news-hero-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.news-hero-stat {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.news-hero-stat:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.news-hero-stat-icon {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.news-hero-stat-number {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.news-hero-stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .news-hero-section {
+    min-height: 50vh;
+    padding: 1rem;
+  }
+
+  .news-hero-title {
+    font-size: 2rem;
+  }
+
+  .news-hero-description {
+    font-size: 1rem;
+  }
+
+  .news-hero-stats {
+    gap: 1rem;
+  }
+
+  .news-hero-stat {
+    min-width: 120px;
+    padding: 1rem;
+  }
+
+  .news-hero-stat-number {
+    font-size: 1.5rem;
+  }
+
+  .news-hero-stat-label {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .news-hero-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .news-hero-stat {
+    min-width: 200px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .news-hero-section::before,
+  .news-hero-icon,
+  .news-hero-stat {
+    animation: none;
+  }
+
+  .news-hero-stat:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .news-hero-section {
+    background: #047857;
+  }
+
+  .news-hero-stat {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+} 
