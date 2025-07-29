@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import SEO from '../../components/SEO';
+import CTASection from './Sections/CTASection';
 
 // Lazy load heavy sections for performance
 const HeroSection = lazy(() => import('./Sections/HeroSection'));
@@ -7,7 +8,6 @@ const StatsSection = lazy(() => import('./Sections/StatsSection'));
 const FeaturesSection = lazy(() => import('./Sections/FeaturesSection'));
 const LatestNewsSection = lazy(() => import('./Sections/LatestNewsSection'));
 const TestimonialsSection = lazy(() => import('./Sections/TestimonialsSection'));
-const CTASection = lazy(() => import('./Sections/CTASection'));
 
 const Home: React.FC = () => {
   return (
@@ -25,8 +25,8 @@ const Home: React.FC = () => {
           <FeaturesSection />
           <LatestNewsSection />
           <TestimonialsSection />
-          <CTASection />
         </Suspense>
+        <CTASection />
       </div>
     </>
   );

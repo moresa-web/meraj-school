@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSiteInfo } from '../../hooks/useSiteInfo';
-import { Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Twitter, Mail, Phone, MapPin, Facebook, Linkedin, Youtube, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { newsletterService } from '../../services/newsletterService';
+import '../Footer.css';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -11,6 +12,31 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const footerRef = useRef<HTMLElement>(null);
+
+  // Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => {
+      if (footerRef.current) {
+        observer.unobserve(footerRef.current);
+      }
+    };
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,140 +67,218 @@ const Footer = () => {
     }
   };
 
+  // Social media icons mapping
+  const socialIcons = {
+    instagram: Instagram,
+    twitter: Twitter,
+    facebook: Facebook,
+    linkedin: Linkedin,
+    youtube: Youtube
+  };
+
+  const getSocialIcon = (platform: string) => {
+    const IconComponent = socialIcons[platform as keyof typeof socialIcons];
+    return IconComponent ? <IconComponent className="w-5 h-5" /> : null;
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <footer className="bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer 
+      ref={footerRef}
+      className={`footer ${isVisible ? 'footer--visible' : ''}`}
+      role="contentinfo"
+      aria-label="پاورقی سایت"
+    >
+      {/* Background decoration */}
+      <div className="footer-background">
+        <div className="footer-pattern"></div>
+      </div>
+
+      <div className="footer-container">
+        <div className="footer-content">
           {/* About Section */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('footer.about')}</h3>
-            <p className="text-gray-500 dark:text-gray-400">
-              {loading ? '...' : siteInfo?.description}
-            </p>
-            <div className="flex space-x-4">
-              {!loading && siteInfo?.socialMedia?.instagram && (
-                <a
-                  href={siteInfo.socialMedia.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors"
-                >
-                  <Instagram className="w-6 h-6" />
-                </a>
-              )}
-              {!loading && siteInfo?.socialMedia?.twitter && (
-                <a
-                  href={`https://twitter.com/${siteInfo.socialMedia.twitter}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors"
-                >
-                  <Twitter className="w-6 h-6" />
-                </a>
-              )}
+          <div className="footer-section footer-about">
+            <h3 className="footer-section-title">
+              {t('footer.about')}
+            </h3>
+            <div className="footer-about-content">
+              <p className="footer-description">
+                {loading ? (
+                  <span className="footer-loading">در حال بارگذاری...</span>
+                ) : (
+                  siteInfo?.description || 'مدرسه معراج، مرکز آموزشی پیشرفته با امکانات مدرن و کادر مجرب'
+                )}
+              </p>
+              
+              {/* Social Media */}
+              <div className="footer-social">
+                {!loading && siteInfo?.socialMedia && Object.entries(siteInfo.socialMedia).map(([platform, url]) => {
+                  if (!url) return null;
+                  
+                  const icon = getSocialIcon(platform);
+                  if (!icon) return null;
+
+                  return (
+                    <a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="footer-social-link"
+                      aria-label={`${platform} مدرسه معراج`}
+                    >
+                      {icon}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('footer.quickLinks')}</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-                  {t('nav.home')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/news" className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-                  {t('nav.news')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/classes" className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-                  {t('nav.classes')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-                  {t('nav.about')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors">
-                  {t('nav.contact')}
-                </Link>
-              </li>
-            </ul>
+          <div className="footer-section footer-links">
+            <h3 className="footer-section-title">
+              {t('footer.quickLinks')}
+            </h3>
+            <nav className="footer-nav" role="navigation" aria-label="لینک‌های سریع">
+              <ul className="footer-nav-list">
+                <li>
+                  <Link to="/" className="footer-nav-link">
+                    {t('nav.home')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/news" className="footer-nav-link">
+                    {t('nav.news')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/classes" className="footer-nav-link">
+                    {t('nav.classes')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="footer-nav-link">
+                    {t('nav.about')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="footer-nav-link">
+                    {t('nav.contact')}
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </div>
 
           {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('footer.contactInfo')}</h3>
-            <ul className="space-y-4">
+          <div className="footer-section footer-contact">
+            <h3 className="footer-section-title">
+              {t('footer.contactInfo')}
+            </h3>
+            <div className="footer-contact-info">
               {!loading && siteInfo?.address && (
-                <li className="flex items-start space-x-3">
-                  <MapPin className="w-5 h-5 text-emerald-500 mt-1" />
-                  <span className="text-gray-500 dark:text-gray-400">{siteInfo.address}</span>
-                </li>
+                <div className="footer-contact-item">
+                  <MapPin className="footer-contact-icon" aria-hidden="true" />
+                  <span className="footer-contact-text">{siteInfo.address}</span>
+                </div>
               )}
               {!loading && siteInfo?.phone && (
-                <li className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-emerald-500" />
+                <div className="footer-contact-item">
+                  <Phone className="footer-contact-icon" aria-hidden="true" />
                   <a
                     href={`tel:${siteInfo.phone}`}
-                    className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors"
+                    className="footer-contact-link"
+                    aria-label={`تماس با شماره ${siteInfo.phone}`}
                   >
                     {siteInfo.phone}
                   </a>
-                </li>
+                </div>
               )}
               {!loading && siteInfo?.email && (
-                <li className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-emerald-500" />
+                <div className="footer-contact-item">
+                  <Mail className="footer-contact-icon" aria-hidden="true" />
                   <a
                     href={`mailto:${siteInfo.email}`}
-                    className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors"
+                    className="footer-contact-link"
+                    aria-label={`ارسال ایمیل به ${siteInfo.email}`}
                   >
                     {siteInfo.email}
                   </a>
-                </li>
+                </div>
               )}
-            </ul>
+            </div>
           </div>
 
           {/* Newsletter */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('footer.newsletter')}</h3>
-            <p className="text-gray-500 dark:text-gray-400">{t('footer.newsletterDescription')}</p>
-            <form className="space-y-2" onSubmit={handleSubscribe}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('footer.emailPlaceholder')}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-emerald-500 text-gray-900 dark:text-white"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? t('footer.subscribing') : t('footer.subscribe')}
-              </button>
-              {message && (
-                <div className={`text-sm mt-2 ${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {message.text}
+          <div className="footer-section footer-newsletter">
+            <h3 className="footer-section-title">
+              {t('footer.newsletter')}
+            </h3>
+            <div className="footer-newsletter-content">
+              <p className="footer-newsletter-description">
+                {t('footer.newsletterDescription') || 'برای دریافت آخرین اخبار و اطلاعیه‌ها عضو خبرنامه ما شوید'}
+              </p>
+              
+              <form className="footer-newsletter-form" onSubmit={handleSubscribe} noValidate>
+                <div className="footer-newsletter-input-group">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t('footer.emailPlaceholder') || 'ایمیل خود را وارد کنید'}
+                    className="footer-newsletter-input"
+                    aria-label="ایمیل برای خبرنامه"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="footer-newsletter-button"
+                    aria-label="عضویت در خبرنامه"
+                  >
+                    {isSubmitting ? (
+                      <div className="footer-loading-spinner"></div>
+                    ) : (
+                      <Send className="footer-newsletter-icon" />
+                    )}
+                  </button>
                 </div>
-              )}
-            </form>
+                
+                {message && (
+                  <div className={`footer-message footer-message--${message.type}`}>
+                    {message.type === 'success' ? (
+                      <CheckCircle className="footer-message-icon" />
+                    ) : (
+                      <AlertCircle className="footer-message-icon" />
+                    )}
+                    <span>{message.text}</span>
+                  </div>
+                )}
+              </form>
+            </div>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} {loading ? '...' : siteInfo?.schoolName}. {t('footer.allRightsReserved')}
-          </p>
+        <div className="footer-copyright">
+          <div className="footer-copyright-content">
+            <p className="footer-copyright-text">
+              © {new Date().getFullYear()} {loading ? 'مدرسه معراج' : siteInfo?.schoolName || 'مدرسه معراج'}. {t('footer.allRightsReserved') || 'تمامی حقوق محفوظ است'}
+            </p>
+            <button
+              onClick={scrollToTop}
+              className="footer-scroll-top"
+              aria-label="بازگشت به بالای صفحه"
+            >
+              <svg className="footer-scroll-top-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </footer>

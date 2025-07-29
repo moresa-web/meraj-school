@@ -2,7 +2,7 @@
 .cta-section {
   position: relative;
   padding: 8rem 2rem;
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #93c5fd 75%, #dbeafe 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 25%, #065f46 50%, #064e3b 75%, #022c22 100%);
   overflow: hidden;
   min-height: 100vh;
   transition: opacity 0.6s ease-in-out;
@@ -30,7 +30,7 @@
 .cta-floating-element {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
   animation: ctaFloat 20s ease-in-out infinite;
 }
 
@@ -163,7 +163,7 @@
 /* Primary CTA button */
 .cta-primary-button {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  color: #1e40af;
+  color: #059669;
   border: none;
   padding: 1.25rem 2.5rem;
   border-radius: 50px;
@@ -190,7 +190,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
   transition: left 0.6s;
 }
 
@@ -200,7 +200,7 @@
     0 20px 40px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  color: #1e3a8a;
+  color: #047857;
 }
 
 .cta-primary-button:hover::before {
@@ -546,7 +546,7 @@
   position: absolute;
   top: -40px;
   left: 6px;
-  background: #1e40af;
+  background: #059669;
   color: white;
   padding: 8px;
   text-decoration: none;
@@ -627,7 +627,7 @@
 
 .cta-retry-button {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  color: #1e40af;
+  color: #059669;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -835,7 +835,7 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .cta-section {
-    background: #1e40af;
+    background: #047857;
   }
   
   .cta-primary-button {
