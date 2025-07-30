@@ -7,6 +7,7 @@ import Home from './pages/Home/Home';
 import News from './pages/News/News';
 import NewsDetail from './pages/News/NewsDetail';
 import Classes from './pages/Classes/Classes';
+import ClassDetail from './pages/Classes/ClassDetail';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Auth/Login';
@@ -60,6 +61,7 @@ const AppContent: React.FC = () => {
           <Route path="/news" element={<News />} />
           <Route path="/news/:slug" element={<NewsDetail />} />
           <Route path="/classes" element={<Classes />} />
+          <Route path="/classes/:slug" element={<ClassDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/404" element={<NotFound />} />

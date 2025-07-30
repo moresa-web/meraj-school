@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { BookOpen, Users, Clock, Star, Heart, Share2, Calendar, DollarSign } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import EditableContent from '../../../components/EditableContent/EditableContent';
 import './ClassesListSection.css';
 
 interface ClassInfo {
@@ -15,6 +17,7 @@ interface ClassInfo {
   level: string;
   image: string;
   category: string;
+  slug: string;
   views: number;
   likes: number;
   capacity: number;
@@ -32,7 +35,17 @@ interface ClassesListSectionProps {
   sortBy: string;
 }
 
+interface ClassesListContent {
+  title: string;
+  subtitle: string;
+}
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const defaultContent: ClassesListContent = {
+  title: 'کلاس‌های موجود',
+  subtitle: 'کلاس یافت شد'
+};
 
 const ClassesListSection: React.FC<ClassesListSectionProps> = ({
   searchQuery,
@@ -46,159 +59,107 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
   const [loadingCourseId, setLoadingCourseId] = useState<string | null>(null);
   const [likedClasses, setLikedClasses] = useState<Set<string>>(new Set());
   const [registeredClasses, setRegisteredClasses] = useState<Set<string>>(new Set());
+  const [content, setContent] = useState<ClassesListContent>(defaultContent);
+  const [contentLoading, setContentLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
   const itemsPerPage = 6;
+
+  // Fetch content for admin editing
+  const fetchContent = useCallback(async () => {
+    try {
+      setContentLoading(true);
+      console.log('Fetching content from:', `${API_URL}/api/content/classes/list`);
+      const response = await fetch(`${API_URL}/api/content/classes/list`);
+      console.log('Content response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Content data:', data);
+        setContent({
+          title: data.title || defaultContent.title,
+          subtitle: data.subtitle || defaultContent.subtitle
+        });
+      } else {
+        console.error('Content response not ok:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching classes list content:', error);
+    } finally {
+      setContentLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
+
+  const handleContentSave = async (field: keyof ClassesListContent, newValue: string) => {
+    try {
+      const updatedContent = { ...content, [field]: newValue };
+      
+      const response = await fetch(`${API_URL}/api/content/classes/list`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedContent)
+      });
+
+      if (response.ok) {
+        setContent(updatedContent);
+        toast.success('محتوا با موفقیت به‌روزرسانی شد');
+      } else {
+        throw new Error('خطا در به‌روزرسانی محتوا');
+      }
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast.error('خطا در به‌روزرسانی محتوا');
+    }
+  };
 
   const fetchClasses = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // برای تست، از داده‌های نمونه استفاده می‌کنیم
-      const mockClasses: ClassInfo[] = [
-        {
-          _id: '1',
-          title: 'ریاضی پیشرفته',
-          teacher: 'دکتر احمدی',
-          schedule: 'شنبه - 14:00',
-          description: 'کلاس ریاضی پیشرفته برای دانش‌آموزان دبیرستان با تمرکز بر مفاهیم پیشرفته',
-          price: 250000,
-          level: 'پیشرفته',
-          image: '',
-          category: 'ریاضی',
-          views: 150,
-          likes: 25,
-          capacity: 20,
-          enrolledStudents: 15,
-          startDate: '2024-01-15',
-          endDate: '2024-06-15',
-          isActive: true,
-          likedBy: []
-        },
-        {
-          _id: '2',
-          title: 'فیزیک کنکور',
-          teacher: 'استاد محمدی',
-          schedule: 'یکشنبه - 16:00',
-          description: 'آموزش فیزیک کنکور با حل تست‌های استاندارد و نکات کلیدی',
-          price: 300000,
-          level: 'متوسط',
-          image: '',
-          category: 'فیزیک',
-          views: 200,
-          likes: 30,
-          capacity: 25,
-          enrolledStudents: 20,
-          startDate: '2024-01-20',
-          endDate: '2024-06-20',
-          isActive: true,
-          likedBy: []
-        },
-        {
-          _id: '3',
-          title: 'شیمی آلی',
-          teacher: 'دکتر رضایی',
-          schedule: 'دوشنبه - 10:00',
-          description: 'آموزش شیمی آلی با تمرکز بر واکنش‌ها و مکانیزم‌های شیمیایی',
-          price: 280000,
-          level: 'پیشرفته',
-          image: '',
-          category: 'شیمی',
-          views: 120,
-          likes: 18,
-          capacity: 18,
-          enrolledStudents: 12,
-          startDate: '2024-01-25',
-          endDate: '2024-06-25',
-          isActive: true,
-          likedBy: []
-        },
-        {
-          _id: '4',
-          title: 'ادبیات فارسی',
-          teacher: 'استاد کریمی',
-          schedule: 'سه‌شنبه - 14:00',
-          description: 'آموزش ادبیات فارسی با تحلیل متون و آموزش فنون نگارش',
-          price: 200000,
-          level: 'متوسط',
-          image: '',
-          category: 'ادبیات',
-          views: 180,
-          likes: 22,
-          capacity: 22,
-          enrolledStudents: 18,
-          startDate: '2024-02-01',
-          endDate: '2024-07-01',
-          isActive: true,
-          likedBy: []
-        },
-        {
-          _id: '5',
-          title: 'زبان انگلیسی',
-          teacher: 'خانم احمدی',
-          schedule: 'چهارشنبه - 16:00',
-          description: 'آموزش زبان انگلیسی با تمرکز بر مهارت‌های چهارگانه',
-          price: 350000,
-          level: 'پیشرفته',
-          image: '',
-          category: 'زبان',
-          views: 250,
-          likes: 35,
-          capacity: 20,
-          enrolledStudents: 20,
-          startDate: '2024-02-05',
-          endDate: '2024-07-05',
-          isActive: true,
-          likedBy: []
-        },
-        {
-          _id: '6',
-          title: 'زیست شناسی',
-          teacher: 'دکتر نوری',
-          schedule: 'پنجشنبه - 10:00',
-          description: 'آموزش زیست شناسی با تمرکز بر مفاهیم سلولی و مولکولی',
-          price: 270000,
-          level: 'متوسط',
-          image: '',
-          category: 'زیست',
-          views: 160,
-          likes: 20,
-          capacity: 24,
-          enrolledStudents: 16,
-          startDate: '2024-02-10',
-          endDate: '2024-07-10',
-          isActive: true,
-          likedBy: []
-        }
-      ];
+      // Map Persian sort values to English values
+      const sortMapping: { [key: string]: string } = {
+        'جدیدترین': 'newest',
+        'پربازدیدترین': 'views',
+        'محبوب‌ترین': 'likes',
+        'قیمت (صعودی)': 'price-asc',
+        'قیمت (نزولی)': 'price-desc'
+      };
       
-      setClasses(mockClasses);
-      setLikedClasses(new Set());
+      const mappedSortBy = sortMapping[sortBy] || 'newest';
       
-      // کد اصلی API (فعلاً غیرفعال)
-      /*
       const response = await axios.get(`${API_URL}/api/classes`, {
         params: {
           category: selectedCategory !== 'همه کلاس‌ها' ? selectedCategory : undefined,
-          sortBy,
+          sortBy: mappedSortBy,
           search: searchQuery
         }
       });
       setClasses(response.data);
       
       // دریافت IP کاربر و بررسی لایک‌ها
-      const userIP = await axios.get(`${API_URL}/api/user/ip`);
-      const liked = new Set<string>(
-        response.data
-          .filter((course: ClassInfo) => course.likedBy?.includes(userIP.data))
-          .map((course: ClassInfo) => course._id)
-      );
-      setLikedClasses(liked);
-      */
-    } catch (err) {
-      setError('خطا در دریافت کلاس‌ها');
+      try {
+        const userIP = await axios.get(`${API_URL}/api/user/ip`);
+        const liked = new Set<string>(
+          response.data
+            .filter((course: ClassInfo) => course.likedBy?.includes(userIP.data))
+            .map((course: ClassInfo) => course._id)
+        );
+        setLikedClasses(liked);
+      } catch (ipError) {
+        console.error('Error fetching user IP:', ipError);
+        setLikedClasses(new Set());
+      }
+    } catch (err: any) {
       console.error('Error fetching classes:', err);
+      setError(`خطا در دریافت کلاس‌ها: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
     }
@@ -208,31 +169,18 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
     fetchClasses();
   }, [fetchClasses]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   // Filter and sort classes
   const filteredClasses = classes
-    .filter(item => selectedCategory === 'همه کلاس‌ها' || item.category === selectedCategory)
-    .filter(item =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.teacher.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter(item => {
+      const categoryMatch = selectedCategory === 'همه کلاس‌ها' || item.category === selectedCategory;
+      return categoryMatch;
+    })
+    .filter(item => {
+      const searchMatch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.teacher.toLowerCase().includes(searchQuery.toLowerCase());
+      return searchMatch;
+    })
     .sort((a, b) => {
       const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه'];
       const [aDay, aTime] = a.schedule ? a.schedule.split(' - ') : ['', ''];
@@ -255,20 +203,25 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
     currentPage * itemsPerPage
   );
 
+  console.log('Debug Info:', {
+    totalClasses: classes.length,
+    filteredClasses: filteredClasses.length,
+    selectedCategory,
+    searchQuery,
+    currentClasses: currentClasses.length,
+    currentPage,
+    itemsPerPage
+  });
+
   const handleRegister = async (classItem: ClassInfo) => {
     try {
-      // برای تست، فقط پیام نمایش می‌دهیم
-      toast.success(`ثبت‌نام در کلاس "${classItem.title}" با موفقیت انجام شد`);
-      
-      // کد اصلی API (فعلاً غیرفعال)
-      /*
       if (!isAuthenticated || !user) {
         localStorage.setItem('redirectAfterLogin', window.location.pathname);
         toast.error('لطفاً ابتدا وارد حساب کاربری خود شوید');
         return;
       }
 
-      if (!user.fullName || !user.studentPhone || !user.parentPhone) {
+      if (!user.username || !user.studentPhone || !user.parentPhone) {
         toast.error('لطفاً ابتدا اطلاعات پروفایل خود را تکمیل کنید');
         return;
       }
@@ -289,7 +242,7 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
       }
 
       const payload = {
-        studentName: user.fullName,
+        studentName: user.username,
         studentPhone: user.studentPhone,
         parentPhone: user.parentPhone,
         grade: user.grade || ''
@@ -311,7 +264,6 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
       } else {
         toast.error(response.data.message || 'خطا در ثبت‌نام');
       }
-      */
     } catch (err: any) {
       console.error('Registration error:', err);
       const errorMessage = err.response?.data?.message || 'خطا در ثبت‌نام';
@@ -323,21 +275,6 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
 
   const handleLike = async (id: string) => {
     try {
-      // برای تست، فقط وضعیت لایک را تغییر می‌دهیم
-      setLikedClasses(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(id)) {
-          newSet.delete(id);
-          toast.success('از علاقه‌مندی‌ها حذف شد');
-        } else {
-          newSet.add(id);
-          toast.success('به علاقه‌مندی‌ها اضافه شد');
-        }
-        return newSet;
-      });
-      
-      // کد اصلی API (فعلاً غیرفعال)
-      /*
       const response = await axios.post(`${API_URL}/api/classes/${id}/like`);
       setClasses(prevClasses =>
         prevClasses.map(course =>
@@ -355,19 +292,17 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
         }
         return newSet;
       });
-      */
     } catch (error) {
       console.error('Like error:', error);
     }
   };
 
+  const handleCardClick = (classItem: ClassInfo) => {
+    navigate(`/classes/${classItem.slug}`);
+  };
+
   const checkAllRegistrations = async () => {
     try {
-      // برای تست، هیچ ثبت‌نامی نمایش نمی‌دهیم
-      setRegisteredClasses(new Set());
-      
-      // کد اصلی API (فعلاً غیرفعال)
-      /*
       const registrations = new Set<string>();
       for (const course of classes) {
         const response = await axios.get(`${API_URL}/api/classes/${course._id}/check-registration`);
@@ -376,7 +311,6 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
         }
       }
       setRegisteredClasses(registrations);
-      */
     } catch (error) {
       console.error('Error checking registrations:', error);
     }
@@ -428,14 +362,24 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
   return (
     <section ref={sectionRef} className="classes-list-section">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="classes-list-title">
-            کلاس‌های موجود
-          </h2>
-          <p className="classes-list-subtitle">
-            {filteredClasses.length} کلاس یافت شد
-          </p>
-        </div>
+                  <div className="text-center mb-12">
+            <h2 className="classes-list-title">
+              <EditableContent
+                type="text"
+                value={content.title}
+                isAdmin={user?.role === 'admin'}
+                onSave={(newValue) => handleContentSave('title', newValue)}
+              />
+            </h2>
+            <p className="classes-list-subtitle">
+              <EditableContent
+                type="text"
+                value={`${filteredClasses.length} ${content.subtitle}`}
+                isAdmin={user?.role === 'admin'}
+                onSave={(newValue) => handleContentSave('subtitle', newValue)}
+              />
+            </p>
+          </div>
 
         {filteredClasses.length === 0 ? (
           <div className="text-center py-12">
@@ -445,33 +389,38 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
           </div>
         ) : (
           <>
+            
             <div className="classes-grid">
-              {currentClasses.map((classItem, index) => (
+              {currentClasses.map((classItem) => (
                 <div
                   key={classItem._id}
-                  className="classes-card"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  className="classes-card cursor-pointer"
+                  onClick={() => handleCardClick(classItem)}
                 >
                   <div className="classes-card-image">
-                                         <div className="classes-card-image-placeholder">
-                       <div className="classes-card-image-icon">
-                         <BookOpen className="w-12 h-12 text-emerald-400" />
-                       </div>
-                       <div className="classes-card-image-text">
-                         <h4 className="classes-card-image-title">{classItem.title}</h4>
-                         <p className="classes-card-image-subtitle">{classItem.category}</p>
-                       </div>
-                     </div>
+                    <div className="classes-card-image-placeholder">
+                      <div className="classes-card-image-icon">
+                        <BookOpen className="w-12 h-12 text-emerald-400" />
+                      </div>
+                      <div className="classes-card-image-text">
+                        <h4 className="classes-card-image-title">{classItem.title}</h4>
+                        <p className="classes-card-image-subtitle">{classItem.category}</p>
+                      </div>
+                    </div>
                     <div className="classes-card-overlay">
                       <div className="classes-card-overlay-buttons">
                         <button
-                          onClick={() => handleLike(classItem._id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLike(classItem._id);
+                          }}
                           className={`classes-like-button ${likedClasses.has(classItem._id) ? 'liked' : ''}`}
                           aria-label={likedClasses.has(classItem._id) ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
                         >
                           <Heart className="w-5 h-5" />
                         </button>
                         <button 
+                          onClick={(e) => e.stopPropagation()}
                           className="classes-share-button"
                           aria-label="اشتراک‌گذاری"
                         >
@@ -540,7 +489,10 @@ const ClassesListSection: React.FC<ClassesListSectionProps> = ({
                         <span>{classItem.price.toLocaleString()} تومان</span>
                       </div>
                       <button
-                        onClick={() => handleRegister(classItem)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRegister(classItem);
+                        }}
                         disabled={loadingCourseId === classItem._id || registeredClasses.has(classItem._id) || !classItem.isActive || classItem.enrolledStudents >= classItem.capacity}
                         className={`classes-register-button ${registeredClasses.has(classItem._id) ? 'registered' : ''} ${!classItem.isActive || classItem.enrolledStudents >= classItem.capacity ? 'disabled' : ''}`}
                       >

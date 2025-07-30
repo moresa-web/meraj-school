@@ -3,6 +3,7 @@ import {
   getAllClasses,
   getAllClassesForAdmin,
   getClassById,
+  getClassBySlug,
   createClass,
   updateClass,
   deleteClass,
@@ -28,6 +29,7 @@ router.get('/admin/all', auth, getAllClassesForAdmin); // دریافت همه ک
 router.post('/', auth, upload.single('image'), createClass);           // ایجاد کلاس جدید
 
 // مسیرهای با پارامتر
+router.get('/slug/:slug', getClassBySlug); // دریافت یک کلاس با slug
 router.get('/:id', getClassById);         // دریافت یک کلاس با ID
 router.post('/:id/like', toggleLike);      // لایک کردن یک کلاس
 router.post('/:id/register', registerForClass); // ثبت نام در کلاس

@@ -18,6 +18,7 @@ export interface IClass extends Document {
   level: string;          // سطح کلاس
   image: string;          // تصویر کلاس
   category: string;       // دسته‌بندی
+  slug: string;           // slug برای URL
   views: number;          // تعداد بازدید
   likes: number;          // تعداد لایک
   capacity: number;       // ظرفیت کلاس
@@ -63,11 +64,18 @@ const classSchema = new Schema<IClass>({
   },
   image: {
     type: String,
-    required: [true, 'تصویر کلاس الزامی است']
+    default: ''
   },
   category: {
     type: String,
     required: [true, 'دسته‌بندی الزامی است']
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
   },
   views: {
     type: Number,

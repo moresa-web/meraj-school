@@ -10,6 +10,8 @@
     "test": "jest",
     "seed:faq": "ts-node src/scripts/seedFAQs.ts",
     "seed": "ts-node src/scripts/seed.ts",
+    "seed:content": "ts-node src/scripts/seedContent.ts",
+    "seed:classes": "ts-node src/scripts/seedClasses.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },

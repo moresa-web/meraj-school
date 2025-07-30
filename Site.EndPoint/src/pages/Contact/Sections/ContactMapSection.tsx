@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Navigation, ExternalLink } from 'lucide-react';
+import { MapPin, Navigation, ExternalLink, Bus, Train, Car } from 'lucide-react';
 import './ContactMapSection.css';
 
 const ContactMapSection: React.FC = () => {
@@ -96,15 +96,21 @@ const ContactMapSection: React.FC = () => {
             </p>
             <div className="contact-map-footer-features">
               <div className="contact-map-footer-feature">
-                <span className="contact-map-footer-feature-icon">🚌</span>
+                <div className="contact-map-footer-feature-icon">
+                  <Bus className="w-6 h-6" />
+                </div>
                 <span>اتوبوس شهری</span>
               </div>
               <div className="contact-map-footer-feature">
-                <span className="contact-map-footer-feature-icon">🚇</span>
+                <div className="contact-map-footer-feature-icon">
+                  <Train className="w-6 h-6" />
+                </div>
                 <span>مترو</span>
               </div>
               <div className="contact-map-footer-feature">
-                <span className="contact-map-footer-feature-icon">🚗</span>
+                <div className="contact-map-footer-feature-icon">
+                  <Car className="w-6 h-6" />
+                </div>
                 <span>پارکینگ</span>
               </div>
             </div>

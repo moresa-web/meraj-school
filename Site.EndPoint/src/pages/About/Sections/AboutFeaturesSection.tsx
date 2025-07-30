@@ -132,44 +132,43 @@ export const AboutFeaturesSection: React.FC = () => {
     };
   }, []);
 
-  // Temporarily disable API calls to isolate the issue
-  // const fetchContent = useCallback(async () => {
-  //   try {
-  //     setError(null);
-  //     setIsLoading(true);
+  const fetchContent = useCallback(async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
       
-  //     const controller = new AbortController();
-  //     const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-  //     const response = await fetch(`${API_URL}/api/content/about/features`, {
-  //       signal: controller.signal
-  //     });
+      const response = await fetch(`${API_URL}/api/content/about/features`, {
+        signal: controller.signal
+      });
       
-  //     clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
 
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setContent({
-  //         title: data.title || defaultContent.title,
-  //         description: data.description || defaultContent.description,
-  //         features: data.features || defaultContent.features
-  //       });
-  //     } else {
-  //       throw new Error(`خطا در دریافت ویژگی‌ها: ${response.status}`);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching about features content:', error);
-  //     const errorMessage = error instanceof Error ? error.message : 'خطا در دریافت ویژگی‌ها';
-  //     setError(errorMessage);
-  //     setContent(defaultContent);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, []);
+      if (response.ok) {
+        const data = await response.json();
+        setContent({
+          title: data.title || defaultContent.title,
+          description: data.description || defaultContent.description,
+          features: data.features || defaultContent.features
+        });
+      } else {
+        throw new Error(`خطا در دریافت ویژگی‌ها: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching about features content:', error);
+      const errorMessage = error instanceof Error ? error.message : 'خطا در دریافت ویژگی‌ها';
+      setError(errorMessage);
+      setContent(defaultContent);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   fetchContent();
-  // }, [fetchContent]);
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
   // Save handlers
   const handleSave = useCallback(async (field: keyof AboutFeaturesContent, newValue: any) => {
@@ -265,11 +264,21 @@ export const AboutFeaturesSection: React.FC = () => {
       <div className="about-features-container">
         <div className="about-features-header">
           <h2 className="about-features-title animate-fade-in-up">
-            {content.title}
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
           </h2>
           
           <p className="about-features-description animate-fade-in-up animation-delay-200">
-            {content.description}
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
           </p>
         </div>
 
@@ -285,11 +294,21 @@ export const AboutFeaturesSection: React.FC = () => {
               </div>
               
               <h3 className="about-feature-title">
-                {feature.title}
+                <EditableContent
+                  type="text"
+                  value={feature.title}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleFeatureSave(index, 'title', newValue)}
+                />
               </h3>
               
               <p className="about-feature-description">
-                {feature.description}
+                <EditableContent
+                  type="text"
+                  value={feature.description}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleFeatureSave(index, 'description', newValue)}
+                />
               </p>
             </div>
           ))}

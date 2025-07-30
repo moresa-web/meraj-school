@@ -21,6 +21,7 @@ export const getAllClasses = async (req: Request, res: Response) => {
 
     // ساخت سورت
     let sort: any = { createdAt: -1 }; // پیش‌فرض: جدیدترین
+    if (sortBy === 'newest') sort = { createdAt: -1 };
     if (sortBy === 'views') sort = { views: -1 };
     if (sortBy === 'likes') sort = { likes: -1 };
     if (sortBy === 'price-asc') sort = { price: 1 };
@@ -29,6 +30,7 @@ export const getAllClasses = async (req: Request, res: Response) => {
     const classes = await Class.find(filter).sort(sort);
     res.json(classes);
   } catch (error) {
+    console.error('Error in getAllClasses:', error);
     res.status(500).json({ message: 'خطا در دریافت کلاس‌ها' });
   }
 };
@@ -53,6 +55,7 @@ export const getAllClassesForAdmin = async (req: Request, res: Response) => {
 
     // ساخت سورت
     let sort: any = { createdAt: -1 }; // پیش‌فرض: جدیدترین
+    if (sortBy === 'newest') sort = { createdAt: -1 };
     if (sortBy === 'views') sort = { views: -1 };
     if (sortBy === 'likes') sort = { likes: -1 };
     if (sortBy === 'price-asc') sort = { price: 1 };
@@ -91,6 +94,27 @@ export const getClassById = async (req: Request, res: Response) => {
 
     res.json(result);
   } catch (error) {
+    res.status(500).json({ message: 'خطا در دریافت اطلاعات کلاس' });
+  }
+};
+
+// دریافت یک کلاس با slug
+export const getClassBySlug = async (req: Request, res: Response) => {
+  try {
+    const slug = req.params.slug;
+    const classData = await Class.findOne({ slug });
+    
+    if (!classData) {
+      return res.status(404).json({ message: 'کلاس مورد نظر یافت نشد' });
+    }
+
+    // افزایش تعداد بازدید
+    classData.views += 1;
+    await classData.save();
+
+    res.json(classData);
+  } catch (error) {
+    console.error('Error in getClassBySlug:', error);
     res.status(500).json({ message: 'خطا در دریافت اطلاعات کلاس' });
   }
 };

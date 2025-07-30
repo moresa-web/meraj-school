@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteInfo } from '../../hooks/useSiteInfo';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 import { getImageUrl } from '../../utils/format';
 import { Menu, X, Home, Info, BookOpen, Newspaper, Phone, LogOut, LogIn, Settings } from 'lucide-react';
 

@@ -135,6 +135,13 @@ const CTAFeatureCard: React.FC<{
     <div 
       className="cta-feature"
       style={{ 
+        background: 'rgba(255, 255, 255, 0.1)',
+        padding: '2rem',
+        borderRadius: '16px',
+        textAlign: 'center',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        transition: 'all 0.3s ease',
         animationDelay: `${index * 200}ms`,
         transform: isHovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)'
       }}
@@ -146,10 +153,25 @@ const CTAFeatureCard: React.FC<{
       onBlur={() => setIsHovered(false)}
       tabIndex={0}
     >
-      <div className="cta-feature-icon">
+      <div className="cta-feature-icon" style={{
+        width: '64px',
+        height: '64px',
+        margin: '0 auto 1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+        color: 'white'
+      }}>
         <FeatureIcon iconName={feature.icon} />
       </div>
-      <h3 className="cta-feature-title">
+      <h3 className="cta-feature-title" style={{
+        fontSize: '1.25rem',
+        fontWeight: '600',
+        marginBottom: '0.75rem',
+        color: 'white'
+      }}>
         <EditableContent
           type="text"
           value={feature.title}
@@ -157,7 +179,11 @@ const CTAFeatureCard: React.FC<{
           onSave={(newValue) => onSave('title', newValue)}
         />
       </h3>
-      <p className="cta-feature-description">
+      <p className="cta-feature-description" style={{
+        fontSize: '0.95rem',
+        lineHeight: '1.6',
+        color: 'rgba(255, 255, 255, 0.8)'
+      }}>
         <EditableContent
           type="text"
           value={feature.description}
@@ -172,8 +198,7 @@ const CTAFeatureCard: React.FC<{
 CTAFeatureCard.displayName = 'CTAFeatureCard';
 
 export const CTASection: React.FC = () => {
-  // const { user } = useAuth(); // Temporarily disabled
-  const user = { role: 'user' }; // Temporary mock
+  const { user } = useAuth();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [content, setContent] = useState<CTAContent>(defaultContent);
@@ -253,7 +278,7 @@ export const CTASection: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // fetchContent(); // Temporarily disabled for testing
+    fetchContent();
   }, [fetchContent]);
 
   // Handle retry with exponential backoff
@@ -402,7 +427,12 @@ export const CTASection: React.FC = () => {
             marginBottom: '1.5rem',
             color: 'white'
           }}>
-            {content.title}
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
           </h2>
           
           <p className="cta-description animate-fade-in-up animation-delay-200" style={{
@@ -411,7 +441,12 @@ export const CTASection: React.FC = () => {
             marginBottom: '2rem',
             color: 'rgba(255, 255, 255, 0.9)'
           }}>
-            {content.description}
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
           </p>
 
           <div className="cta-buttons animate-fade-in-up animation-delay-400" style={{
@@ -441,7 +476,12 @@ export const CTASection: React.FC = () => {
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
               }}
             >
-              {content.primaryButton.text}
+              <EditableContent
+                type="text"
+                value={content.primaryButton.text}
+                isAdmin={user?.role === 'admin'}
+                onSave={(newValue) => handleSave('primaryButton', { ...content.primaryButton, text: newValue })}
+              />
               <svg className="cta-primary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style={{ width: '1.5rem', height: '1.5rem' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
@@ -466,9 +506,14 @@ export const CTASection: React.FC = () => {
                 gap: '0.75rem'
               }}
             >
-              {content.secondaryButton.text}
+              <EditableContent
+                type="text"
+                value={content.secondaryButton.text}
+                isAdmin={user?.role === 'admin'}
+                onSave={(newValue) => handleSave('secondaryButton', { ...content.secondaryButton, text: newValue })}
+              />
               <svg className="cta-secondary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style={{ width: '1.5rem', height: '1.5rem' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </Link>
           </div>
@@ -483,44 +528,13 @@ export const CTASection: React.FC = () => {
               marginBottom: '2rem'
             }}>
               {content.features.map((feature, index) => (
-                <div key={`${feature.title}-${index}`} className="cta-feature" style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  padding: '2rem',
-                  borderRadius: '16px',
-                  textAlign: 'center',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <div className="cta-feature-icon" style={{
-                    width: '64px',
-                    height: '64px',
-                    margin: '0 auto 1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '50%',
-                    color: 'white'
-                  }}>
-                    <FeatureIcon iconName={feature.icon} />
-                  </div>
-                  <h3 className="cta-feature-title" style={{
-                    fontSize: '1.25rem',
-                    fontWeight: '600',
-                    marginBottom: '0.75rem',
-                    color: 'white'
-                  }}>
-                    {feature.title}
-                  </h3>
-                  <p className="cta-feature-description" style={{
-                    fontSize: '0.95rem',
-                    lineHeight: '1.6',
-                    color: 'rgba(255, 255, 255, 0.8)'
-                  }}>
-                    {feature.description}
-                  </p>
-                </div>
+                <CTAFeatureCard
+                  key={`${feature.title}-${index}`}
+                  feature={feature}
+                  index={index}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(field, value) => handleFeatureSave(index, field, value)}
+                />
               ))}
             </div>
           )}

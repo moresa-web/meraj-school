@@ -183,19 +183,47 @@ export const AboutMainSection: React.FC = () => {
             {/* Stats */}
             <div className="about-main-stats animate-fade-in-up animation-delay-400">
               <div className="about-main-stat">
-                <span className="about-main-stat-number">{content.stats.students}</span>
+                <span className="about-main-stat-number">
+                  <EditableContent
+                    type="text"
+                    value={content.stats.students}
+                    isAdmin={user?.role === 'admin'}
+                    onSave={(newValue) => handleSave('stats', { ...content.stats, students: newValue })}
+                  />
+                </span>
                 <span className="about-main-stat-label">دانش‌آموز</span>
               </div>
               <div className="about-main-stat">
-                <span className="about-main-stat-number">{content.stats.teachers}</span>
+                <span className="about-main-stat-number">
+                  <EditableContent
+                    type="text"
+                    value={content.stats.teachers}
+                    isAdmin={user?.role === 'admin'}
+                    onSave={(newValue) => handleSave('stats', { ...content.stats, teachers: newValue })}
+                  />
+                </span>
                 <span className="about-main-stat-label">معلم</span>
               </div>
               <div className="about-main-stat">
-                <span className="about-main-stat-number">{content.stats.years}</span>
+                <span className="about-main-stat-number">
+                  <EditableContent
+                    type="text"
+                    value={content.stats.years}
+                    isAdmin={user?.role === 'admin'}
+                    onSave={(newValue) => handleSave('stats', { ...content.stats, years: newValue })}
+                  />
+                </span>
                 <span className="about-main-stat-label">سال تجربه</span>
               </div>
               <div className="about-main-stat">
-                <span className="about-main-stat-number">{content.stats.satisfaction}</span>
+                <span className="about-main-stat-number">
+                  <EditableContent
+                    type="text"
+                    value={content.stats.satisfaction}
+                    isAdmin={user?.role === 'admin'}
+                    onSave={(newValue) => handleSave('stats', { ...content.stats, satisfaction: newValue })}
+                  />
+                </span>
                 <span className="about-main-stat-label">رضایت</span>
               </div>
             </div>

@@ -10,7 +10,7 @@ interface ClassesSearchContent {
 
 const defaultContent: ClassesSearchContent = {
   searchPlaceholder: 'جستجو در کلاس‌ها...',
-  categories: ['همه کلاس‌ها', 'ریاضی', 'فیزیک', 'شیمی', 'زیست‌شناسی', 'ادبیات', 'زبان انگلیسی'],
+  categories: ['همه کلاس‌ها', 'ریاضی', 'فیزیک', 'شیمی', 'زیست', 'ادبیات', 'زبان', 'تاریخ'],
   sortOptions: ['جدیدترین', 'پربازدیدترین', 'محبوب‌ترین', 'قیمت (صعودی)', 'قیمت (نزولی)']
 };
 

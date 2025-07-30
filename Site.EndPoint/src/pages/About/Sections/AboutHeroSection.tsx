@@ -47,43 +47,42 @@ export const AboutHeroSection: React.FC = () => {
     };
   }, []);
 
-  // Temporarily disable API calls to isolate the issue
-  // const fetchContent = useCallback(async () => {
-  //   try {
-  //     setError(null);
-  //     setIsLoading(true);
+  const fetchContent = useCallback(async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
       
-  //     const controller = new AbortController();
-  //     const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-  //     const response = await fetch(`${API_URL}/api/content/about/hero`, {
-  //       signal: controller.signal
-  //     });
+      const response = await fetch(`${API_URL}/api/content/about/hero`, {
+        signal: controller.signal
+      });
       
-  //     clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
 
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setContent({
-  //         title: data.title || defaultContent.title,
-  //         description: data.description || defaultContent.description
-  //       });
-  //     } else {
-  //       throw new Error(`خطا در دریافت محتوای Hero: ${response.status}`);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching about hero content:', error);
-  //     const errorMessage = error instanceof Error ? error.message : 'خطا در دریافت محتوای Hero';
-  //     setError(errorMessage);
-  //     setContent(defaultContent);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, []);
+      if (response.ok) {
+        const data = await response.json();
+        setContent({
+          title: data.title || defaultContent.title,
+          description: data.description || defaultContent.description
+        });
+      } else {
+        throw new Error(`خطا در دریافت محتوای Hero: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching about hero content:', error);
+      const errorMessage = error instanceof Error ? error.message : 'خطا در دریافت محتوای Hero';
+      setError(errorMessage);
+      setContent(defaultContent);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   fetchContent();
-  // }, [fetchContent]);
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
   // Save handler
   const handleSave = useCallback(async (field: keyof AboutHeroContent, newValue: string) => {
@@ -151,11 +150,21 @@ export const AboutHeroSection: React.FC = () => {
           </div>
           
           <h1 className="about-hero-title">
-            {content.title}
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
           </h1>
           
           <p className="about-hero-description">
-            {content.description}
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
           </p>
 
           {/* Quick stats */}

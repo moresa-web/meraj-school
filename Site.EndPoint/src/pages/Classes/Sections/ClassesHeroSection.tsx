@@ -1,83 +1,136 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { BookOpen, Users, Award, Clock } from 'lucide-react';
+import EditableContent from '../../../components/EditableContent/EditableContent';
 import './ClassesHeroSection.css';
+
+interface ClassesHeroStats {
+  totalClasses: number;
+  activeStudents: number;
+  successRate: number;
+  totalHours: number;
+}
 
 interface ClassesHeroContent {
   title: string;
   description: string;
-  stats: {
-    totalClasses: number;
-    activeStudents: number;
-    successRate: number;
-    totalHours: number;
-  };
+  stats: ClassesHeroStats;
 }
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const defaultContent: ClassesHeroContent = {
   title: 'کلاس‌های تقویتی',
-  description: 'با بهترین روش‌های نوین آموزشی، مسیر موفقیت تحصیلی خود را هموار کنید',
+  description: 'با بهترین اساتید و روش‌های نوین آموزشی، آینده تحصیلی فرزندتان را تضمین کنید',
   stats: {
     totalClasses: 15,
-    activeStudents: 320,
+    activeStudents: 500,
     successRate: 95,
     totalHours: 480
   }
 };
 
 const ClassesHeroSection: React.FC = () => {
-  const [content, setContent] = useState<ClassesHeroContent>(defaultContent);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
   const { user } = useAuth();
-
-  const fetchContent = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      // API call would go here
-      // const response = await axios.get(`${API_URL}/api/content/classes-hero`);
-      // setContent(response.data);
-    } catch (err) {
-      setError('خطا در دریافت محتوا');
-      console.error('Error fetching classes hero content:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  const [content, setContent] = useState<ClassesHeroContent>(defaultContent);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
+    const fetchContent = async () => {
+      try {
+        setError(null);
+        const response = await fetch(`${API_URL}/api/content/classes/hero`);
+        if (response.ok) {
+          const data = await response.json();
+          setContent({
+            title: data.title || defaultContent.title,
+            description: data.description || defaultContent.description,
+            stats: {
+              totalClasses: data.stats?.totalClasses || defaultContent.stats.totalClasses,
+              activeStudents: data.stats?.activeStudents || defaultContent.stats.activeStudents,
+              successRate: data.stats?.successRate || defaultContent.stats.successRate,
+              totalHours: data.stats?.totalHours || defaultContent.stats.totalHours
+            }
+          });
+        } else {
+          throw new Error('خطا در دریافت اطلاعات');
+        }
+      } catch (error) {
+        console.error('Error fetching classes hero content:', error);
+        setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+    fetchContent();
+  }, []);
+
+  // استفاده از Intersection Observer برای تشخیص زمانی که کاربر به این بخش می‌رسد
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
+          setInView(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+      }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
   }, []);
+
+  const handleSave = async (field: keyof ClassesHeroContent | 'stats', newValue: any, statField?: keyof ClassesHeroStats) => {
+    try {
+      let updatedContent = { ...content };
+
+      if (field === 'stats' && statField) {
+        updatedContent.stats = { ...updatedContent.stats, [statField]: newValue };
+      } else {
+        (updatedContent as any)[field] = newValue;
+      }
+
+      const response = await fetch(`${API_URL}/api/content/classes/hero`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedContent)
+      });
+
+      if (response.ok) {
+        setContent(updatedContent);
+      } else {
+        throw new Error('خطا در به‌روزرسانی محتوا');
+      }
+    } catch (error) {
+      console.error('Error updating content:', error);
+      alert('خطا در به‌روزرسانی محتوا');
+    }
+  };
 
   if (isLoading) {
     return (
-      <section className="classes-hero-section">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-700 rounded mb-4"></div>
-              <div className="h-4 bg-gray-700 rounded mb-8"></div>
-            </div>
-          </div>
+      <section className="classes-hero-section loading" role="status" aria-live="polite">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <p>در حال بارگذاری...</p>
         </div>
       </section>
     );
@@ -85,17 +138,16 @@ const ClassesHeroSection: React.FC = () => {
 
   if (error) {
     return (
-      <section className="classes-hero-section">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="text-red-400 mb-4">{error}</div>
-            <button
-              onClick={fetchContent}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              تلاش مجدد
-            </button>
-          </div>
+      <section className="classes-hero-section error" role="alert">
+        <div className="error-content">
+          <h3>خطا در بارگذاری</h3>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="retry-button"
+          >
+            تلاش مجدد
+          </button>
         </div>
       </section>
     );
@@ -112,10 +164,20 @@ const ClassesHeroSection: React.FC = () => {
 
           {/* Title and Description */}
           <h1 className="classes-hero-title mb-6">
-            {content.title}
+            <EditableContent
+              type="text"
+              value={content.title}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('title', newValue)}
+            />
           </h1>
           <p className="classes-hero-description mb-12">
-            {content.description}
+            <EditableContent
+              type="text"
+              value={content.description}
+              isAdmin={user?.role === 'admin'}
+              onSave={(newValue) => handleSave('description', newValue)}
+            />
           </p>
 
           {/* Quick Stats */}
@@ -124,7 +186,14 @@ const ClassesHeroSection: React.FC = () => {
               <div className="classes-hero-stat-icon">
                 <BookOpen className="w-6 h-6" />
               </div>
-              <div className="classes-hero-stat-number">{content.stats.totalClasses}</div>
+              <div className="classes-hero-stat-number">
+                <EditableContent
+                  type="text"
+                  value={content.stats.totalClasses.toString()}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleSave('stats', parseInt(newValue) || 0, 'totalClasses')}
+                />
+              </div>
               <div className="classes-hero-stat-label">کلاس فعال</div>
             </div>
 
@@ -132,7 +201,14 @@ const ClassesHeroSection: React.FC = () => {
               <div className="classes-hero-stat-icon">
                 <Users className="w-6 h-6" />
               </div>
-              <div className="classes-hero-stat-number">{content.stats.activeStudents}</div>
+              <div className="classes-hero-stat-number">
+                <EditableContent
+                  type="text"
+                  value={content.stats.activeStudents.toString()}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleSave('stats', parseInt(newValue) || 0, 'activeStudents')}
+                />
+              </div>
               <div className="classes-hero-stat-label">دانش‌آموز</div>
             </div>
 
@@ -140,11 +216,32 @@ const ClassesHeroSection: React.FC = () => {
               <div className="classes-hero-stat-icon">
                 <Award className="w-6 h-6" />
               </div>
-              <div className="classes-hero-stat-number">{content.stats.successRate}%</div>
+              <div className="classes-hero-stat-number">
+                <EditableContent
+                  type="text"
+                  value={content.stats.successRate.toString()}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleSave('stats', parseInt(newValue) || 0, 'successRate')}
+                />
+                %
+              </div>
               <div className="classes-hero-stat-label">نرخ موفقیت</div>
             </div>
 
-
+            <div className="classes-hero-stat">
+              <div className="classes-hero-stat-icon">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div className="classes-hero-stat-number">
+                <EditableContent
+                  type="text"
+                  value={content.stats.totalHours.toString()}
+                  isAdmin={user?.role === 'admin'}
+                  onSave={(newValue) => handleSave('stats', parseInt(newValue) || 0, 'totalHours')}
+                />
+              </div>
+              <div className="classes-hero-stat-label">ساعت آموزشی</div>
+            </div>
           </div>
         </div>
       </div>
