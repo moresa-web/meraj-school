@@ -70,4 +70,41 @@ code {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Custom scrollbar styles for chat tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scrolling for chat tabs */
+.scrollbar-hide {
+  scroll-behavior: smooth;
+}
+
+/* Mobile-specific styles for chat */
+@media (max-width: 768px) {
+  /* Ensure chat takes full screen on mobile */
+  .fixed.inset-0 {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+  }
+  
+  /* Remove any margins or padding that might interfere */
+  .fixed.inset-0 > div {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
 } 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { useAuth } from '../../contexts/AuthContext';
-import { FiClock } from 'react-icons/fi';
+import { Clock, Check, CheckCheck, Download, Image as ImageIcon, FileText } from 'lucide-react';
 import moment from 'moment';
 import type { ChatMessage as ChatMessageType } from '../../types/chat';
 
@@ -40,10 +40,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
 
     const formattedTime = moment(message.timestamp).format('HH:mm');
 
+    const getFileIcon = (fileType: string) => {
+        if (fileType?.startsWith('image/')) {
+            return <ImageIcon className="w-4 h-4" />;
+        }
+        return <FileText className="w-4 h-4" />;
+    };
+
     if (message.isDeleted) {
         return (
             <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-                <div className="bg-gray-100 rounded-lg px-4 py-2 text-gray-500 italic">
+                <div className="bg-gray-700/50 rounded-lg px-4 py-2 text-gray-400 italic border border-gray-600/50">
                     این پیام حذف شده است
                 </div>
             </div>
@@ -51,66 +58,104 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isOwnMessage }) => {
     }
 
     return (
-        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-            <div className={`max-w-[70%] ${
+        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4 group`}>
+            <div className={`max-w-[75%] ${
                 isCurrentUser 
-                    ? 'bg-emerald-500 text-white' 
+                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-lg' 
                     : isAdminMessage 
-                        ? 'bg-blue-100 text-blue-800 border-l-4 border-blue-500' 
-                        : 'bg-gray-100 text-gray-800'
-            } rounded-lg px-4 py-2`}>
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg' 
+                        : 'bg-gray-700/80 text-gray-100 border border-gray-600/50'
+            } rounded-2xl px-4 py-3 relative`}>
+                
+                {/* Header for non-user messages */}
                 {!isCurrentUser && (
-                    <div className={`text-xs font-semibold mb-1 ${
-                        isAdminMessage ? 'text-blue-600' : 'text-emerald-600'
-                    }`}>
+                    <div className={`text-xs font-semibold mb-2 ${
+                        isAdminMessage ? 'text-blue-200' : 'text-emerald-300'
+                    } flex items-center gap-1`}>
                         {message.senderName}
-                        {isAdminMessage && <span className="ml-1">👨‍💼</span>}
+                        {isAdminMessage && <span className="text-blue-200">👨‍💼</span>}
                     </div>
                 )}
-                <div className="break-words">{message.message}</div>
+                
+                {/* Message content */}
+                <div className="break-words leading-relaxed text-sm">
+                    {message.message}
+                </div>
+                
+                {/* File attachment */}
                 {message.fileUrl && (
-                    <div className="mt-2">
+                    <div className="mt-3 p-3 bg-black/20 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-2 mb-2">
+                            {getFileIcon(message.fileType)}
+                            <span className="text-xs font-medium">
+                                {message.fileName || 'فایل پیوست'}
+                            </span>
+                        </div>
+                        
                         {message.fileType?.startsWith('image/') ? (
-                            <img
-                                src={message.fileUrl}
-                                alt={message.fileName || 'تصویر'}
-                                className="max-w-full rounded-lg"
-                            />
+                            <div className="relative group">
+                                <img
+                                    src={message.fileUrl}
+                                    alt={message.fileName || 'تصویر'}
+                                    className="max-w-full rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                                />
+                                <a
+                                    href={message.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Download className="w-3 h-3" />
+                                </a>
+                            </div>
                         ) : (
                             <a
                                 href={message.fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-500 hover:text-blue-700 underline"
+                                className="inline-flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors"
                             >
-                                {message.fileName || 'دانلود فایل'}
+                                <Download className="w-3 h-3" />
+                                دانلود فایل
                             </a>
                         )}
                     </div>
                 )}
+                
+                {/* Message footer */}
                 <div
-                    className={`flex items-center justify-end mt-2 space-x-1 space-x-reverse ${
+                    className={`flex items-center justify-end mt-2 gap-1 ${
                         isCurrentUser 
                             ? 'text-white/70' 
                             : isAdminMessage 
-                                ? 'text-blue-500' 
-                                : 'text-gray-500'
+                                ? 'text-blue-200' 
+                                : 'text-gray-400'
                     }`}
                 >
+                    {/* Read status for user messages */}
                     {isCurrentUser && (
                         <span className="text-xs flex items-center">
                             {message.isRead ? (
-                                <span className="ml-1">✓✓</span>
+                                <CheckCheck className="w-3 h-3 text-blue-300" />
                             ) : (
-                                <span className="ml-1">✓</span>
+                                <Check className="w-3 h-3" />
                             )}
                         </span>
                     )}
-                    <span className="text-xs flex items-center">
-                        <FiClock className="ml-1" size={13} />
+                    
+                    {/* Time */}
+                    <span className="text-xs flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
                         {formattedTime}
                     </span>
                 </div>
+                
+                {/* Message status indicator */}
+                {isCurrentUser && (
+                    <div className={`absolute -bottom-1 ${isCurrentUser ? 'right-4' : 'left-4'} w-2 h-2 rounded-full ${
+                        message.isRead ? 'bg-blue-400' : 'bg-gray-400'
+                    }`} />
+                )}
             </div>
         </div>
     );

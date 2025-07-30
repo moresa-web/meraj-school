@@ -1,13 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMinimize2, FiX, FiMessageSquare, FiHelpCircle, FiShare2, FiUser, FiClock, FiMaximize2, FiInstagram, FiSend, FiTwitter } from 'react-icons/fi';
-import toast from 'react-hot-toast';
+import { 
+  Minimize2, 
+  X, 
+  MessageSquare, 
+  HelpCircle, 
+  Share2, 
+  User, 
+  Clock, 
+  Maximize2, 
+  Instagram, 
+  Send, 
+  Twitter,
+  Phone,
+  Mail,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Image as ImageIcon,
+  Download
+} from 'lucide-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import ChatInput from './ChatInput';
 import ChatMessage from './ChatMessage';
 import { chatService } from '../../services/chat.service';
 import type { ChatMessage as ChatMessageType } from '../../types/chat';
 import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface FAQ {
     _id: string;
@@ -26,14 +49,20 @@ interface ChatBoxProps {
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
+    console.log('ChatBox rendered, isOpen:', isOpen);
     const { user } = useAuth();
+    
+    useEffect(() => {
+        console.log('isOpen changed to:', isOpen);
+    }, [isOpen]);
     const [isMinimized, setIsMinimized] = useState(false);
     const [messages, setMessages] = useState<ChatMessageType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
-    const [activeTab, setActiveTab] = useState<'chat' | 'faq' | 'social'>('chat');
+    const [activeTab, setActiveTab] = useState<'chat' | 'faq' | 'social' | 'contact'>('chat');
     const [faqs, setFaqs] = useState<FAQ[]>([]);
     const [isLoadingFaqs, setIsLoadingFaqs] = useState(false);
+    const [expandedFaqs, setExpandedFaqs] = useState<Set<string>>(new Set());
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatIdRef = useRef<string | null>(null);
     const [onlineStatus, setOnlineStatus] = useState<'online' | 'offline'>('offline');
@@ -497,87 +526,123 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
         console.log('Current messages state:', messages);
     }, [messages]);
 
+    const toggleFaq = (faqId: string) => {
+        setExpandedFaqs(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(faqId)) {
+                newSet.delete(faqId);
+            } else {
+                newSet.add(faqId);
+            }
+            return newSet;
+        });
+    };
+
+    const handleFaqClick = (faq: FAQ) => {
+        if (chatIdRef.current) {
+            handleSendMessage(`سوال: ${faq.question}\n\nپاسخ: ${faq.answer}`);
+            setActiveTab('chat');
+        }
+    };
+
     return (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed inset-0 md:bottom-4 md:right-4 md:inset-auto z-50">
+            <ToastContainer
+                position="top-right"
+                autoClose={4000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+            
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="bg-white rounded-lg shadow-xl w-96 h-[600px] flex flex-col"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="w-full h-full md:w-96 md:h-[600px] bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 md:rounded-2xl md:shadow-2xl flex flex-col border border-gray-700"
                     >
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-emerald-600 to-teal-500 p-4 rounded-t-lg flex justify-between items-center">
-                            <div className="flex items-center space-x-2">
-                                <h3 className="text-white font-semibold">پشتیبانی آنلاین</h3>
-                                <span className={`w-2 h-2 rounded-full ${onlineStatus === 'online' ? 'bg-green-400' : 'bg-red-400'}`} />
+                        <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 p-4 rounded-t-2xl flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                                <div className="relative">
+                                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                        <MessageSquare className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                                        onlineStatus === 'online' ? 'bg-green-400' : 'bg-red-400'
+                                    }`} />
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-bold text-lg">پشتیبانی آنلاین</h3>
+                                    <p className="text-white/80 text-xs">
+                                        {onlineStatus === 'online' ? 'آنلاین' : 'آفلاین'}
+                                    </p>
+                                </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <button
+                                <Button
                                     onClick={() => setIsMinimized(!isMinimized)}
-                                    className="text-white hover:text-emerald-100 transition-colors"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-white hover:bg-white/20 rounded-full p-2"
                                 >
-                                    <FiMaximize2 className="w-5 h-5" />
-                                </button>
-                                <button
+                                    {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+                                </Button>
+                                <Button
                                     onClick={onClose}
-                                    className="text-white hover:text-emerald-100 transition-colors"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-white hover:bg-white/20 rounded-full p-2"
                                 >
-                                    <FiX className="w-5 h-5" />
-                                </button>
+                                    <X className="w-4 h-4" />
+                                </Button>
                             </div>
                         </div>
 
                         {!isMinimized && (
                             <>
                                 {/* Tabs */}
-                                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-2 flex space-x-2">
-                                    <button
-                                        onClick={() => setActiveTab('chat')}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                            activeTab === 'chat'
-                                                ? 'bg-white text-emerald-600 shadow-md scale-105'
-                                                : 'text-gray-600 hover:bg-white hover:bg-opacity-50'
-                                        }`}
-                                    >
-                                        چت آنلاین
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setActiveTab('faq');
-                                            // فوراً FAQ ها را بارگذاری کن
-                                            if (faqs.length === 0) {
-                                                fetchFaqs();
-                                            }
-                                        }}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                            activeTab === 'faq'
-                                                ? 'bg-white text-emerald-600 shadow-md scale-105'
-                                                : 'text-gray-600 hover:bg-white hover:bg-opacity-50'
-                                        }`}
-                                    >
-                                        سوالات متداول
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('social')}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                            activeTab === 'social'
-                                                ? 'bg-white text-emerald-600 shadow-md scale-105'
-                                                : 'text-gray-600 hover:bg-white hover:bg-opacity-50'
-                                        }`}
-                                    >
-                                        شبکه‌های اجتماعی
-                                    </button>
+                                <div className="bg-gray-800/50 p-2">
+                                    <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
+                                        {[
+                                            { id: 'chat', label: 'چت آنلاین', icon: MessageSquare },
+                                            { id: 'faq', label: 'سوالات متداول', icon: HelpCircle },
+                                            { id: 'contact', label: 'اطلاعات تماس', icon: Phone },
+                                            { id: 'social', label: 'شبکه‌های اجتماعی', icon: Share2 }
+                                        ].map((tab) => (
+                                            <Button
+                                                key={tab.id}
+                                                onClick={() => setActiveTab(tab.id as any)}
+                                                variant={activeTab === tab.id ? "default" : "ghost"}
+                                                size="sm"
+                                                className={`flex-shrink-0 h-8 text-xs font-medium transition-all whitespace-nowrap ${
+                                                    activeTab === tab.id
+                                                        ? 'bg-emerald-600 text-white shadow-md'
+                                                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                                }`}
+                                            >
+                                                <tab.icon className="w-3 h-3 ml-1" />
+                                                {tab.label}
+                                            </Button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Content */}
-                                <div className="flex-1 overflow-y-auto p-4">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                     {activeTab === 'chat' && (
                                         <div className="space-y-4">
                                             {isLoading ? (
                                                 <div className="flex justify-center items-center h-full">
-                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
                                                 </div>
                                             ) : (
                                                 <>
@@ -592,13 +657,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                         );
                                                     })}
                                                     {isTyping && (
-                                                        <div className="flex items-center space-x-2 text-gray-500">
-                                                            <span>در حال تایپ...</span>
+                                                        <div className="flex items-center space-x-2 text-gray-400 bg-gray-700/50 rounded-lg p-3">
                                                             <div className="flex space-x-1">
-                                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
-                                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200" />
+                                                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
+                                                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-100" />
+                                                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-200" />
                                                             </div>
+                                                            <span className="text-sm">در حال تایپ...</span>
                                                         </div>
                                                     )}
                                                     <div ref={messagesEndRef} />
@@ -611,7 +676,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                         <div className="space-y-4">
                                             {isLoadingFaqs ? (
                                                 <div className="flex justify-center items-center h-full">
-                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
                                                 </div>
                                             ) : (
                                                 (() => {
@@ -622,37 +687,69 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                                     console.log('Sorted FAQs:', sortedFaqs);
                                                     
                                                     return sortedFaqs.length === 0 ? (
-                                                        <div className="flex flex-col items-center justify-center h-full text-center">
-                                                            <div className="text-gray-400 mb-4">
-                                                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
-                                                            </div>
-                                                            <h3 className="text-lg font-semibold text-gray-600 mb-2">سوالات متداول</h3>
-                                                            <p className="text-gray-500">در حال حاضر سوالات متداول در دسترس نیستند.</p>
-                                                            <p className="text-gray-400 text-sm mt-2">لطفاً از طریق چت آنلاین با ما در تماس باشید.</p>
-                                                        </div>
+                                                        <Card className="bg-gray-800/50 border-gray-700">
+                                                            <CardContent className="flex flex-col items-center justify-center h-32 text-center">
+                                                                <HelpCircle className="w-12 h-12 text-gray-400 mb-4" />
+                                                                <h3 className="text-lg font-semibold text-gray-300 mb-2">سوالات متداول</h3>
+                                                                <p className="text-gray-400 text-sm">در حال حاضر سوالات متداول در دسترس نیستند.</p>
+                                                                <p className="text-gray-500 text-xs mt-2">لطفاً از طریق چت آنلاین با ما در تماس باشید.</p>
+                                                            </CardContent>
+                                                        </Card>
                                                     ) : (
                                                         sortedFaqs.map((faq) => (
-                                                            <div
+                                                            <Card 
                                                                 key={faq._id}
-                                                                className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer"
-                                                                onClick={() => {
-                                                                    // اضافه کردن سوال FAQ به چت
-                                                                    if (chatIdRef.current) {
-                                                                        handleSendMessage(`سوال: ${faq.question}`);
-                                                                        // تغییر به tab چت
-                                                                        setActiveTab('chat');
-                                                                    }
-                                                                }}
+                                                                className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
+                                                                onClick={() => toggleFaq(faq._id)}
                                                             >
-                                                                <h3 className="font-semibold text-gray-800 mb-2">{faq.question}</h3>
-                                                                <p className="text-gray-600">{faq.answer}</p>
-                                                                <span className="text-xs text-gray-400 mt-2 block">{faq.category}</span>
-                                                                <div className="text-xs text-emerald-600 mt-2">
-                                                                    کلیک کنید تا در چت ارسال شود
-                                                                </div>
-                                                            </div>
+                                                                <CardHeader className="pb-2">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <CardTitle className="text-sm font-semibold text-white">
+                                                                            {faq.question}
+                                                                        </CardTitle>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-gray-400 hover:text-white"
+                                                                        >
+                                                                            {expandedFaqs.has(faq._id) ? (
+                                                                                <ChevronUp className="w-4 h-4" />
+                                                                            ) : (
+                                                                                <ChevronDown className="w-4 h-4" />
+                                                                            )}
+                                                                        </Button>
+                                                                    </div>
+                                                                </CardHeader>
+                                                                <AnimatePresence>
+                                                                    {expandedFaqs.has(faq._id) && (
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0, height: 0 }}
+                                                                            animate={{ opacity: 1, height: "auto" }}
+                                                                            exit={{ opacity: 0, height: 0 }}
+                                                                            transition={{ duration: 0.3 }}
+                                                                        >
+                                                                            <CardContent className="pt-0">
+                                                                                <p className="text-gray-300 text-sm mb-3">{faq.answer}</p>
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">
+                                                                                        {faq.category}
+                                                                                    </span>
+                                                                                    <Button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleFaqClick(faq);
+                                                                                        }}
+                                                                                        size="sm"
+                                                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                                                                                    >
+                                                                                        ارسال در چت
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </CardContent>
+                                                                        </motion.div>
+                                                                    )}
+                                                                </AnimatePresence>
+                                                            </Card>
                                                         ))
                                                     );
                                                 })()
@@ -660,32 +757,97 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isOpen, onClose }) => {
                                         </div>
                                     )}
 
+                                    {activeTab === 'contact' && (
+                                        <div className="space-y-4">
+                                            <Card className="bg-gray-800/50 border-gray-700">
+                                                <CardHeader>
+                                                    <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                                                        <Phone className="w-5 h-5 text-emerald-400" />
+                                                        اطلاعات تماس
+                                                    </CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="space-y-4">
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                                                        <Phone className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                                                        <div>
+                                                            <div className="text-sm text-gray-400">تلفن تماس</div>
+                                                            <div className="text-white font-medium">۰۲۱-۱۲۳۴۵۶۷۸</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                                                        <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                                                        <div>
+                                                            <div className="text-sm text-gray-400">ایمیل</div>
+                                                            <div className="text-white font-medium">info@merajschool.ir</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                                                        <MapPin className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                                                        <div>
+                                                            <div className="text-sm text-gray-400">آدرس</div>
+                                                            <div className="text-white font-medium">تهران، خیابان ولیعصر</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                                                        <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                                                        <div>
+                                                            <div className="text-sm text-gray-400">ساعات کاری</div>
+                                                            <div className="text-white font-medium">شنبه تا چهارشنبه: ۸ صبح تا ۴ عصر</div>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        </div>
+                                    )}
+
                                     {activeTab === 'social' && (
                                         <div className="space-y-4">
-                                            <a
-                                                href="https://instagram.com/your-account"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 transition-colors"
-                                            >
-                                                <FiInstagram className="w-5 h-5" />
-                                                <span>اینستاگرام</span>
-                                            </a>
-                                            <a
-                                                href="https://twitter.com/your-account"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center space-x-2 text-blue-400 hover:text-blue-500 transition-colors"
-                                            >
-                                                <FiTwitter className="w-5 h-5" />
-                                                <span>توییتر</span>
-                                            </a>
+                                            <Card className="bg-gray-800/50 border-gray-700">
+                                                <CardHeader>
+                                                    <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                                                        <Share2 className="w-5 h-5 text-emerald-400" />
+                                                        شبکه‌های اجتماعی
+                                                    </CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="space-y-3">
+                                                    <a
+                                                        href="https://instagram.com/merajschool"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg hover:from-pink-500/30 hover:to-purple-500/30 transition-all cursor-pointer border border-pink-500/30"
+                                                    >
+                                                        <Instagram className="w-5 h-5 text-pink-400" />
+                                                        <span className="text-white font-medium">اینستاگرام</span>
+                                                    </a>
+                                                    <a
+                                                        href="https://twitter.com/merajschool"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg hover:from-blue-500/30 hover:to-cyan-500/30 transition-all cursor-pointer border border-blue-500/30"
+                                                    >
+                                                        <Twitter className="w-5 h-5 text-blue-400" />
+                                                        <span className="text-white font-medium">توییتر</span>
+                                                    </a>
+                                                    <a
+                                                        href="https://t.me/merajschool"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-lg hover:from-blue-500/30 hover:to-emerald-500/30 transition-all cursor-pointer border border-blue-500/30"
+                                                    >
+                                                        <MessageSquare className="w-5 h-5 text-blue-400" />
+                                                        <span className="text-white font-medium">تلگرام</span>
+                                                    </a>
+                                                </CardContent>
+                                            </Card>
                                         </div>
                                     )}
                                 </div>
 
                                 {activeTab === 'chat' && (
-                                    <div className="border-t p-4">
+                                    <div className="border-t border-gray-700 p-4">
                                         <ChatInput onSendMessage={handleSendMessage} isTyping={isTyping} />
                                     </div>
                                 )}
