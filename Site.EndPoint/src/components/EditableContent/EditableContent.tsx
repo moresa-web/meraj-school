@@ -172,7 +172,7 @@ const EditableContent: React.FC<EditableContentProps> = ({ type, value, isAdmin,
           <div className="image-upload-container">
             <div className="image-preview-container">
               <img 
-                src={previewUrl} 
+                src={getFullImageUrl(previewUrl)} 
                 alt="Preview" 
                 className="image-preview"
                 style={{ opacity: isUploading ? 0.5 : 1 }}

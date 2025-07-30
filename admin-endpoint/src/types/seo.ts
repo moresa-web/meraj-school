@@ -12,7 +12,38 @@ export interface SEO {
   socialMedia: {
     instagram?: string;
     twitter?: string;
+    telegram?: string;
+    linkedin?: string;
   };
+  googleAnalyticsId?: string;
+  googleTagManagerId?: string;
+  bingWebmasterTools?: string;
+  yandexWebmaster?: string;
+  defaultTitle?: string;
+  defaultDescription?: string;
+  defaultKeywords?: string[];
+  ogImage?: string;
+  twitterImage?: string;
+  favicon?: string;
+  themeColor?: string;
+  backgroundColor?: string;
+  structuredData?: {
+    organization?: any;
+    school?: any;
+    localBusiness?: any;
+  };
+  latitude?: number;
+  longitude?: number;
+  openingHours?: string;
+  priceRange?: string;
+  foundingDate?: string;
+  numberOfStudents?: string;
+  numberOfTeachers?: string;
+  slogan?: string;
+  awards?: string[];
+  serviceTypes?: string[];
+  curriculum?: string;
+  educationalLevel?: string;
   createdAt: string;
   updatedAt: string;
 } 

@@ -1,52 +1,75 @@
 {
   "short_name": "دبیرستان معراج",
-  "name": "دبیرستان پسرانه معراج",
-  "description": "دبیرستان دولتی پسرانه معراج",
+  "name": "دبیرستان پسرانه معراج - مدرسه هوشمند در مشهد",
+  "description": "دبیرستان پسرانه معراج، مدرسه‌ای هوشمند در مشهد با امکانات پیشرفته آموزشی، کلاس‌های تقویتی، ثبت‌نام آنلاین و سیستم مدیریت هوشمند برای دانش‌آموزان و والدین",
   "icons": [
     {
       "src": "/icons/icon-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-96x96.png",
       "type": "image/png",
-      "sizes": "96x96"
+      "sizes": "96x96",
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-72x72.png",
       "type": "image/png",
-      "sizes": "72x72"
+      "sizes": "72x72",
+      "purpose": "any"
     }
   ],
-  "url": "/",
+  "url": "https://mohammadrezasardashti.ir",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#059669",
-  "background_color": "#ffffff",
+  "background_color": "#f8fafc",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "fa",
+  "dir": "rtl",
   "categories": [
     "education",
-    "school"
+    "school",
+    "productivity",
+    "utilities"
   ],
-  "lang": "fa",
-  "orientation": "portrait",
-  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "صفحه اصلی دبیرستان معراج"
+    },
+    {
+      "src": "/images/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "صفحه اصلی دبیرستان معراج - موبایل"
+    }
+  ],
   "shortcuts": [
     {
       "name": "درباره ما",
       "url": "/about",
-      "description": "درباره ما",
-      "icon": "/icons/icon-72x72.png",
+      "description": "معرفی دبیرستان پسرانه معراج",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -58,7 +81,7 @@
     {
       "name": "تماس با ما",
       "url": "/contact",
-      "description": "تماس با ما",
+      "description": "راه‌های ارتباطی با مدرسه",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -70,7 +93,7 @@
     {
       "name": "اخبار و اطلاع رسانی",
       "url": "/news",
-      "description": "اخبار و اطلاع رسانی",
+      "description": "آخرین اخبار و اطلاعیه‌های مدرسه",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -80,9 +103,33 @@
       ]
     },
     {
-      "name": "کلاس ها",
+      "name": "کلاس‌های تقویتی",
       "url": "/classes",
-      "description": "کلاس ها",
+      "description": "ثبت‌نام در کلاس‌های تقویتی",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "ثبت‌نام آنلاین",
+      "url": "/register",
+      "description": "ثبت‌نام دانش‌آموزان جدید",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "type": "image/png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "ورود به سیستم",
+      "url": "/login",
+      "description": "ورود به پنل کاربری",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -92,6 +139,44 @@
       ]
     }
   ],
-  "prefer_related_applications": true,
-  "dir": "rtl"
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+merajschool",
+      "url": "/%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", "application/pdf"]
+        }
+      ]
+    }
+  }
 }

@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import ShareModal from '../../../components/ShareModal/ShareModal';
 import { NewsSkeleton, SkeletonLoading } from '../../../components/SkeletonLoading';
+import { getImageUrl } from '../../../utils/format';
+import { Eye, Heart, Share2, Calendar, User, Tag } from 'lucide-react';
 import './LatestNewsSection.css';
 
 interface NewsItem {
@@ -22,6 +24,8 @@ interface NewsItem {
   views: number;
   likes: number;
   likedBy: string[];
+  tags?: string[];
+  slug: string;
 }
 
 interface NewsContent {
@@ -31,6 +35,47 @@ interface NewsContent {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'تاریخ نامعتبر';
+    }
+    return date.toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'تاریخ نامعتبر';
+  }
+};
+
+// Helper function to get time ago
+const getTimeAgo = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'زمان نامعتبر';
+    }
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 0) return 'لحظاتی پیش';
+    if (diffInSeconds < 60) return 'لحظاتی پیش';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه پیش`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت پیش`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} روز پیش`;
+    if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} ماه پیش`;
+    return `${Math.floor(diffInSeconds / 31536000)} سال پیش`;
+  } catch (error) {
+    console.error('Error calculating time ago:', error);
+    return 'زمان نامعتبر';
+  }
+};
 
 export const LatestNewsSection: React.FC = () => {
   const { user } = useAuth();
@@ -241,19 +286,7 @@ export const LatestNewsSection: React.FC = () => {
     setShowShareModal(false);
   };
 
-  // تابع برای فرمت کردن تاریخ
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('fa-IR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch {
-      return dateString;
-    }
-  };
+
 
   if (isLoading) {
     return (
@@ -333,98 +366,111 @@ export const LatestNewsSection: React.FC = () => {
         ) : (
           <div className="news-grid">
             {content.news.map((newsItem, index) => (
-              <article 
-                key={newsItem._id} 
+              <article
+                key={newsItem._id}
                 className="news-card"
-                style={{ animationDelay: `${index * 200}ms` }}
-                role="article"
-                aria-label={`خبر: ${newsItem.title}`}
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="news-image-container">
-                  <img
-                    src={`${API_URL.replace('/api', '')}${newsItem.image}`}
-                    alt={newsItem.title}
-                    className="news-image"
-                    loading="lazy"
-                  />
-                  <div className="news-image-overlay"></div>
-                  <div className="news-category">
-                    {newsItem.category}
-                  </div>
-                </div>
-                
-                <div className="news-content">
-                  <div className="news-meta">
-                    <div className="news-meta-left">
-                      <div className="news-meta-item">
-                        <svg className="news-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>{formatDate(newsItem.date)}</span>
+                <Link to={`/news/${newsItem.slug || newsItem._id}`} className="news-card-link">
+                  <div className="news-card-image-container">
+                    {newsItem.image ? (
+                      <img 
+                        src={getImageUrl(newsItem.image)} 
+                        alt={newsItem.title}
+                        className="news-card-image"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="news-card-image-placeholder">
+                        <div className="news-card-image-icon">
+                          <Tag className="w-8 h-8" />
+                        </div>
+                        <div className="news-card-image-title">{newsItem.category}</div>
+                        <div className="news-card-image-subtitle">خبر</div>
                       </div>
-                      {newsItem.author && (
-                        <div className="news-meta-item">
-                          <svg className="news-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          <span>{newsItem.author.fullName}</span>
+                    )}
+                    <div className="news-card-overlay">
+                      <div className="news-card-overlay-buttons">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleLike(newsItem._id);
+                          }}
+                          className={`news-like-button ${likedNews.has(newsItem._id) ? 'liked' : ''}`}
+                          aria-label="لایک کردن خبر"
+                        >
+                          <Heart className="w-4 h-4" />
+                          <span>{newsItem.likes}</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleShare(newsItem._id);
+                          }}
+                          className="news-share-button"
+                          aria-label="اشتراک‌گذاری خبر"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="news-card-badge">
+                      <span className="news-card-category">{newsItem.category}</span>
+                    </div>
+                  </div>
+
+                  <div className="news-card-content">
+                    <div className="news-card-header">
+                      <h3 className="news-card-title">{newsItem.title}</h3>
+                      <div className="news-card-meta">
+                        <span className="news-card-date">
+                          <Calendar className="w-4 h-4" />
+                          {newsItem.date ? formatDate(newsItem.date) : formatDate(newsItem._id)}
+                        </span>
+                        <span className="news-card-time" title={getTimeAgo(newsItem._id)}>
+                          {getTimeAgo(newsItem._id)}
+                        </span>
+                        {newsItem.author && (
+                          <span className="news-card-author">
+                            <User className="w-4 h-4" />
+                            {newsItem.author.fullName}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="news-card-description">
+                      {newsItem.description && newsItem.description.length > 150 
+                        ? `${newsItem.description.substring(0, 150)}...` 
+                        : newsItem.description}
+                    </p>
+
+                    <div className="news-card-footer">
+                      <div className="news-card-stats">
+                        <span className="news-card-views" title={`${newsItem.views} بازدید`}>
+                          <Eye className="w-4 h-4" />
+                          {newsItem.views.toLocaleString('fa-IR')}
+                        </span>
+                        <span className="news-card-likes" title={`${newsItem.likes} پسند`}>
+                          <Heart className="w-4 h-4" />
+                          {newsItem.likes.toLocaleString('fa-IR')}
+                        </span>
+                      </div>
+                      {newsItem.tags && newsItem.tags.length > 0 && (
+                        <div className="news-card-tags">
+                          {newsItem.tags.slice(0, 3).map(tag => (
+                            <span key={tag} className="news-card-tag" title={tag}>{tag}</span>
+                          ))}
+                          {newsItem.tags.length > 3 && (
+                            <span className="news-card-tag-more" title={`و ${newsItem.tags.length - 3} برچسب دیگر`}>
+                              +{newsItem.tags.length - 3}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
-                    
-                    <div className="news-meta-right">
-                      <div className="news-stats">
-                        <div className="news-stat">
-                          <svg className="news-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          <span>{newsItem.views}</span>
-                        </div>
-                        
-                        <button
-                          onClick={() => handleLike(newsItem._id)}
-                          className={`news-like-button ${likedNews.has(newsItem._id) ? 'liked' : ''}`}
-                          aria-label={likedNews.has(newsItem._id) ? 'حذف لایک' : 'لایک کردن'}
-                        >
-                          <svg className="news-like-icon" fill={likedNews.has(newsItem._id) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                          <span>{newsItem.likes}</span>
-                        </button>
-                        
-                        <button
-                          onClick={() => handleShare(newsItem._id)}
-                          className="news-share-button"
-                          aria-label="اشتراک‌گذاری"
-                        >
-                          <svg className="news-share-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
                   </div>
-                  
-                  <h3 className="news-item-title">
-                    {newsItem.title}
-                  </h3>
-                  
-                  <p className="news-item-description">
-                    {newsItem.description}
-                  </p>
-                  
-                  <Link
-                    to={`/news/${newsItem._id}`}
-                    className="news-read-more"
-                    aria-label={`خواندن کامل خبر: ${newsItem.title}`}
-                  >
-                    ادامه مطلب
-                    <svg className="news-read-more-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </Link>
-                </div>
+                </Link>
               </article>
             ))}
           </div>

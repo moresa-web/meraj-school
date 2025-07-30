@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { SkeletonLoading } from '../../../components/SkeletonLoading';
+import { getImageUrl } from '../../../utils/format';
 import './HeroSection.css';
 
 const EditableContent = React.lazy(() => import('../../../components/EditableContent/EditableContent'));
@@ -164,7 +165,7 @@ const HeroSection: React.FC = () => {
         <div className="hero-logo" role="img" aria-label="لوگوی دبیرستان معراج">
           <Suspense fallback={
             <img 
-              src={content.logo} 
+              src={getImageUrl(content.logo)} 
               alt="لوگوی دبیرستان معراج" 
               className="w-full h-full object-contain"
               loading="lazy"

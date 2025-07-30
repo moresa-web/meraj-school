@@ -6,6 +6,7 @@ import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import ShareModal from '../../../components/ShareModal/ShareModal';
 import NoResults from '../../../components/NoResults/NoResults';
 import { NewsSkeleton } from '../../../components/SkeletonLoading';
+import { getImageUrl } from '../../../utils/format';
 import './NewsListSection.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -38,6 +39,47 @@ interface NewsListSectionProps {
   currentPage: number;
   onPageChange: (page: number) => void;
 }
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'تاریخ نامعتبر';
+    }
+    return date.toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'تاریخ نامعتبر';
+  }
+};
+
+// Helper function to get time ago
+const getTimeAgo = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'زمان نامعتبر';
+    }
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 0) return 'لحظاتی پیش';
+    if (diffInSeconds < 60) return 'لحظاتی پیش';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه پیش`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت پیش`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} روز پیش`;
+    if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} ماه پیش`;
+    return `${Math.floor(diffInSeconds / 31536000)} سال پیش`;
+  } catch (error) {
+    console.error('Error calculating time ago:', error);
+    return 'زمان نامعتبر';
+  }
+};
 
 const NewsListSection: React.FC<NewsListSectionProps> = ({
   searchQuery,
@@ -201,13 +243,22 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
                 >
                   <Link to={`/news/${newsItem.slug}`} className="news-card-link">
                     <div className="news-card-image-container">
-                      <div className="news-card-image-placeholder">
-                        <div className="news-card-image-icon">
-                          <Tag className="w-8 h-8" />
+                      {newsItem.image ? (
+                        <img 
+                          src={getImageUrl(newsItem.image)} 
+                          alt={newsItem.title}
+                          className="news-card-image"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="news-card-image-placeholder">
+                          <div className="news-card-image-icon">
+                            <Tag className="w-8 h-8" />
+                          </div>
+                          <div className="news-card-image-title">{newsItem.category}</div>
+                          <div className="news-card-image-subtitle">خبر</div>
                         </div>
-                        <div className="news-card-image-title">{newsItem.category}</div>
-                        <div className="news-card-image-subtitle">خبر</div>
-                      </div>
+                      )}
                       <div className="news-card-overlay">
                         <div className="news-card-overlay-buttons">
                           <button
@@ -244,7 +295,10 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
                         <div className="news-card-meta">
                           <span className="news-card-date">
                             <Calendar className="w-4 h-4" />
-                            {newsItem.date}
+                            {newsItem.date ? formatDate(newsItem.date) : formatDate(newsItem.createdAt)}
+                          </span>
+                          <span className="news-card-time" title={getTimeAgo(newsItem.createdAt)}>
+                            {getTimeAgo(newsItem.createdAt)}
                           </span>
                           {newsItem.author && (
                             <span className="news-card-author">
@@ -255,20 +309,33 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
                         </div>
                       </div>
 
-                      <p className="news-card-description">{newsItem.description}</p>
+                      <p className="news-card-description">
+                        {newsItem.description && newsItem.description.length > 150 
+                          ? `${newsItem.description.substring(0, 150)}...` 
+                          : newsItem.description}
+                      </p>
 
                       <div className="news-card-footer">
                         <div className="news-card-stats">
-                          <span className="news-card-views">
+                          <span className="news-card-views" title={`${newsItem.views} بازدید`}>
                             <Eye className="w-4 h-4" />
-                            {newsItem.views}
+                            {newsItem.views.toLocaleString('fa-IR')}
+                          </span>
+                          <span className="news-card-likes" title={`${newsItem.likes} پسند`}>
+                            <Heart className="w-4 h-4" />
+                            {newsItem.likes.toLocaleString('fa-IR')}
                           </span>
                         </div>
                         {newsItem.tags && newsItem.tags.length > 0 && (
                           <div className="news-card-tags">
-                            {newsItem.tags.slice(0, 2).map(tag => (
-                              <span key={tag} className="news-card-tag">{tag}</span>
+                            {newsItem.tags.slice(0, 3).map(tag => (
+                              <span key={tag} className="news-card-tag" title={tag}>{tag}</span>
                             ))}
+                            {newsItem.tags.length > 3 && (
+                              <span className="news-card-tag-more" title={`و ${newsItem.tags.length - 3} برچسب دیگر`}>
+                                +{newsItem.tags.length - 3}
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>

@@ -219,7 +219,7 @@ const SEO = () => {
                 <Input
                   id="socialMedia.instagram"
                   name="socialMedia.instagram"
-                  value={seoData.socialMedia.instagram}
+                  value={seoData.socialMedia?.instagram || ''}
                   onChange={handleChange}
                   required
                 />
@@ -230,7 +230,7 @@ const SEO = () => {
                 <Input
                   id="socialMedia.twitter"
                   name="socialMedia.twitter"
-                  value={seoData.socialMedia.twitter}
+                  value={seoData.socialMedia?.twitter || ''}
                   onChange={handleChange}
                   required
                 />

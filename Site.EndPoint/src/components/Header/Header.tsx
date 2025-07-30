@@ -7,6 +7,12 @@ import { cn } from '../../lib/utils';
 import { getImageUrl } from '../../utils/format';
 import { Menu, X, Home, Info, BookOpen, Newspaper, Phone, LogOut, LogIn, Settings } from 'lucide-react';
 
+interface HeroContent {
+  logo: string;
+  title: string;
+  description: string;
+}
+
 const Header: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +22,8 @@ const Header: React.FC = () => {
   const { siteInfo, loading } = useSiteInfo();
   const { t, i18n } = useTranslation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [heroContent, setHeroContent] = useState<HeroContent | null>(null);
+  const [heroLoading, setHeroLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +36,40 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobileMenuOpen]);
+
+  // Fetch hero content for logo
+  useEffect(() => {
+    const fetchHeroContent = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${API_URL}/api/content/home/hero`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Hero content fetched for header logo:', data);
+          setHeroContent(data);
+        } else {
+          // Fallback to default logo if API fails
+          setHeroContent({
+            logo: '/images/logo.png',
+            title: 'دبیرستان معراج',
+            description: 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching hero content for logo:', error);
+        // Fallback to default logo if API fails
+        setHeroContent({
+          logo: '/images/logo.png',
+          title: 'دبیرستان معراج',
+          description: 'دبیرستان معراج - مرکز آموزش و پرورش با کیفیت'
+        });
+      } finally {
+        setHeroLoading(false);
+      }
+    };
+
+    fetchHeroContent();
+  }, []);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -90,11 +132,11 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group" onClick={() => handleNavigation('/')}>
             <div className="relative">
-              <img
-                src={loading ? '/images/logo.png' : getImageUrl(siteInfo?.image || '') || '/images/logo.png'}
-                alt={loading ? 'لوگو مدرسه' : siteInfo?.schoolName || 'دبیرستان معراج'}
-                className="h-12 w-auto transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-lg"
-              />
+                          <img
+              src={heroLoading ? '/images/logo.png' : getImageUrl(heroContent?.logo || '/images/logo.png')}
+              alt={heroLoading ? 'لوگو مدرسه' : siteInfo?.schoolName || 'دبیرستان معراج'}
+              className="h-12 w-auto transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-lg"
+            />
               <div className="absolute inset-0 bg-emerald-500/20 rounded-lg blur-sm group-hover:bg-emerald-500/30 transition-all duration-300"></div>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent group-hover:from-emerald-300 group-hover:to-emerald-200 transition-all duration-300">

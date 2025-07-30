@@ -12,6 +12,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import LoadingState from '../../components/LoadingState';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { getImageUrl } from '../../utils/format';
 import { 
   Calendar, 
   Clock, 
@@ -99,53 +100,70 @@ const NewsDetail: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'تاریخ نامعتبر';
+      }
+      return date.toLocaleDateString('fa-IR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'تاریخ نامعتبر';
+    }
   };
 
   const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) return 'همین الان';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه پیش`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت پیش`;
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} روز پیش`;
-    return formatDate(dateString);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'زمان نامعتبر';
+      }
+      const now = new Date();
+      const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (diffInSeconds < 0) return 'لحظاتی پیش';
+      if (diffInSeconds < 60) return 'لحظاتی پیش';
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه پیش`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت پیش`;
+      if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} روز پیش`;
+      if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} ماه پیش`;
+      return `${Math.floor(diffInSeconds / 31536000)} سال پیش`;
+    } catch (error) {
+      console.error('Error calculating time ago:', error);
+      return 'زمان نامعتبر';
+    }
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-        <LoadingState />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-4">{error || 'خبر یافت نشد'}</h2>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-2xl font-bold mb-4">خطا در بارگذاری خبر</h1>
+          <p className="text-gray-300 mb-6">{error || 'خبر مورد نظر یافت نشد'}</p>
           <Button
             onClick={() => navigate('/news')}
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            بازگشت به لیست اخبار
+            بازگشت به اخبار
           </Button>
         </div>
       </div>
     );
   }
 
-  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajschool.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://mohammadrezasardashti.ir';
   const pageUrl = `${siteUrl}/news/${news.slug}`;
   const ogImage = `${siteUrl}${news.image}`;
+
+  // Enhanced structured data for news articles
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -155,52 +173,81 @@ const NewsDetail: React.FC = () => {
     },
     "headline": news.title,
     "image": [ogImage],
-    "datePublished": new Date(news.createdAt).toISOString().split('T')[0],
+    "datePublished": new Date(news.createdAt).toISOString(),
+    "dateModified": new Date(news.createdAt).toISOString(),
     "author": {
       "@type": "Person",
-      "name": news.author?.fullName || 'دبیرستان معراج'
+      "name": news.author?.fullName || 'دبیرستان معراج',
+      "url": `${siteUrl}/teachers`
     },
     "publisher": {
       "@type": "Organization",
-      "name": import.meta.env.VITE_DEFAULT_TITLE || 'دبیرستان پسرانه معراج',
+      "name": "دبیرستان پسرانه معراج",
       "logo": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/logo.png`
-      }
+        "url": `${siteUrl}/images/logo.png`,
+        "width": 500,
+        "height": 500
+      },
+      "url": siteUrl
     },
     "description": news.description,
     "articleSection": news.category,
-    "keywords": news.tags.join(', ')
+    "keywords": news.tags.join(', '),
+    "wordCount": news.content.length,
+    "timeRequired": "PT3M",
+    "inLanguage": "fa-IR",
+    "isAccessibleForFree": true,
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "دبیرستان پسرانه معراج",
+      "url": siteUrl
+    },
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "آموزش",
+        "description": "اخبار و اطلاعیه‌های آموزشی"
+      },
+      {
+        "@type": "Thing", 
+        "name": "مدرسه",
+        "description": "اخبار مدرسه معراج"
+      }
+    ],
+    "mentions": news.tags.map(tag => ({
+      "@type": "Thing",
+      "name": tag
+    }))
   };
 
   return (
     <>
       <SEO
-        title={`${news.title} | دبیرستان پسرانه معراج`}
+        title={`${news.title} | اخبار دبیرستان پسرانه معراج`}
         description={news.description}
-        keywords={news.tags.join(', ')}
-        image={`${API_URL.replace('/api', '')}${news.image}`}
+        keywords={`${news.tags.join(', ')}, اخبار مدرسه, دبیرستان معراج, ${news.category}`}
+        image={ogImage}
         url={`/news/${news.slug}`}
         type="article"
+        publishedTime={new Date(news.createdAt).toISOString()}
+        modifiedTime={new Date(news.createdAt).toISOString()}
+        author={news.author?.fullName || 'دبیرستان معراج'}
+        section={news.category}
+        tags={news.tags}
       />
+      
       <Helmet>
-        <title>{news.title} - دبیرستان پسرانه معراج</title>
-        <meta name="description" content={news.description} />
-        <link rel="canonical" href={pageUrl} />
-
-        {/* Open Graph */}
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={news.title} />
-        <meta property="og:description" content={news.description} />
-        <meta property="og:url" content={pageUrl} />
-        <meta property="og:image" content={ogImage} />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={news.title} />
-        <meta name="twitter:description" content={news.description} />
-        <meta name="twitter:image" content={ogImage} />
-
+        {/* Additional article-specific meta tags */}
+        <meta property="article:published_time" content={new Date(news.createdAt).toISOString()} />
+        <meta property="article:modified_time" content={new Date(news.createdAt).toISOString()} />
+        <meta property="article:author" content={news.author?.fullName || 'دبیرستان معراج'} />
+        <meta property="article:section" content={news.category} />
+        {news.tags.map(tag => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Enhanced structured data */}
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
@@ -236,7 +283,7 @@ const NewsDetail: React.FC = () => {
                 <div className="relative">
                   {news.image ? (
                     <img 
-                      src={`${API_URL.replace('/api', '')}${news.image}`}
+                      src={getImageUrl(news.image)}
                       alt={news.title}
                       className="w-full h-80 object-cover rounded-t-lg"
                     />
@@ -286,12 +333,12 @@ const NewsDetail: React.FC = () => {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center p-4 bg-gray-700/50 rounded-lg">
                       <Eye className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{news.views}</div>
+                      <div className="text-2xl font-bold text-white">{news.views.toLocaleString('fa-IR')}</div>
                       <div className="text-sm text-gray-400">بازدید</div>
                     </div>
                     <div className="text-center p-4 bg-gray-700/50 rounded-lg">
                       <Heart className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">{news.likes}</div>
+                      <div className="text-2xl font-bold text-white">{news.likes.toLocaleString('fa-IR')}</div>
                       <div className="text-sm text-gray-400">پسند</div>
                     </div>
                     <div className="text-center p-4 bg-gray-700/50 rounded-lg">
@@ -346,6 +393,9 @@ const NewsDetail: React.FC = () => {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}
+                        <div className="text-xs text-gray-400 mt-1">
+                          {getTimeAgo(news.createdAt)}
+                        </div>
                       </div>
                     </div>
                   </div>
