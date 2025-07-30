@@ -380,14 +380,6 @@ export const CTASection: React.FC = () => {
       className={`cta-section ${inView ? 'cta-section--visible' : ''}`}
       role="region" 
       aria-label="فراخوان به عمل"
-      style={{ 
-        backgroundColor: '#059669', 
-        minHeight: '100vh', 
-        padding: '2rem',
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
     >
         {/* Enhanced animated background elements */}
       <div className="cta-background">
@@ -409,24 +401,9 @@ export const CTASection: React.FC = () => {
         </div>
       </div>
 
-      <div className="cta-container" style={{ 
-        maxWidth: '1400px', 
-        margin: '0 auto', 
-        padding: '2rem',
-        position: 'relative',
-        zIndex: 2
-      }}>
-        <div className="cta-content" style={{ 
-          textAlign: 'center',
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <h2 className="cta-title animate-fade-in-up" style={{
-            fontSize: '3rem',
-            fontWeight: '700',
-            marginBottom: '1.5rem',
-            color: 'white'
-          }}>
+      <div className="cta-container">
+        <div className="cta-content">
+          <h2 className="cta-title animate-fade-in-up">
             <EditableContent
               type="text"
               value={content.title}
@@ -435,12 +412,7 @@ export const CTASection: React.FC = () => {
             />
           </h2>
           
-          <p className="cta-description animate-fade-in-up animation-delay-200" style={{
-            fontSize: '1.25rem',
-            lineHeight: '1.7',
-            marginBottom: '2rem',
-            color: 'rgba(255, 255, 255, 0.9)'
-          }}>
+          <p className="cta-description animate-fade-in-up animation-delay-200">
             <EditableContent
               type="text"
               value={content.description}
@@ -449,32 +421,11 @@ export const CTASection: React.FC = () => {
             />
           </p>
 
-          <div className="cta-buttons animate-fade-in-up animation-delay-400" style={{
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            marginBottom: '2rem'
-          }}>
+          <div className="cta-buttons animate-fade-in-up animation-delay-400">
             <Link
               to={content.primaryButton.link}
               className="cta-primary-button"
               aria-label={`${content.primaryButton.text} - دکمه اصلی`}
-              style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                color: '#059669',
-                border: 'none',
-                padding: '1.25rem 2.5rem',
-                borderRadius: '50px',
-                fontSize: '1.125rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
-              }}
             >
               <EditableContent
                 type="text"
@@ -482,7 +433,7 @@ export const CTASection: React.FC = () => {
                 isAdmin={user?.role === 'admin'}
                 onSave={(newValue) => handleSave('primaryButton', { ...content.primaryButton, text: newValue })}
               />
-              <svg className="cta-primary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style={{ width: '1.5rem', height: '1.5rem' }}>
+              <svg className="cta-primary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
@@ -491,20 +442,6 @@ export const CTASection: React.FC = () => {
               to={content.secondaryButton.link}
               className="cta-secondary-button"
               aria-label={`${content.secondaryButton.text} - دکمه فرعی`}
-              style={{
-                background: 'transparent',
-                color: '#ffffff',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
-                padding: '1.25rem 2.5rem',
-                borderRadius: '50px',
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-              }}
             >
               <EditableContent
                 type="text"
@@ -512,7 +449,7 @@ export const CTASection: React.FC = () => {
                 isAdmin={user?.role === 'admin'}
                 onSave={(newValue) => handleSave('secondaryButton', { ...content.secondaryButton, text: newValue })}
               />
-              <svg className="cta-secondary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style={{ width: '1.5rem', height: '1.5rem' }}>
+              <svg className="cta-secondary-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </Link>
@@ -520,13 +457,7 @@ export const CTASection: React.FC = () => {
 
           {/* Enhanced CTA Features */}
           {content.features && content.features.length > 0 && (
-            <div className="cta-features animate-fade-in-up animation-delay-600" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '2rem',
-              marginTop: '2rem',
-              marginBottom: '2rem'
-            }}>
+            <div className="cta-features animate-fade-in-up animation-delay-600">
               {content.features.map((feature, index) => (
                 <CTAFeatureCard
                   key={`${feature.title}-${index}`}
@@ -540,71 +471,18 @@ export const CTASection: React.FC = () => {
           )}
 
           {/* Additional trust indicators */}
-          <div className="cta-trust-indicators animate-fade-in-up animation-delay-800" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2rem',
-            marginTop: '2rem'
-          }}>
-            <div className="cta-trust-item" style={{
-              textAlign: 'center',
-              padding: '1.5rem',
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              <span className="cta-trust-number" style={{
-                display: 'block',
-                fontSize: '2.5rem',
-                fontWeight: '700',
-                color: 'white',
-                marginBottom: '0.5rem'
-              }}>500+</span>
-              <span className="cta-trust-label" style={{
-                fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>دانش‌آموز فعال</span>
+          <div className="cta-trust-indicators animate-fade-in-up animation-delay-800">
+            <div className="cta-trust-item">
+              <span className="cta-trust-number">500+</span>
+              <span className="cta-trust-label">دانش‌آموز فعال</span>
             </div>
-            <div className="cta-trust-item" style={{
-              textAlign: 'center',
-              padding: '1.5rem',
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              <span className="cta-trust-number" style={{
-                display: 'block',
-                fontSize: '2.5rem',
-                fontWeight: '700',
-                color: 'white',
-                marginBottom: '0.5rem'
-              }}>50+</span>
-              <span className="cta-trust-label" style={{
-                fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>معلم متخصص</span>
+            <div className="cta-trust-item">
+              <span className="cta-trust-number">50+</span>
+              <span className="cta-trust-label">معلم متخصص</span>
             </div>
-            <div className="cta-trust-item" style={{
-              textAlign: 'center',
-              padding: '1.5rem',
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              <span className="cta-trust-number" style={{
-                display: 'block',
-                fontSize: '2.5rem',
-                fontWeight: '700',
-                color: 'white',
-                marginBottom: '0.5rem'
-              }}>98%</span>
-              <span className="cta-trust-label" style={{
-                fontSize: '0.9rem',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>رضایت والدین</span>
+            <div className="cta-trust-item">
+              <span className="cta-trust-number">98%</span>
+              <span className="cta-trust-label">رضایت والدین</span>
             </div>
           </div>
         </div>

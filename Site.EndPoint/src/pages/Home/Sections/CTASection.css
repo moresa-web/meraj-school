@@ -715,7 +715,29 @@
 }
 
 /* Responsive design */
+@media (max-width: 1200px) {
+  .cta-section {
+    padding: 6rem 1.5rem;
+  }
+  
+  .cta-container {
+    max-width: 1000px;
+  }
+  
+  .cta-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+  }
+  
+  .cta-description {
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  }
+}
+
 @media (max-width: 1024px) {
+  .cta-section {
+    padding: 5rem 1.5rem;
+  }
+  
   .cta-features {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
@@ -725,11 +747,22 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
+  
+  .cta-buttons {
+    gap: 1.5rem;
+  }
+  
+  .cta-primary-button,
+  .cta-secondary-button {
+    padding: 1.125rem 2rem;
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
   .cta-section {
-    padding: 6rem 1rem;
+    padding: 4rem 1rem;
+    min-height: auto;
   }
 
   .cta-container {
@@ -737,41 +770,78 @@
   }
 
   .cta-content {
-    gap: 2rem;
+    gap: 2.5rem;
+  }
+  
+  .cta-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin-bottom: 1rem;
+  }
+  
+  .cta-title::after {
+    width: 80px;
+    height: 4px;
+    bottom: -10px;
+  }
+
+  .cta-description {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    margin-bottom: 1.5rem;
   }
 
   .cta-buttons {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .cta-primary-button,
   .cta-secondary-button {
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
     justify-content: center;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
   }
 
   .cta-features {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .cta-feature {
-    padding: 2rem 1.5rem;
+    padding: 1.75rem 1.25rem;
+  }
+  
+  .cta-feature-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+  
+  .cta-feature-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .cta-feature-description {
+    font-size: 0.95rem;
   }
 
   .cta-trust-indicators {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-top: 2rem;
   }
 
   .cta-trust-item {
     padding: 1.5rem 1rem;
   }
-
+  
   .cta-trust-number {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
   }
 
   .cta-trust-label {
@@ -785,50 +855,131 @@
   .cta-particles {
     display: none;
   }
+  
+  .cta-decoration {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
   .cta-section {
-    padding: 4rem 1rem;
+    padding: 3rem 0.75rem;
+  }
+  
+  .cta-container {
+    padding: 0 0.25rem;
   }
 
   .cta-title {
-    font-size: 2.5rem;
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
   }
 
   .cta-description {
-    font-size: 1.1rem;
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    line-height: 1.6;
   }
 
   .cta-primary-button,
   .cta-secondary-button {
-    padding: 1rem 2rem;
-    font-size: 1rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
+    max-width: 260px;
+  }
+  
+  .cta-primary-icon,
+  .cta-secondary-icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
+  .cta-feature {
+    padding: 1.5rem 1rem;
+  }
+  
   .cta-feature-icon {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
 
   .cta-feature-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .cta-feature-description {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
+  .cta-trust-item {
+    padding: 1.25rem 0.75rem;
+  }
+  
   .cta-trust-number {
     font-size: 2rem;
   }
 
   .cta-trust-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .cta-error-actions {
     flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .cta-retry-button,
+  .cta-reload-button {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .cta-section {
+    padding: 2.5rem 0.5rem;
+  }
+  
+  .cta-title {
+    font-size: 1.5rem;
+  }
+  
+  .cta-description {
+    font-size: 0.85rem;
+  }
+  
+  .cta-primary-button,
+  .cta-secondary-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    max-width: 240px;
+  }
+  
+  .cta-feature {
+    padding: 1.25rem 0.75rem;
+  }
+  
+  .cta-feature-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .cta-feature-title {
+    font-size: 1rem;
+  }
+  
+  .cta-feature-description {
+    font-size: 0.85rem;
+  }
+  
+  .cta-trust-item {
+    padding: 1rem 0.5rem;
+  }
+  
+  .cta-trust-number {
+    font-size: 1.75rem;
+  }
+  
+  .cta-trust-label {
+    font-size: 0.75rem;
   }
 }
 

@@ -219,22 +219,22 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile Menu */}
-        <div className={`md:hidden fixed inset-0 z-[9999] transition-all duration-700 ease-out ${
+        <div className={`md:hidden fixed inset-0 z-[99999] transition-all duration-700 ease-out ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}>
           {/* Backdrop */}
           <div 
-            className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700 ease-out ${
+            className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700 ease-out z-10 ${
               isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
             }`}
             onClick={closeMenu}
           />
           
           {/* Menu Panel */}
-          <div className={`absolute top-0 right-0 w-80 h-full bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 shadow-2xl border-l border-gray-700 transition-all duration-700 ease-out transform ${
+          <div className={`absolute top-0 right-0 w-80 h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 shadow-2xl border-l border-gray-700 transition-all duration-700 ease-out transform z-20 overflow-y-auto ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}>
-            <div className="p-6 h-full flex flex-col relative overflow-hidden">
+            <div className="p-6 min-h-screen flex flex-col relative">
               {/* Background Pattern */}
               <div className={`absolute inset-0 opacity-5 transition-all duration-1000 ease-out ${
                 isMobileMenuOpen ? 'opacity-5' : 'opacity-0'
@@ -266,7 +266,7 @@ const Header: React.FC = () => {
               </div>
 
               {/* Navigation Links */}
-              <div className="flex-1 flex flex-col justify-center space-y-2 relative z-10">
+              <div className="flex-1 flex flex-col justify-start space-y-2 relative z-10 py-8">
                 {[
                   { path: '/', label: 'خانه', icon: Home },
                   { path: '/about', label: 'درباره ما', icon: Info },
@@ -323,7 +323,7 @@ const Header: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className={`mt-auto pt-8 space-y-4 relative z-10 transition-all duration-700 ease-out transform ${
+              <div className={`mt-8 pt-8 space-y-4 relative z-10 transition-all duration-700 ease-out transform ${
                 isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`} style={{ transitionDelay: '800ms' }}>
                 {isAuthenticated ? (
@@ -367,7 +367,7 @@ const Header: React.FC = () => {
               </div>
 
               {/* Footer */}
-              <div className={`mt-6 pt-6 border-t border-gray-700 relative z-10 transition-all duration-700 ease-out transform ${
+              <div className={`mt-8 pt-6 border-t border-gray-700 relative z-10 transition-all duration-700 ease-out transform ${
                 isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`} style={{ transitionDelay: '900ms' }}>
                 <div className="text-center text-gray-400 text-sm">
