@@ -1,11 +1,18 @@
 // src/pages/Contact.tsx
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
+import './Contact.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Helmet } from 'react-helmet-async';
-import HeroSection from '../../components/HeroSection/HeroSection';
-import EditableContent from '../../components/EditableContent/EditableContent';
-import { useAuth } from '../../contexts/AuthContext';
-import ContactForm from './ContactForm';
 import SEO from '../../components/SEO';
+import { useAuth } from '../../contexts/AuthContext';
+
+// Lazy load sections
+const ContactHeroSection = lazy(() => import('./Sections/ContactHeroSection'));
+const ContactFormSection = lazy(() => import('./Sections/ContactFormSection'));
+const ContactInfoSection = lazy(() => import('./Sections/ContactInfoSection'));
+const ContactMapSection = lazy(() => import('./Sections/ContactMapSection'));
+const ContactFeaturesSection = lazy(() => import('./Sections/ContactFeaturesSection'));
 
 interface ContactContent {
   heroTitle: string;
@@ -214,6 +221,30 @@ const Contact: React.FC = () => {
     }
   };
 
+  // Centralized state for form data
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleFormSubmit = async (formData: any) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setSubmitSuccess(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <SEO
@@ -247,223 +278,45 @@ const Contact: React.FC = () => {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50">
-        <HeroSection
-          title={
-            <EditableContent
-              type="text"
-              value={content.heroTitle}
-              isAdmin={user?.role === 'admin'}
-              onSave={(newValue) => handleSave('heroTitle', newValue)}
-            />
-          }
-          description={
-            <EditableContent
-              type="text"
-              value={content.heroDescription}
-              isAdmin={user?.role === 'admin'}
-              onSave={(newValue) => handleSave('heroDescription', newValue)}
-            />
-          }
-          backgroundImage="/images/contact-hero.jpg"
-          overlayColor="from-black/40"
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={true}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
         />
+        
+        <Suspense fallback={<div className="h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div></div>}>
+          <ContactHeroSection />
+        </Suspense>
 
-        {/* Contact Information Section */}
-        <section className="py-24">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* Contact Form */}
-              <div className="bg-white p-8 rounded-2xl shadow-lg animate-fade-in-up">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  <EditableContent
-                    type="text"
-                    value={content.sectionTitles.contactForm}
-                    isAdmin={user?.role === 'admin'}
-                    onSave={(newValue) => handleSectionTitleSave('contactForm', newValue)}
-                  />
-                </h2>
-                <ContactForm />
-              </div>
+        <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
+          <ContactFormSection
+            formData={formData}
+            setFormData={setFormData}
+            isSubmitting={isSubmitting}
+            submitSuccess={submitSuccess}
+            onSubmit={handleFormSubmit}
+          />
+        </Suspense>
 
-              {/* Contact Information */}
-              <div className="space-y-8 animate-fade-in-up animation-delay-200">
-                <div className="bg-white p-8 rounded-2xl shadow-lg">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    <EditableContent
-                      type="text"
-                      value={content.sectionTitles.contactInfo}
-                      isAdmin={user?.role === 'admin'}
-                      onSave={(newValue) => handleSectionTitleSave('contactInfo', newValue)}
-                    />
-                  </h2>
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                      </div>
-                      <div className="mr-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-1">آدرس</h3>
-                        <p className="text-gray-600">
-                          <EditableContent
-                            type="text"
-                            value={content.contactInfo.address}
-                            isAdmin={user?.role === 'admin'}
-                            onSave={(newValue) => handleContactInfoSave('address', newValue)}
-                          />
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                      </div>
-                      <div className="mr-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-1">تلفن</h3>
-                        <p className="text-gray-600">
-                          <EditableContent
-                            type="text"
-                            value={content.contactInfo.phone}
-                            isAdmin={user?.role === 'admin'}
-                            onSave={(newValue) => handleContactInfoSave('phone', newValue)}
-                          />
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="mr-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-1">ایمیل</h3>
-                        <p className="text-gray-600">
-                          <EditableContent
-                            type="text"
-                            value={content.contactInfo.email}
-                            isAdmin={user?.role === 'admin'}
-                            onSave={(newValue) => handleContactInfoSave('email', newValue)}
-                          />
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
+          <ContactInfoSection />
+        </Suspense>
 
-                {/* Map */}
-                <div className="bg-white p-8 rounded-2xl shadow-lg">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      <EditableContent
-                        type="text"
-                        value={content.sectionTitles.location}
-                        isAdmin={user?.role === 'admin'}
-                        onSave={(newValue) => handleSectionTitleSave('location', newValue)}
-                      />
-                    </h2>
-                    {user?.role === 'admin' && (
-                      <div className="flex gap-2">
-                        {/* دکمه ویرایش لینک نقشه */}
-                        <div className="relative">
-                          <button
-                            onClick={() => {
-                              const modal = document.createElement('div');
-                              modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-                              const modalContent = document.createElement('div');
-                              modalContent.className = 'bg-white rounded-lg p-6 w-full max-w-lg';
-                              const title = document.createElement('h3');
-                              title.className = 'text-lg font-semibold mb-4';
-                              title.textContent = 'ویرایش لینک نقشه';
-                              const input = document.createElement('input');
-                              input.type = 'text';
-                              input.id = 'mapUrlInput';
-                              input.className = 'w-full px-4 py-2 border rounded-lg mb-4';
-                              input.value = content.mapUrl;
-                              const buttonContainer = document.createElement('div');
-                              buttonContainer.className = 'flex justify-end gap-2';
-                              const cancelButton = document.createElement('button');
-                              cancelButton.className = 'px-4 py-2 text-gray-600 hover:text-gray-800';
-                              cancelButton.textContent = 'انصراف';
-                              cancelButton.onclick = () => modal.remove();
-                              const saveButton = document.createElement('button');
-                              saveButton.className = 'px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700';
-                              saveButton.textContent = 'ذخیره';
-                              saveButton.onclick = async () => {
-                                const newValue = input.value;
-                                try {
-                                  const response = await fetch(`${API_URL}/content/contact/main`, {
-                                    method: 'PUT',
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                      'Authorization': `Bearer ${localStorage.getItem('token')}`
-                                    },
-                                    body: JSON.stringify({ ...content, mapUrl: newValue, mapLocation: content.mapLocation })
-                                  });
-                                  if (response.ok) {
-                                    window.location.reload();
-                                  } else {
-                                    alert('خطا در به‌روزرسانی لینک نقشه');
-                                  }
-                                } catch (error) {
-                                  console.error('Error updating map URL:', error);
-                                  alert('خطا در به‌روزرسانی لینک نقشه');
-                                }
-                                modal.remove();
-                              };
-                              buttonContainer.appendChild(cancelButton);
-                              buttonContainer.appendChild(saveButton);
-                              modalContent.appendChild(title);
-                              modalContent.appendChild(input);
-                              modalContent.appendChild(buttonContainer);
-                              modal.appendChild(modalContent);
-                              document.body.appendChild(modal);
-                            }}
-                            className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-emerald-200 transition-colors"
-                          >
-                            <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                        </div>
-                        {/* دکمه ویرایش lat/lng */}
-                        <button
-                          onClick={() => {
-                            setEditLat(content.mapLocation?.lat || 36.2972);
-                            setEditLng(content.mapLocation?.lng || 59.6067);
-                            setShowMapLocationModal(true);
-                          }}
-                          className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 transition-colors"
-                          title="ویرایش موقعیت مکانی (lat/lng)"
-                        >
-                          <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="aspect-[4/3] rounded-xl overflow-hidden">
-                    <iframe
-                      src={content.mapUrl}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
+          <ContactMapSection />
+        </Suspense>
+
+        <Suspense fallback={<div className="h-64 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
+          <ContactFeaturesSection />
+        </Suspense>
       </div>
 
       {/* modal ویرایش lat/lng */}
