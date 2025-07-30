@@ -5,14 +5,14 @@ const { SitemapStream, streamToPromise } = require('sitemap');
 
 // تنظیمات sitemap
 const sitemapConfig = {
-    hostname: 'https://mohammadrezasardashti.ir',
+    hostname: 'https://merajfutureschool.ir',
     cacheTime: 600000,
     urls: []
 };
 
 // تنظیمات محیطی
 const config = {
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://mohammadrezasardashti.ir',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://merajfutureschool.ir',
     sitePath: process.env.SITE_PATH || path.join(__dirname, '..', '..', '..', 'Site.EndPoint')
 };
 

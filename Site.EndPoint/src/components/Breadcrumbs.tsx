@@ -84,7 +84,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = '' }) => {
       "@type": "ListItem",
       "position": index + 1,
       "name": item.label,
-      "item": `https://mohammadrezasardashti.ir${item.path}`
+      "item": `https://merajfutureschool.ir${item.path}`
     }))
   };
 

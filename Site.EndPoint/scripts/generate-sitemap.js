@@ -6,7 +6,7 @@ const axios = require('axios');
 
 // تنظیمات sitemap
 const sitemapConfig = {
-    hostname: 'https://mohammadrezasardashti.ir',
+    hostname: 'https://merajfutureschool.ir',
     xmlns: {
         news: true,
         xhtml: true,

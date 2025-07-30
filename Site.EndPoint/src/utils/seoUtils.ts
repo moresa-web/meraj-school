@@ -71,7 +71,7 @@ export const generateSEOKeywords = (baseKeywords: string[], pageKeywords: string
 /**
  * Generate canonical URL
  */
-export const generateCanonicalUrl = (path: string, baseUrl: string = 'https://mohammadrezasardashti.ir'): string => {
+export const generateCanonicalUrl = (path: string, baseUrl: string = 'https://merajfutureschool.ir'): string => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   return `${baseUrl}${cleanPath}`;
 };
@@ -79,7 +79,7 @@ export const generateCanonicalUrl = (path: string, baseUrl: string = 'https://mo
 /**
  * Generate Open Graph image URL
  */
-export const generateOGImageUrl = (imagePath: string, baseUrl: string = 'https://mohammadrezasardashti.ir'): string => {
+export const generateOGImageUrl = (imagePath: string, baseUrl: string = 'https://merajfutureschool.ir'): string => {
   if (imagePath.startsWith('http')) {
     return imagePath;
   }
@@ -300,7 +300,7 @@ export const generateRobotsContent = (noindex: boolean = false, nofollow: boolea
  * Generate hreflang tags
  */
 export const generateHreflangTags = (url: string, languages: string[] = ['fa', 'en']): Array<{ lang: string; url: string }> => {
-  const baseUrl = 'https://mohammadrezasardashti.ir';
+  const baseUrl = 'https://merajfutureschool.ir';
   
   return languages.map(lang => ({
     lang: lang === 'fa' ? 'fa' : lang,

@@ -29,11 +29,11 @@ Allow: /icons/
 Crawl-delay: 1
 
 # Sitemap locations
-Sitemap: https://mohammadrezasardashti.ir/sitemap.xml
-Sitemap: https://mohammadrezasardashti.ir/news-sitemap.xml
-Sitemap: https://mohammadrezasardashti.ir/classes-sitemap.xml
-Sitemap: https://mohammadrezasardashti.ir/sitemap-index.xml
+Sitemap: https://merajfutureschool.ir/sitemap.xml
+Sitemap: https://merajfutureschool.ir/news-sitemap.xml
+Sitemap: https://merajfutureschool.ir/classes-sitemap.xml
+Sitemap: https://merajfutureschool.ir/sitemap-index.xml
 
 # Additional sitemaps for different content types
-Sitemap: https://mohammadrezasardashti.ir/sitemap-news.xml
-Sitemap: https://mohammadrezasardashti.ir/sitemap-classes.xml
+Sitemap: https://merajfutureschool.ir/sitemap-news.xml
+Sitemap: https://merajfutureschool.ir/sitemap-classes.xml

@@ -22,7 +22,7 @@ export const schoolInfoData: Partial<ISchoolInfo> = {
 };
 
 export const seoData: Partial<ISEO> = {
-  siteUrl: 'https://mohammadrezasardashti.ir',
+  siteUrl: 'https://merajfutureschool.ir',
   schoolName: 'دبیرستان پسرانه معراج',
   title: 'دبیرستان پسرانه معراج',
   description: 'دبیرستان پسرانه معراج، مدرسه‌ای هوشمند در مشهد با امکانات پیشرفته آموزشی، کلاس‌های تقویتی، ثبت‌نام آنلاین و سیستم مدیریت هوشمند برای دانش‌آموزان و والدین.',

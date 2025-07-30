@@ -159,7 +159,7 @@ const NewsDetail: React.FC = () => {
     );
   }
 
-  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://mohammadrezasardashti.ir';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://merajfutureschool.ir';
   const pageUrl = `${siteUrl}/news/${news.slug}`;
   const ogImage = `${siteUrl}${news.image}`;
 

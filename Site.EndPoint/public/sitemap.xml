@@ -6,12 +6,12 @@
   
   <!-- صفحه اصلی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir</loc>
+    <loc>https://merajfutureschool.ir</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://mohammadrezasardashti.ir/images/logo.png</image:loc>
+      <image:loc>https://merajfutureschool.ir/images/logo.png</image:loc>
       <image:title>لوگوی دبیرستان پسرانه معراج</image:title>
       <image:caption>دبیرستان پسرانه معراج - مدرسه هوشمند در مشهد</image:caption>
     </image:image>
@@ -19,19 +19,19 @@
   
   <!-- صفحه درباره ما -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/about</loc>
+    <loc>https://merajfutureschool.ir/about</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://mohammadrezasardashti.ir/images/about-school.png</image:loc>
+      <image:loc>https://merajfutureschool.ir/images/about-school.png</image:loc>
       <image:title>درباره دبیرستان معراج</image:title>
     </image:image>
   </url>
   
   <!-- صفحه تماس با ما -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/contact</loc>
+    <loc>https://merajfutureschool.ir/contact</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -39,31 +39,31 @@
   
   <!-- صفحه کلاس‌ها -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/classes</loc>
+    <loc>https://merajfutureschool.ir/classes</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://mohammadrezasardashti.ir/images/classes.jpg</image:loc>
+      <image:loc>https://merajfutureschool.ir/images/classes.jpg</image:loc>
       <image:title>کلاس‌های تقویتی دبیرستان معراج</image:title>
     </image:image>
   </url>
   
   <!-- صفحه اخبار -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/news</loc>
+    <loc>https://merajfutureschool.ir/news</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://mohammadrezasardashti.ir/images/news1.jpg</image:loc>
+      <image:loc>https://merajfutureschool.ir/images/news1.jpg</image:loc>
       <image:title>اخبار و اطلاعیه‌های مدرسه</image:title>
     </image:image>
   </url>
   
   <!-- صفحه ثبت‌نام -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/register</loc>
+    <loc>https://merajfutureschool.ir/register</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -71,7 +71,7 @@
   
   <!-- صفحه ورود -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/login</loc>
+    <loc>https://merajfutureschool.ir/login</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -79,7 +79,7 @@
   
   <!-- صفحه پروفایل -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/profile</loc>
+    <loc>https://merajfutureschool.ir/profile</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -87,7 +87,7 @@
   
   <!-- صفحه چت -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/chat</loc>
+    <loc>https://merajfutureschool.ir/chat</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -95,7 +95,7 @@
   
   <!-- صفحه سوالات متداول -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/faq</loc>
+    <loc>https://merajfutureschool.ir/faq</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -103,7 +103,7 @@
   
   <!-- صفحه قوانین و مقررات -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/rules</loc>
+    <loc>https://merajfutureschool.ir/rules</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -111,7 +111,7 @@
   
   <!-- صفحه گالری تصاویر -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/gallery</loc>
+    <loc>https://merajfutureschool.ir/gallery</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -119,7 +119,7 @@
   
   <!-- صفحه افتخارات -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/achievements</loc>
+    <loc>https://merajfutureschool.ir/achievements</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -127,7 +127,7 @@
   
   <!-- صفحه کادر آموزشی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/teachers</loc>
+    <loc>https://merajfutureschool.ir/teachers</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -135,7 +135,7 @@
   
   <!-- صفحه امکانات مدرسه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/facilities</loc>
+    <loc>https://merajfutureschool.ir/facilities</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -143,7 +143,7 @@
   
   <!-- صفحه برنامه‌های فوق برنامه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/extracurricular</loc>
+    <loc>https://merajfutureschool.ir/extracurricular</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -151,7 +151,7 @@
   
   <!-- صفحه مشاوره تحصیلی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/counseling</loc>
+    <loc>https://merajfutureschool.ir/counseling</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -159,7 +159,7 @@
   
   <!-- صفحه تقویم آموزشی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/calendar</loc>
+    <loc>https://merajfutureschool.ir/calendar</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -167,7 +167,7 @@
   
   <!-- صفحه نتایج امتحانات -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/results</loc>
+    <loc>https://merajfutureschool.ir/results</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -175,7 +175,7 @@
   
   <!-- صفحه کتابخانه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/library</loc>
+    <loc>https://merajfutureschool.ir/library</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -183,7 +183,7 @@
   
   <!-- صفحه آزمایشگاه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/laboratory</loc>
+    <loc>https://merajfutureschool.ir/laboratory</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -191,7 +191,7 @@
   
   <!-- صفحه سالن ورزشی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/gym</loc>
+    <loc>https://merajfutureschool.ir/gym</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -199,7 +199,7 @@
   
   <!-- صفحه کافه‌تریا -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/cafeteria</loc>
+    <loc>https://merajfutureschool.ir/cafeteria</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -207,7 +207,7 @@
   
   <!-- صفحه بهداشت و درمان -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/health</loc>
+    <loc>https://merajfutureschool.ir/health</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -215,7 +215,7 @@
   
   <!-- صفحه امنیت -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/security</loc>
+    <loc>https://merajfutureschool.ir/security</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -223,7 +223,7 @@
   
   <!-- صفحه حمل و نقل -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/transportation</loc>
+    <loc>https://merajfutureschool.ir/transportation</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -231,7 +231,7 @@
   
   <!-- صفحه خوابگاه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/dormitory</loc>
+    <loc>https://merajfutureschool.ir/dormitory</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -239,7 +239,7 @@
   
   <!-- صفحه بورسیه -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/scholarship</loc>
+    <loc>https://merajfutureschool.ir/scholarship</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -247,7 +247,7 @@
   
   <!-- صفحه همکاری با ما -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/careers</loc>
+    <loc>https://merajfutureschool.ir/careers</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -255,7 +255,7 @@
   
   <!-- صفحه حریم خصوصی -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/privacy</loc>
+    <loc>https://merajfutureschool.ir/privacy</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -263,7 +263,7 @@
   
   <!-- صفحه شرایط استفاده -->
   <url>
-    <loc>https://mohammadrezasardashti.ir/terms</loc>
+    <loc>https://merajfutureschool.ir/terms</loc>
     <lastmod>2024-01-15T10:00:00+03:30</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

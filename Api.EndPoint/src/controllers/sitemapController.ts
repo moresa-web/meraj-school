@@ -25,7 +25,7 @@ export class SitemapController {
     public generateMainSitemap = async (req: Request, res: Response) => {
   try {
     const seo = await SEO.findOne();
-    const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+    const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
     
     // دریافت تمام کلاس‌ها و اخبار
     const classes = await Class.find({ status: 'active' }).lean();
@@ -95,7 +95,7 @@ export class SitemapController {
     public generateNewsSitemap = async (req: Request, res: Response) => {
         try {
             const seo = await SEO.findOne();
-            const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+            const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
             const news = await (await import('../models/News')).default.find({ status: 'published' }).lean();
 
             let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -130,7 +130,7 @@ export class SitemapController {
     public generateClassesSitemap = async (req: Request, res: Response) => {
         try {
             const seo = await SEO.findOne();
-            const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+            const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
             const classes = await Class.find({ status: 'active' }).lean();
 
             let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -167,7 +167,7 @@ export class SitemapController {
     public generateSitemapIndex = async (req: Request, res: Response) => {
         try {
             const seo = await SEO.findOne();
-            const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+            const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
 
             let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
             xml += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -266,7 +266,7 @@ export class SitemapController {
     public getSitemapUrls = async (req: Request, res: Response) => {
         try {
             const seo = await SEO.findOne();
-            const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+            const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
             
             // دریافت تمام کلاس‌ها و اخبار
             const classes = await Class.find({ isActive: true }).lean();

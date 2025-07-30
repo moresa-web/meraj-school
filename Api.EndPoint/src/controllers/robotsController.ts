@@ -4,7 +4,7 @@ import SEO from '../models/SEO';
 export const generateRobots = async (req: Request, res: Response) => {
   try {
     const seo = await SEO.findOne();
-    const baseUrl = seo?.siteUrl || 'https://mohammadrezasardashti.ir';
+    const baseUrl = seo?.siteUrl || 'https://merajfutureschool.ir';
 
     let robotsTxt = '# robots.txt for ' + baseUrl + '\n\n';
     robotsTxt += 'User-agent: *\n';
