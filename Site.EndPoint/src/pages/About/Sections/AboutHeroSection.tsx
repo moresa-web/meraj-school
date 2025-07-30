@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
 import { Building2, Users, Award } from 'lucide-react';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './AboutHeroSection.css';
 
 interface AboutHeroContent {
@@ -113,9 +114,30 @@ export const AboutHeroSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="about-hero-section loading" role="status" aria-live="polite">
-        <div className="about-hero-loading-content">
-          <div className="about-hero-loading-spinner"></div>
-          <p>در حال بارگذاری...</p>
+        <div className="about-hero-container">
+          <div className="about-hero-content">
+            <div className="about-hero-icon">
+              <SkeletonLoading type="avatar" width="48px" height="48px" />
+            </div>
+            
+            <SkeletonLoading type="title" height="48px" width="60%" />
+            
+            <div className="mt-6">
+              <SkeletonLoading type="text" lines={3} height="20px" />
+            </div>
+            
+            <div className="about-hero-stats">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="about-hero-stat">
+                  <div className="about-hero-stat-icon">
+                    <SkeletonLoading type="avatar" width="20px" height="20px" />
+                  </div>
+                  <SkeletonLoading type="title" height="24px" width="60px" />
+                  <SkeletonLoading type="text" width="80px" height="16px" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );

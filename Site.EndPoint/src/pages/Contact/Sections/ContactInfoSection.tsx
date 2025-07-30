@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { MapPin, Phone, Mail, Clock, Users, Globe } from 'lucide-react';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './ContactInfoSection.css';
 
 interface ContactInfoItem {
@@ -168,9 +169,25 @@ const ContactInfoSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="contact-info-section loading" role="status" aria-live="polite">
-        <div className="loading-content">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری اطلاعات تماس...</p>
+        <div className="contact-info-container">
+          <div className="contact-info-header">
+            <SkeletonLoading type="title" height="48px" width="50%" />
+            <SkeletonLoading type="text" lines={2} height="20px" />
+          </div>
+          <div className="contact-info-grid">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="contact-info-card">
+                <div className="contact-info-icon">
+                  <SkeletonLoading type="avatar" width="24px" height="24px" />
+                </div>
+                <div className="contact-info-content">
+                  <SkeletonLoading type="title" height="24px" width="80%" />
+                  <SkeletonLoading type="text" width="100%" height="18px" />
+                  <SkeletonLoading type="text" width="70%" height="16px" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

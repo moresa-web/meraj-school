@@ -12,6 +12,10 @@
     "seed": "ts-node src/scripts/seed.ts",
     "seed:content": "ts-node src/scripts/seedContent.ts",
     "seed:classes": "ts-node src/scripts/seedClasses.ts",
+    "seed:news": "ts-node src/scripts/seedNews.ts",
+    "add:news": "ts-node src/scripts/addNews.ts",
+    "add:content": "ts-node src/scripts/addMissingContent.ts",
+    "update:seo": "ts-node src/scripts/updateSEO.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },

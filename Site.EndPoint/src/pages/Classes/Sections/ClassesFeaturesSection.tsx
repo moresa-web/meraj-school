@@ -19,6 +19,7 @@ import {
   CheckCircle,
   Lightbulb
 } from 'lucide-react';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './ClassesFeaturesSection.css';
 
 interface ClassesFeature {
@@ -200,9 +201,25 @@ const ClassesFeaturesSection: React.FC = () => {
     return (
       <section className="classes-features-section">
         <div className="classes-features-container">
-          <div className="classes-features-loading">
-            <div className="classes-features-loading-spinner"></div>
-            <p>در حال بارگذاری مزایای کلاس‌ها...</p>
+          <div className="classes-features-header">
+            <div className="classes-features-badge">
+              <SkeletonLoading type="avatar" width="20px" height="20px" />
+              <SkeletonLoading type="text" width="100px" height="16px" />
+            </div>
+            <SkeletonLoading type="title" height="48px" width="60%" />
+            <SkeletonLoading type="text" lines={2} height="20px" />
+          </div>
+          <div className="classes-features-grid">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="classes-features-card">
+                <div className="classes-features-card-header">
+                  <SkeletonLoading type="avatar" width="32px" height="32px" />
+                  <SkeletonLoading type="text" width="40px" height="24px" />
+                </div>
+                <SkeletonLoading type="title" height="24px" width="80%" />
+                <SkeletonLoading type="text" lines={3} height="16px" />
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -4,6 +4,7 @@ import EditableContent from '../../../components/EditableContent/EditableContent
 import { Link } from 'react-router-dom';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import ShareModal from '../../../components/ShareModal/ShareModal';
+import { NewsSkeleton, SkeletonLoading } from '../../../components/SkeletonLoading';
 import './LatestNewsSection.css';
 
 interface NewsItem {
@@ -257,9 +258,14 @@ export const LatestNewsSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="latest-news-section loading" role="status" aria-live="polite">
-        <div className="news-loading-content">
-          <div className="news-loading-spinner"></div>
-          <p>در حال بارگذاری اخبار...</p>
+        <div className="news-container">
+          <div className="news-header">
+            <SkeletonLoading type="title" height="48px" width="60%" />
+            <div className="mt-4">
+              <SkeletonLoading type="text" lines={2} height="20px" />
+            </div>
+          </div>
+          <NewsSkeleton count={3} />
         </div>
       </section>
     );

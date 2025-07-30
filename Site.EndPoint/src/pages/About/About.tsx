@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import SEO from '../../components/SEO';
 import { Helmet } from 'react-helmet-async';
+import { SkeletonLoading } from '../../components/SkeletonLoading';
 
 // Lazy load sections for better performance
 const AboutHeroSection = lazy(() => import('./Sections/AboutHeroSection'));
@@ -70,7 +71,16 @@ const About: React.FC = () => {
 
       <div className="min-h-screen">
         
-        <Suspense fallback={<div>درحال بارگذاری...</div>}>
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <SkeletonLoading type="title" height="48px" width="300px" />
+              <div className="mt-4">
+                <SkeletonLoading type="text" lines={2} height="20px" />
+              </div>
+            </div>
+          </div>
+        }>
           <AboutHeroSection />
           <AboutMainSection />
           <AboutFeaturesSection />

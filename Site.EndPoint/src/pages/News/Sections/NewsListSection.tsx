@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import ShareModal from '../../../components/ShareModal/ShareModal';
 import NoResults from '../../../components/NoResults/NoResults';
+import { NewsSkeleton } from '../../../components/SkeletonLoading';
 import './NewsListSection.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -55,136 +56,13 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const itemsPerPage = 6;
 
-  // Mock data for development
-  const mockNews: NewsItem[] = [
-    {
-      _id: '1',
-      title: 'افتتاح آزمایشگاه جدید علوم تجربی',
-      description: 'آزمایشگاه مجهز به جدیدترین تجهیزات علمی برای دانش‌آموزان دبیرستان معراج افتتاح شد.',
-      createdAt: '2024-01-15T10:00:00Z',
-      date: '۱۵ دی ۱۴۰۲',
-      image: '/images/news1.jpg',
-      category: 'اخبار مدرسه',
-      author: {
-        userId: '1',
-        fullName: 'مدیریت مدرسه',
-        email: 'admin@merajschool.ir'
-      },
-      views: 1250,
-      likes: 89,
-      likedBy: [],
-      tags: ['آموزشی', 'علمی'],
-      slug: 'opening-new-science-lab'
-    },
-    {
-      _id: '2',
-      title: 'قهرمانی تیم فوتبال در مسابقات منطقه‌ای',
-      description: 'تیم فوتبال دبیرستان معراج با پیروزی در فینال مسابقات منطقه‌ای، عنوان قهرمانی را کسب کرد.',
-      createdAt: '2024-01-14T14:30:00Z',
-      date: '۱۴ دی ۱۴۰۲',
-      image: '/images/news2.jpg',
-      category: 'افتخارات',
-      author: {
-        userId: '2',
-        fullName: 'مربی ورزشی',
-        email: 'sport@merajschool.ir'
-      },
-      views: 2100,
-      likes: 156,
-      likedBy: [],
-      tags: ['ورزشی', 'افتخارات'],
-      slug: 'football-team-championship'
-    },
-    {
-      _id: '3',
-      title: 'برگزاری همایش علمی دانش‌آموزی',
-      description: 'همایش سالانه پروژه‌های علمی دانش‌آموزی با حضور اساتید دانشگاه و دانش‌آموزان برگزار شد.',
-      createdAt: '2024-01-13T09:00:00Z',
-      date: '۱۳ دی ۱۴۰۲',
-      image: '/images/news3.jpg',
-      category: 'همایش‌ها',
-      author: {
-        userId: '3',
-        fullName: 'معاون آموزشی',
-        email: 'education@merajschool.ir'
-      },
-      views: 890,
-      likes: 67,
-      likedBy: [],
-      tags: ['علمی', 'آموزشی'],
-      slug: 'student-science-conference'
-    },
-    {
-      _id: '4',
-      title: 'شروع کلاس‌های تقویتی ریاضی',
-      description: 'کلاس‌های تقویتی ریاضی برای دانش‌آموزان پایه‌های مختلف از هفته آینده آغاز می‌شود.',
-      createdAt: '2024-01-12T11:00:00Z',
-      date: '۱۲ دی ۱۴۰۲',
-      image: '/images/news4.jpg',
-      category: 'کلاس‌های تقویتی',
-      author: {
-        userId: '4',
-        fullName: 'دبیر ریاضی',
-        email: 'math@merajschool.ir'
-      },
-      views: 750,
-      likes: 45,
-      likedBy: [],
-      tags: ['آموزشی', 'ریاضی'],
-      slug: 'math-enrichment-classes'
-    },
-    {
-      _id: '5',
-      title: 'اردوی تفریحی به کوهستان',
-      description: 'اردوی یک روزه دانش‌آموزان به کوهستان برای تقویت روحیه تیمی و نشاط جسمی برگزار شد.',
-      createdAt: '2024-01-11T08:00:00Z',
-      date: '۱۱ دی ۱۴۰۲',
-      image: '/images/news5.jpg',
-      category: 'اردوها',
-      author: {
-        userId: '5',
-        fullName: 'مربی پرورشی',
-        email: 'cultural@merajschool.ir'
-      },
-      views: 1100,
-      likes: 78,
-      likedBy: [],
-      tags: ['اجتماعی', 'تفریحی'],
-      slug: 'mountain-recreational-trip'
-    },
-    {
-      _id: '6',
-      title: 'مسابقه کتابخوانی مدرسه',
-      description: 'مسابقه کتابخوانی با هدف ترویج فرهنگ مطالعه و کتابخوانی در بین دانش‌آموزان برگزار می‌شود.',
-      createdAt: '2024-01-10T15:00:00Z',
-      date: '۱۰ دی ۱۴۰۲',
-      image: '/images/news6.jpg',
-      category: 'مسابقات',
-      author: {
-        userId: '6',
-        fullName: 'کتابدار مدرسه',
-        email: 'library@merajschool.ir'
-      },
-      views: 680,
-      likes: 52,
-      likedBy: [],
-      tags: ['فرهنگی', 'آموزشی'],
-      slug: 'school-reading-competition'
-    }
-  ];
-
-  // Fetch news from API (temporarily disabled for development)
+  // Fetch news from API
   useEffect(() => {
     const fetchNews = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Use mock data for now
-        setNewsItems(mockNews);
-        
-        // TODO: Uncomment when API is ready
-        /*
         const response = await axios.get(`${API_URL}/api/news`, {
           params: {
             category: selectedCategory !== 'همه اخبار' ? selectedCategory : undefined,
@@ -195,14 +73,17 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
         setNewsItems(response.data);
 
         // Check liked news
-        const userIP = await axios.get(`${API_URL}/api/user/ip`);
-        const liked = new Set<string>(
-          response.data
-            .filter((news: NewsItem) => news.likedBy.includes(userIP.data))
-            .map((news: NewsItem) => news._id)
-        );
-        setLikedNews(liked);
-        */
+        try {
+          const userIP = await axios.get(`${API_URL}/api/user/ip`);
+          const liked = new Set<string>(
+            response.data
+              .filter((news: NewsItem) => news.likedBy.includes(userIP.data))
+              .map((news: NewsItem) => news._id)
+          );
+          setLikedNews(liked);
+        } catch (ipError) {
+          console.log('Could not fetch user IP, skipping liked news check');
+        }
         
       } catch (error) {
         handleAxiosError(error);
@@ -213,7 +94,7 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
     };
 
     fetchNews();
-  }, [selectedCategory, sortBy, searchQuery]);
+  }, [selectedCategory, sortBy, searchQuery, handleAxiosError]);
 
   // Filter news based on search query and tags
   const filteredNews = newsItems.filter(item => {
@@ -234,14 +115,12 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
     currentPage * itemsPerPage
   );
 
-  // Handle like (temporarily disabled)
+  // Handle like
   const handleLike = async (id: string) => {
     try {
       const newsItem = newsItems.find(item => item._id === id);
       if (!newsItem) return;
 
-      // TODO: Uncomment when API is ready
-      /*
       const response = await axios.post(`${API_URL}/api/news/${newsItem.slug}/like`);
       setNewsItems(prevNews =>
         prevNews.map(news =>
@@ -249,36 +128,20 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
         )
       );
 
-      const userIP = await axios.get(`${API_URL}/api/user/ip`);
-      setLikedNews(prev => {
-        const newSet = new Set(prev);
-        if (response.data.likedBy.includes(userIP.data)) {
-          newSet.add(id);
-        } else {
-          newSet.delete(id);
-        }
-        return newSet;
-      });
-      */
-
-      // Mock like functionality
-      setNewsItems(prevNews =>
-        prevNews.map(news =>
-          news._id === id 
-            ? { ...news, likes: likedNews.has(id) ? news.likes - 1 : news.likes + 1 }
-            : news
-        )
-      );
-
-      setLikedNews(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(id)) {
-          newSet.delete(id);
-        } else {
-          newSet.add(id);
-        }
-        return newSet;
-      });
+      try {
+        const userIP = await axios.get(`${API_URL}/api/user/ip`);
+        setLikedNews(prev => {
+          const newSet = new Set(prev);
+          if (response.data.likedBy.includes(userIP.data)) {
+            newSet.add(id);
+          } else {
+            newSet.delete(id);
+          }
+          return newSet;
+        });
+      } catch (ipError) {
+        console.log('Could not fetch user IP, skipping liked news update');
+      }
     } catch (error) {
       handleAxiosError(error);
     }
@@ -293,10 +156,11 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
     return (
       <section className="news-list-section">
         <div className="news-list-container">
-          <div className="news-list-loading">
-            <div className="news-loading-spinner"></div>
-            <p>در حال بارگذاری اخبار...</p>
+          <div className="news-list-header">
+            <h2 className="news-list-title">آخرین اخبار</h2>
+            <p className="news-list-subtitle">در حال بارگذاری...</p>
           </div>
+          <NewsSkeleton count={6} />
         </div>
       </section>
     );
@@ -451,8 +315,9 @@ const NewsListSection: React.FC<NewsListSectionProps> = ({
       {/* Share Modal */}
       {showShareModal && selectedNews && (
         <ShareModal
-          news={selectedNews}
+          isOpen={showShareModal}
           onClose={() => setShowShareModal(false)}
+          newsItem={selectedNews}
         />
       )}
     </section>

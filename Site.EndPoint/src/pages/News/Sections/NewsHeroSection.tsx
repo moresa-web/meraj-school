@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Newspaper, Eye, Heart, Share2 } from 'lucide-react';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './NewsHeroSection.css';
 
 interface NewsHeroStats {
@@ -97,9 +98,36 @@ const NewsHeroSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="news-hero-section loading" role="status" aria-live="polite">
-        <div className="loading-content">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری...</p>
+        <div className="news-hero-container">
+          <div className="news-hero-content">
+            <div className="news-hero-icon">
+              <SkeletonLoading type="avatar" width="48px" height="48px" />
+            </div>
+            
+            <div className="mb-6">
+              <SkeletonLoading type="title" height="48px" width="70%" />
+            </div>
+            
+            <div className="mb-8">
+              <SkeletonLoading type="text" lines={2} height="20px" />
+            </div>
+            
+            <div className="news-hero-stats">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="news-hero-stat">
+                  <div className="news-hero-stat-icon">
+                    <SkeletonLoading type="avatar" width="24px" height="24px" />
+                  </div>
+                  <div className="news-hero-stat-number">
+                    <SkeletonLoading type="title" height="32px" width="80px" />
+                  </div>
+                  <div className="news-hero-stat-label">
+                    <SkeletonLoading type="text" width="120px" height="16px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );

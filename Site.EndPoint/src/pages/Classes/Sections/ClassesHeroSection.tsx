@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { BookOpen, Users, Award, Clock } from 'lucide-react';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './ClassesHeroSection.css';
 
 interface ClassesHeroStats {
@@ -128,9 +129,36 @@ const ClassesHeroSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="classes-hero-section loading" role="status" aria-live="polite">
-        <div className="loading-content">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری...</p>
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="classes-hero-icon mb-8">
+              <SkeletonLoading type="avatar" width="64px" height="64px" />
+            </div>
+            
+            <div className="mb-6">
+              <SkeletonLoading type="title" height="48px" width="60%" />
+            </div>
+            
+            <div className="mb-12">
+              <SkeletonLoading type="text" lines={3} height="20px" />
+            </div>
+            
+            <div className="classes-hero-stats">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="classes-hero-stat">
+                  <div className="classes-hero-stat-icon">
+                    <SkeletonLoading type="avatar" width="24px" height="24px" />
+                  </div>
+                  <div className="classes-hero-stat-number">
+                    <SkeletonLoading type="title" height="32px" width="60px" />
+                  </div>
+                  <div className="classes-hero-stat-label">
+                    <SkeletonLoading type="text" width="80px" height="16px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );

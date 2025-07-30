@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import { TestimonialsSkeleton, SkeletonLoading } from '../../../components/SkeletonLoading';
 import './TestimonialsSection.css';
 
 interface Testimonial {
@@ -183,9 +184,14 @@ export const TestimonialsSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="testimonials-section loading" role="status" aria-live="polite">
-        <div className="testimonials-loading-content">
-          <div className="testimonials-loading-spinner"></div>
-          <p>در حال بارگذاری نظرات...</p>
+        <div className="testimonials-container">
+          <div className="testimonials-header">
+            <SkeletonLoading type="title" height="48px" width="60%" />
+            <div className="mt-4">
+              <SkeletonLoading type="text" lines={2} height="20px" />
+            </div>
+          </div>
+          <TestimonialsSkeleton count={3} />
         </div>
       </section>
     );

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
 import { Link } from 'react-router-dom';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './CTASection.css';
 
 interface CTAFeature {
@@ -334,12 +335,30 @@ export const CTASection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="cta-section loading" role="status" aria-live="polite">
-        <div className="cta-loading-content">
-          <div className="cta-loading-spinner"></div>
-          <p>در حال بارگذاری محتوای CTA...</p>
-          {retryCount > 0 && (
-            <p className="cta-retry-info">تلاش {retryCount} از 3</p>
-          )}
+        <div className="cta-container">
+          <div className="cta-content">
+            <SkeletonLoading type="title" height="48px" width="60%" />
+            <div className="mt-6">
+              <SkeletonLoading type="text" lines={3} height="20px" />
+            </div>
+            
+            <div className="cta-buttons mt-8">
+              <SkeletonLoading type="button" width="200px" height="48px" />
+              <SkeletonLoading type="button" width="160px" height="48px" />
+            </div>
+            
+            <div className="cta-features mt-12">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="cta-feature">
+                  <SkeletonLoading type="avatar" width="32px" height="32px" />
+                  <div className="cta-feature-content">
+                    <SkeletonLoading type="title" height="20px" width="120px" />
+                    <SkeletonLoading type="text" width="200px" height="16px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );

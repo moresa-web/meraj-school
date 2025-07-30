@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './HeroSection.css';
 
 const EditableContent = React.lazy(() => import('../../../components/EditableContent/EditableContent'));
@@ -99,7 +100,24 @@ const HeroSection: React.FC = () => {
   if (loading) {
     return (
       <div className="hero-section loading" role="status" aria-live="polite">
-        در حال بارگذاری...
+        <div className="hero-content">
+          <div className="hero-logo">
+            <SkeletonLoading type="image" width="120px" height="120px" />
+          </div>
+          
+          <div className="hero-title">
+            <SkeletonLoading type="title" height="48px" width="60%" />
+          </div>
+          
+          <div className="hero-description">
+            <SkeletonLoading type="text" lines={3} height="20px" />
+          </div>
+          
+          <div className="hero-actions">
+            <SkeletonLoading type="button" width="160px" height="48px" />
+            <SkeletonLoading type="button" width="140px" height="48px" />
+          </div>
+        </div>
       </div>
     );
   }

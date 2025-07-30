@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './FeaturesSection.css';
 
 interface Feature {
@@ -224,9 +225,26 @@ export const FeaturesSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="features-section loading" role="status" aria-live="polite">
-        <div className="loading-content">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری ویژگی‌ها...</p>
+        <div className="features-container">
+          <div className="features-header">
+            <SkeletonLoading type="title" height="48px" width="50%" />
+            <div className="mt-4">
+              <SkeletonLoading type="text" lines={2} height="20px" />
+            </div>
+          </div>
+          <div className="features-grid">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="feature-card">
+                <div className="feature-icon">
+                  <SkeletonLoading type="avatar" width="48px" height="48px" />
+                </div>
+                <div className="feature-content">
+                  <SkeletonLoading type="title" height="24px" width="80%" />
+                  <SkeletonLoading type="text" lines={2} height="16px" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

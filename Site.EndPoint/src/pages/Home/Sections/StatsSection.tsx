@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import EditableContent from '../../../components/EditableContent/EditableContent';
 import CountUp from 'react-countup';
+import { SkeletonLoading } from '../../../components/SkeletonLoading';
 import './StatsSection.css';
 
 interface StatItem {
@@ -258,9 +259,28 @@ export const StatsSection: React.FC = () => {
   if (isLoading) {
     return (
       <section className="stats-section loading" role="status" aria-live="polite">
-        <div className="loading-content">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری آمار...</p>
+        <div className="stats-container">
+          <div className="stats-header">
+            <SkeletonLoading type="title" height="48px" width="50%" />
+            <div className="mt-4">
+              <SkeletonLoading type="text" lines={2} height="20px" />
+            </div>
+          </div>
+          <div className="stats-grid">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="stat-card">
+                <div className="stat-icon">
+                  <SkeletonLoading type="avatar" width="48px" height="48px" />
+                </div>
+                <div className="stat-number">
+                  <SkeletonLoading type="title" height="36px" width="80px" />
+                </div>
+                <div className="stat-text">
+                  <SkeletonLoading type="text" width="120px" height="18px" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

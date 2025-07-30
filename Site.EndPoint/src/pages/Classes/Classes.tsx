@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '../../components/SEO';
 import { toast, ToastContainer } from 'react-toastify';
+import { SkeletonLoading } from '../../components/SkeletonLoading';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Lazy load sections
@@ -9,7 +10,6 @@ const ClassesHeroSection = lazy(() => import('./Sections/ClassesHeroSection'));
 const ClassesSearchSection = lazy(() => import('./Sections/ClassesSearchSection'));
 const ClassesListSection = lazy(() => import('./Sections/ClassesListSection'));
 const ClassesFeaturesSection = lazy(() => import('./Sections/ClassesFeaturesSection'));
-const ClassesScheduleSection = lazy(() => import('./Sections/ClassesScheduleSection'));
 
 const Classes: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -73,8 +73,13 @@ const Classes: React.FC = () => {
         />
         
         <Suspense fallback={
-          <div className="h-screen flex items-center justify-center">
-            <div className="text-white text-xl">در حال بارگذاری...</div>
+          <div className="h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+            <div className="text-center">
+              <SkeletonLoading type="title" height="48px" width="300px" />
+              <div className="mt-4">
+                <SkeletonLoading type="text" lines={2} height="20px" />
+              </div>
+            </div>
           </div>
         }>
           <ClassesHeroSection />
@@ -92,7 +97,6 @@ const Classes: React.FC = () => {
             sortBy={sortBy}
           />
           <ClassesFeaturesSection />
-          <ClassesScheduleSection />
         </Suspense>
       </div>
     </>

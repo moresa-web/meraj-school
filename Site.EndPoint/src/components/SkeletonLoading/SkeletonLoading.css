@@ -1,0 +1,216 @@
+/* Base skeleton styles */
+.skeleton {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-animated {
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-rounded {
+  border-radius: 0.5rem;
+}
+
+/* Animation keyframes */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Text skeleton */
+.skeleton-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-text {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+/* Title skeleton */
+.skeleton-title {
+  background: linear-gradient(90deg, #4b5563 25%, #6b7280 50%, #4b5563 75%);
+  background-size: 200% 100%;
+}
+
+/* Card skeleton */
+.skeleton-card {
+  background: #1f2937;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  border: 1px solid #374151;
+}
+
+.skeleton-card-image {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+.skeleton-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-card-title {
+  background: linear-gradient(90deg, #4b5563 25%, #6b7280 50%, #4b5563 75%);
+  background-size: 200% 100%;
+}
+
+.skeleton-card-text {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+/* List skeleton */
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #1f2937;
+  border-radius: 0.5rem;
+  border: 1px solid #374151;
+}
+
+.skeleton-list-avatar {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-list-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-list-title {
+  background: linear-gradient(90deg, #4b5563 25%, #6b7280 50%, #4b5563 75%);
+  background-size: 200% 100%;
+}
+
+.skeleton-list-text {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+/* Image skeleton */
+.skeleton-image {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  border-radius: 0.5rem;
+}
+
+/* Button skeleton */
+.skeleton-button {
+  background: linear-gradient(90deg, #4b5563 25%, #6b7280 50%, #4b5563 75%);
+  background-size: 200% 100%;
+  border-radius: 0.5rem;
+}
+
+/* Avatar skeleton */
+.skeleton-avatar {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  border-radius: 50%;
+}
+
+/* Table skeleton */
+.skeleton-table {
+  background: #1f2937;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #374151;
+}
+
+.skeleton-table-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #374151;
+}
+
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #374151;
+}
+
+.skeleton-table-cell {
+  background: #1f2937;
+  padding: 0.75rem;
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+/* Form skeleton */
+.skeleton-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.skeleton-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-form-label {
+  background: linear-gradient(90deg, #4b5563 25%, #6b7280 50%, #4b5563 75%);
+  background-size: 200% 100%;
+}
+
+.skeleton-form-input {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+  border-radius: 0.375rem;
+}
+
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .skeleton-card-content {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .skeleton-list-item {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .skeleton-table-header,
+  .skeleton-table-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-table-header,
+  .skeleton-table-row {
+    grid-template-columns: 1fr;
+  }
+} 

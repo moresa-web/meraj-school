@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './News.css';
 import axios from 'axios';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
@@ -7,6 +9,23 @@ import ShareModal from '../../components/ShareModal/ShareModal';
 import SEO from '../../components/SEO';
 import { Helmet } from 'react-helmet-async';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import LoadingState from '../../components/LoadingState';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { 
+  Calendar, 
+  Clock, 
+  Eye, 
+  Heart, 
+  User, 
+  Tag, 
+  Share2, 
+  ArrowLeft,
+  BookOpen,
+  MessageCircle,
+  TrendingUp,
+  CalendarDays
+} from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -68,8 +87,10 @@ const NewsDetail: React.FC = () => {
       const response = await axios.post(`${API_URL}/api/news/${news.slug}/like`);
       setNews(response.data);
       setIsLiked(!isLiked);
+      toast.success(isLiked ? 'پسند شما حذف شد' : 'خبر مورد پسند شما قرار گرفت');
     } catch (error) {
       handleAxiosError(error);
+      toast.error('خطا در ثبت پسند');
     }
   };
 
@@ -77,25 +98,46 @@ const NewsDetail: React.FC = () => {
     setShowShareModal(true);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'همین الان';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه پیش`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت پیش`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} روز پیش`;
+    return formatDate(dateString);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+        <LoadingState />
       </div>
     );
   }
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">{error || 'خبر یافت نشد'}</h2>
-          <button
+          <h2 className="text-2xl font-bold text-red-400 mb-4">{error || 'خبر یافت نشد'}</h2>
+          <Button
             onClick={() => navigate('/news')}
             className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
           >
             بازگشت به لیست اخبار
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -116,7 +158,7 @@ const NewsDetail: React.FC = () => {
     "datePublished": new Date(news.createdAt).toISOString().split('T')[0],
     "author": {
       "@type": "Person",
-      "name": news.author
+      "name": news.author?.fullName || 'دبیرستان معراج'
     },
     "publisher": {
       "@type": "Organization",
@@ -163,91 +205,208 @@ const NewsDetail: React.FC = () => {
           {JSON.stringify(structuredData)}
         </script>
       </Helmet>
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs
-          items={[
-            { label: 'اخبار و اطلاعیه‌ها', path: '/news' },
-            { label: news.title }
-          ]}
+      
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 pt-20">
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
         />
-        <div className="min-h-screen bg-gray-50">
-          {/* Hero Section with Parallax Effect */}
-          <div className="relative h-[70vh] overflow-hidden">
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
-              style={{
-                backgroundImage: `url(${API_URL.replace('/api', '')}${news.image})`,
-                backgroundAttachment: 'fixed'
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
-            </div>
-
-            {/* Content Overlay */}
-            <div className="relative h-full flex items-end">
-              <div className="max-w-7xl mx-auto px-4 w-full pb-16">
-                <div className="max-w-3xl">
-                  <div className="flex items-center gap-4 mb-6">
-                    <span className="px-4 py-2 bg-emerald-500 text-white rounded-full text-sm font-medium">
+        
+        <div className="container mx-auto px-4 py-8">
+          <Breadcrumbs
+            items={[
+              { label: 'اخبار و اطلاعیه‌ها', path: '/news' },
+              { label: news.title }
+            ]}
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* News Image and Title */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <div className="relative">
+                  {news.image ? (
+                    <img 
+                      src={`${API_URL.replace('/api', '')}${news.image}`}
+                      alt={news.title}
+                      className="w-full h-80 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-80 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center rounded-t-lg">
+                      <BookOpen className="w-16 h-16 text-white/80" />
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       {news.category}
                     </span>
-                    <span className="text-white/80 text-sm">{news.date}</span>
-                  </div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                    {news.title}
-                  </h1>
-                  <p className="text-white/90 text-lg mb-8 max-w-2xl">
-                    {news.description}
-                  </p>
-                  <div className="flex items-center gap-6">
-                    {news.author && (
-                      <div className="flex items-center text-white/80">
-                        <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>{news.author.fullName}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center text-white/80">
-                      <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span>{news.views} بازدید</span>
-                    </div>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                      {getTimeAgo(news.createdAt)}
+                    </span>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+                <CardHeader className="bg-gray-800/30">
+                  <CardTitle className="text-3xl font-bold text-white leading-tight">{news.title}</CardTitle>
+                  <p className="text-gray-300 text-lg mt-4">{news.description}</p>
+                </CardHeader>
+              </Card>
 
-          {/* Content Section */}
-          <section className="py-16">
-            <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="p-8 md:p-12">
-                  {/* Content */}
-                  <div className="prose prose-lg max-w-none">
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+              {/* Content */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-white flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-emerald-400" />
+                    متن کامل خبر
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-lg max-w-none prose-invert">
+                    <div className="text-gray-300 leading-relaxed whitespace-pre-line text-justify">
                       {news.content}
-                    </p>
-                  </div>
-
-                  {/* Share and Tags Section */}
-                  <div className="mt-12 pt-8 border-t border-gray-200">
-                    <div className="flex flex-wrap items-center justify-between gap-6 mb-8">
-                      <h3 className="text-lg font-semibold text-gray-800">برچسب‌ها</h3>
-                      <button
-                        onClick={handleShare}
-                        className="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
-                      >
-                        <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        اشتراک‌گذاری
-                      </button>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
 
+              {/* News Statistics */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-white">آمار خبر</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-gray-700/50 rounded-lg">
+                      <Eye className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{news.views}</div>
+                      <div className="text-sm text-gray-400">بازدید</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-700/50 rounded-lg">
+                      <Heart className="w-6 h-6 text-red-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{news.likes}</div>
+                      <div className="text-sm text-gray-400">پسند</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-700/50 rounded-lg">
+                      <MessageCircle className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{news.tags.length}</div>
+                      <div className="text-sm text-gray-400">برچسب</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-700/50 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{news.category}</div>
+                      <div className="text-sm text-gray-400">دسته‌بندی</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* News Information */}
+              <Card className="bg-gray-800/50 border-gray-700 sticky top-24">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-white">اطلاعات خبر</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {news.author && (
+                    <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                      <User className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <div>
+                        <div className="text-sm text-gray-400">نویسنده</div>
+                        <div className="text-white font-medium">{news.author.fullName}</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                    <Calendar className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm text-gray-400">تاریخ انتشار</div>
+                      <div className="text-white font-medium">
+                        {news.date ? formatDate(news.date) : formatDate(news.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                    <Clock className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm text-gray-400">زمان انتشار</div>
+                      <div className="text-white font-medium">
+                        {new Date(news.createdAt).toLocaleTimeString('fa-IR', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                    <Tag className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm text-gray-400">دسته‌بندی</div>
+                      <div className="text-white font-medium">{news.category}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Actions */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-white">عملیات</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button
+                    onClick={handleLike}
+                    className={`w-full h-12 text-lg font-semibold transition-all duration-300 ${
+                      isLiked
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ml-2 ${isLiked ? 'fill-current' : ''}`} />
+                    {isLiked ? 'حذف پسند' : 'پسندیدن'}
+                  </Button>
+                  
+                  <Button
+                    onClick={handleShare}
+                    className="w-full h-12 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300"
+                  >
+                    <Share2 className="w-5 h-5 ml-2" />
+                    اشتراک‌گذاری
+                  </Button>
+                  
+                  <Button
+                    onClick={() => navigate('/news')}
+                    variant="outline"
+                    className="w-full h-12 text-lg font-semibold border-gray-600 text-gray-300 hover:bg-gray-700 transition-all duration-300"
+                  >
+                    <ArrowLeft className="w-5 h-5 ml-2" />
+                    بازگشت به اخبار
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Tags */}
+              {news.tags.length > 0 && (
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold text-white flex items-center gap-2">
+                      <Tag className="w-5 h-5 text-emerald-400" />
+                      برچسب‌ها
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="flex flex-wrap gap-3">
                       {news.tags.map((tag, index) => (
                         <Link
@@ -260,32 +419,19 @@ const NewsDetail: React.FC = () => {
                         </Link>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Back Button */}
-                  <div className="mt-12 flex justify-center">
-                    <button
-                      onClick={() => navigate('/news')}
-                      className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                      <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                      </svg>
-                      بازگشت به لیست اخبار
-                    </button>
-                  </div>
-                </div>
-              </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          </section>
-
-          {/* Share Modal */}
-          <ShareModal
-            isOpen={showShareModal}
-            onClose={() => setShowShareModal(false)}
-            newsItem={news}
-          />
+          </div>
         </div>
+
+        {/* Share Modal */}
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          newsItem={news}
+        />
       </div>
     </>
   );
