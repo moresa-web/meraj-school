@@ -118,7 +118,7 @@ export class ChatService {
 
     // بستن چت
     async closeChat(chatId: string, adminId: string, adminName: string): Promise<IChat> {
-        return await Chat.findByIdAndUpdate(
+        const result = await Chat.findByIdAndUpdate(
             chatId,
             {
                 status: 'closed',
@@ -128,11 +128,15 @@ export class ChatService {
             },
             { new: true }
         );
+        if (!result) {
+            throw new Error('Chat not found');
+        }
+        return result;
     }
 
     // باز کردن مجدد چت
     async reopenChat(chatId: string): Promise<IChat> {
-        return await Chat.findByIdAndUpdate(
+        const result = await Chat.findByIdAndUpdate(
             chatId,
             {
                 status: 'open',
@@ -142,11 +146,15 @@ export class ChatService {
             },
             { new: true }
         );
+        if (!result) {
+            throw new Error('Chat not found');
+        }
+        return result;
     }
 
     // حذف پیام
     async deleteMessage(messageId: string, deletedBy: string): Promise<IChatMessage> {
-        return await ChatMessage.findByIdAndUpdate(
+        const result = await ChatMessage.findByIdAndUpdate(
             messageId,
             {
                 isDeleted: true,
@@ -155,6 +163,10 @@ export class ChatService {
             },
             { new: true }
         );
+        if (!result) {
+            throw new Error('Message not found');
+        }
+        return result;
     }
 }
 

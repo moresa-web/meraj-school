@@ -208,8 +208,8 @@ const Header: React.FC = () => {
             </Link>
             {user?.role === 'admin' ? (
               <Link
-                to="http://localhost:3001"
-                onClick={() => handleNavigation('http://localhost:3001')}
+                to="https://admin.merajfutureschool.ir"
+                onClick={() => handleNavigation('https://admin.merajfutureschool.ir')}
                 className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-emerald-500/25 border border-emerald-500/20"
               >
                 {t('nav.dashboard')}
@@ -396,7 +396,7 @@ const Header: React.FC = () => {
                 
                 {user?.role === 'admin' && (
                   <Link
-                    to="http://localhost:3001"
+                    to="https://admin.merajfutureschool.ir"
                     onClick={closeMenu}
                     className="block w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 text-center shadow-lg hover:shadow-blue-500/25 text-lg font-medium border border-blue-500/20 hover:scale-105 group"
                   >

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ChatController } from '../controllers/chat.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { rateLimitMiddleware } from '../middleware/rateLimitMiddleware';
 
 const router = Router();
 const chatController = new ChatController();
@@ -9,7 +10,7 @@ const chatController = new ChatController();
 router.get('/list/:userId', chatController.getUserChats.bind(chatController));
 router.get('/messages/:chatId', chatController.getChatMessages.bind(chatController));
 router.post('/create', chatController.createChat.bind(chatController));
-router.post('/send', chatController.sendMessage.bind(chatController));
+router.post('/send', rateLimitMiddleware, chatController.sendMessage.bind(chatController));
 
 // مسیرهای مربوط به چت (با احراز هویت)
 router.post('/', authMiddleware, chatController.createChat.bind(chatController));

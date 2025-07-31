@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   resolve: {
     alias: {
@@ -11,7 +11,24 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 5173,
     host: true,
   },
-}) 
+  build: {
+    outDir: 'dist',
+    sourcemap: mode === 'development',
+    minify: mode === 'production',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['lucide-react', 'framer-motion'],
+        },
+      },
+    },
+  },
+  define: {
+    __DEV__: mode === 'development',
+  },
+})) 

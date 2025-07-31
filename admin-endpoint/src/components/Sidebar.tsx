@@ -1,4 +1,4 @@
-import { Users, Newspaper, BookOpen, Sitemap } from 'lucide-react';
+import { Users, Newspaper, BookOpen, Map } from 'lucide-react';
 
 const menuItems = [
   {
@@ -20,9 +20,9 @@ const menuItems = [
         icon: BookOpen
       },
       {
-        title: 'Sitemap',
-        href: '/dashboard/sitemap',
-        icon: Sitemap
+            title: 'Sitemap',
+    href: '/dashboard/sitemap',
+    icon: Map
       }
     ]
   },

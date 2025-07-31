@@ -86,7 +86,7 @@ const createSampleNews = async () => {
         
         console.log(`Created news: ${news.title}`);
       } catch (error) {
-        console.error(`Error creating news "${news.title}":`, error.response?.data || error.message);
+        console.error(`Error creating news "${news.title}":`, (error as any).response?.data || (error as any).message);
       }
     }
     

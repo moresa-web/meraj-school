@@ -1,4 +1,46 @@
 {
+  "name": "meraj-school",
+  "version": "1.0.0",
+  "description": "Meraj School Project - Complete School Management System",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install && cd Api.EndPoint && npm install && cd ../admin-endpoint && npm install && cd ../Site.EndPoint && npm install",
+    "build:all": "cd Api.EndPoint && npm run build:prod && cd ../admin-endpoint && npm run build:prod && cd ../Site.EndPoint && npm run build:prod",
+    "start:all": "pm2 start ecosystem.config.js",
+    "stop:all": "pm2 stop all",
+    "restart:all": "pm2 restart all",
+    "reload:all": "pm2 reload all",
+    "logs:all": "pm2 logs",
+    "monit": "pm2 monit",
+    "deploy": "powershell -ExecutionPolicy Bypass -File deploy.ps1",
+    "deploy:build": "powershell -ExecutionPolicy Bypass -File deploy.ps1 -BuildOnly",
+    "deploy:start": "powershell -ExecutionPolicy Bypass -File deploy.ps1 -StartOnly",
+    "clean": "cd Api.EndPoint && npm run clean && cd ../Site.EndPoint && npm run clean",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "school",
+    "management",
+    "education",
+    "react",
+    "nextjs",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Meraj School Team",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "your-repository-url"
+  },
+  "bugs": {
+    "url": "your-repository-url/issues"
+  },
+  "homepage": "https://merajfutureschool.ir",
   "dependencies": {
     "mongodb": "^6.16.0",
     "socket.io-client": "^4.8.1"

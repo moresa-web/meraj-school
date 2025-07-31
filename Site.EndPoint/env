@@ -1,0 +1,37 @@
+# Production Environment Variables for Main Site
+VITE_NODE_ENV=production
+
+# API Configuration
+VITE_API_URL=https://api.merajfutureschool.ir
+
+# Site Configuration
+VITE_SITE_URL=https://merajfutureschool.ir
+VITE_ADMIN_URL=https://admin.merajfutureschool.ir
+
+# SEO Configuration
+VITE_DEFAULT_TITLE=دبیرستان پسرانه معراج | دوره اول
+VITE_DEFAULT_DESCRIPTION=دبیرستان پسرانه معراج، مدرسه‌ای دولتی در مشهد با امکانات پیشرفته آموزشی، کلاس‌های تقویتی، ثبت‌نام آنلاین و سیستم مدیریت هوشمند برای دانش‌آموزان و والدین.
+VITE_DEFAULT_KEYWORDS=دبیرستان پسرانه معراج, مدرسه دولتی مشهد, کلاس تقویتی, ثبت‌نام آنلاین, اخبار مدرسه, مشهد, آموزش
+
+# Page Specific SEO
+VITE_ABOUT_TITLE=درباره ما - دبیرستان پسرانه معراج
+VITE_ABOUT_DESCRIPTION=درباره دبیرستان پسرانه معراج، تاریخچه، اهداف آموزشی و امکانات مدرسه
+VITE_CONTACT_TITLE=تماس با ما - دبیرستان پسرانه معراج
+VITE_CONTACT_DESCRIPTION=اطلاعات تماس دبیرستان پسرانه معراج، آدرس، شماره تلفن و فرم تماس
+
+# Image Configuration
+VITE_OG_IMAGE_PATH=/images/logo.png
+VITE_FAVICON_PATH=/favicon.ico
+
+# Analytics Configuration (if using)
+VITE_GA_TRACKING_ID=your-ga-tracking-id
+VITE_GTM_ID=your-gtm-id
+
+# Chat Configuration
+VITE_CHAT_ENABLED=true
+VITE_CHAT_API_URL=https://api.merajfutureschool.ir/api/chat
+
+# Feature Flags
+VITE_REGISTRATION_ENABLED=true
+VITE_NEWSLETTER_ENABLED=true
+VITE_SOCIAL_SHARE_ENABLED=true 

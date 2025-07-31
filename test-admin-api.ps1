@@ -7,7 +7,7 @@ $loginBody = @{
 } | ConvertTo-Json
 
 Write-Host "Step 1: Logging in..." -ForegroundColor Green
-$loginResponse = Invoke-WebRequest -Uri "http://localhost:3001/api/auth/login" -Method POST -Body $loginBody -ContentType "application/json"
+$loginResponse = Invoke-WebRequest -Uri "http://localhost:3004/api/auth/login" -Method POST -Body $loginBody -ContentType "application/json"
 
 Write-Host "Login response status: $($loginResponse.StatusCode)" -ForegroundColor Yellow
 Write-Host "Login response content: $($loginResponse.Content)" -ForegroundColor Yellow
@@ -35,7 +35,7 @@ if ($cookies) {
 
 # Test classes API
 try {
-    $classesResponse = Invoke-WebRequest -Uri "http://localhost:3001/api/classes" -Method GET -WebSession $session
+    $classesResponse = Invoke-WebRequest -Uri "http://localhost:3004/api/classes" -Method GET -WebSession $session
     Write-Host "Classes API response status: $($classesResponse.StatusCode)" -ForegroundColor Yellow
     Write-Host "Classes API response content: $($classesResponse.Content)" -ForegroundColor Yellow
 } catch {

@@ -15,7 +15,7 @@ export class SchoolInfoService {
     }
 
     // دریافت اطلاعات مدرسه
-    public async getSchoolInfo(): Promise<SchoolInfo> {
+    public async getSchoolInfo(): Promise<any> {
         try {
             const schoolInfo = await SchoolInfo.findOne();
             if (!schoolInfo) {
@@ -28,7 +28,7 @@ export class SchoolInfoService {
     }
 
     // دریافت بهترین کلاس‌های تقویتی
-    public async getBestReinforcementClasses(userId: string): Promise<Class[]> {
+    public async getBestReinforcementClasses(userId: string): Promise<any[]> {
         try {
             // دریافت کلاس‌های تقویتی با بالاترین امتیاز
             const classes = await Class.find({
@@ -49,7 +49,7 @@ export class SchoolInfoService {
     }
 
     // جستجوی کلاس بر اساس نیاز کاربر
-    public async findSuitableClass(userId: string, subject: string, level: string): Promise<Class | null> {
+    public async findSuitableClass(userId: string, subject: string, level: string): Promise<any | null> {
         try {
             const suitableClass = await Class.findOne({
                 subject,

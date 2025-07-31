@@ -44,12 +44,17 @@ const limiter = rateLimit({
 app.use(helmet());
 
 // تنظیمات CORS
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:5173',
-    process.env.FRONTEND_URL
-].filter(Boolean);
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [
+      'https://merajfutureschool.ir',
+      'https://admin.merajfutureschool.ir',
+      'https://www.merajfutureschool.ir'
+    ]
+  : [
+      'http://localhost:3004',
+      'http://localhost:5173',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
 
 app.use(cors({
     origin: function(origin, callback) {
@@ -70,7 +75,7 @@ app.use(morgan('dev'));
 
 // سرو فایل‌های آپلود شده
 const uploadPath = process.env.NODE_ENV === 'production'
-  ? 'C:\\inetpub\\wwwroot\\moresa\\mohammadrezasardashti\\site\\uploads'
+  ? path.join(process.cwd(), 'uploads')
   : path.join(__dirname, '../uploads');
 
 // اطمینان از وجود پوشه آپلود

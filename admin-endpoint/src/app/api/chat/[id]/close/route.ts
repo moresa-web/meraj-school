@@ -6,8 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -22,7 +23,7 @@ export async function POST(
     const body = await request.json();
 
     const response = await axios.post(
-      `${API_URL}/api/chat/${params.id}/close`,
+      `${API_URL}/api/chat/${id}/close`,
       body,
       {
         headers: {

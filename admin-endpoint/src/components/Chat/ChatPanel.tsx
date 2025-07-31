@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSend, FiUser, FiClock, FiCheck, FiCheckCircle, FiMessageSquare, FiX, FiRefreshCw } from 'react-icons/fi';
+import { FiSend, FiUser, FiClock, FiCheck, FiCheckCircle, FiMessageSquare } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -336,7 +336,7 @@ const ChatPanel: React.FC = () => {
                                         onClick={() => setSelectedChat(null)}
                                         className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                     >
-                                        <FiX className="h-5 w-5 text-gray-500" />
+                                        <FiCheckCircle className="h-5 w-5 text-gray-500" />
                                     </button>
                                     <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                                         <FiUser className="text-emerald-600" />
@@ -360,12 +360,12 @@ const ChatPanel: React.FC = () => {
                                     >
                                         {selectedChat.status === 'open' ? (
                                             <>
-                                                <FiX className="ml-1" />
+                                                <FiCheckCircle className="ml-1" />
                                                 <span className="hidden sm:inline">بستن چت</span>
                                             </>
                                         ) : (
                                             <>
-                                                <FiRefreshCw className="ml-1" />
+                                                <FiCheckCircle className="ml-1" />
                                                 <span className="hidden sm:inline">باز کردن چت</span>
                                             </>
                                         )}

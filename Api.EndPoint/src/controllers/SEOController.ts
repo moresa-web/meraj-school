@@ -249,7 +249,7 @@ export const updateSEO = async (req: Request, res: Response) => {
     if (title !== undefined) seo.title = title;
     if (description !== undefined) seo.description = description;
     if (keywords !== undefined) {
-      seo.keywords = Array.isArray(keywords) ? keywords : keywords.split(',').map(k => k.trim()).filter(Boolean);
+      seo.keywords = Array.isArray(keywords) ? keywords : keywords.split(',').map((k: any) => k.trim()).filter(Boolean);
     }
     if (image !== undefined) seo.image = image;
     if (siteUrl !== undefined) seo.siteUrl = siteUrl;
@@ -278,7 +278,7 @@ export const updateSEO = async (req: Request, res: Response) => {
     if (defaultTitle !== undefined) seo.defaultTitle = defaultTitle;
     if (defaultDescription !== undefined) seo.defaultDescription = defaultDescription;
     if (defaultKeywords !== undefined) {
-      seo.defaultKeywords = Array.isArray(defaultKeywords) ? defaultKeywords : defaultKeywords.split(',').map(k => k.trim()).filter(Boolean);
+      seo.defaultKeywords = Array.isArray(defaultKeywords) ? defaultKeywords : defaultKeywords.split(',').map((k: any) => k.trim()).filter(Boolean);
     }
     if (ogImage !== undefined) seo.ogImage = ogImage;
     if (twitterImage !== undefined) seo.twitterImage = twitterImage;
@@ -295,10 +295,10 @@ export const updateSEO = async (req: Request, res: Response) => {
     if (numberOfTeachers !== undefined) seo.numberOfTeachers = numberOfTeachers;
     if (slogan !== undefined) seo.slogan = slogan;
     if (awards !== undefined) {
-      seo.awards = Array.isArray(awards) ? awards : awards.split(',').map(a => a.trim()).filter(Boolean);
+      seo.awards = Array.isArray(awards) ? awards : awards.split(',').map((a: any) => a.trim()).filter(Boolean);
     }
     if (serviceTypes !== undefined) {
-      seo.serviceTypes = Array.isArray(serviceTypes) ? serviceTypes : serviceTypes.split(',').map(s => s.trim()).filter(Boolean);
+      seo.serviceTypes = Array.isArray(serviceTypes) ? serviceTypes : serviceTypes.split(',').map((s: any) => s.trim()).filter(Boolean);
     }
     if (curriculum !== undefined) seo.curriculum = curriculum;
     if (educationalLevel !== undefined) seo.educationalLevel = educationalLevel;

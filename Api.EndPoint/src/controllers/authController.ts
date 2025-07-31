@@ -106,7 +106,7 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { 
         _id: user._id, 
-        userId: user._id.toString(), 
+        userId: (user._id as any).toString(), 
         username: user.username, 
         email: user.email, 
         fullName: user.fullName,
@@ -172,7 +172,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { 
         _id: user._id, 
-        userId: user._id.toString(), 
+        userId: (user._id as any).toString(), 
         username: user.username, 
         email: user.email, 
         fullName: user.fullName,

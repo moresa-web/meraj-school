@@ -42,7 +42,7 @@ export const upload = multer({
 
 export const uploadImage = async (req: Request, res: Response) => {
   try {
-    if (!isAdmin(req)) {
+    if (!isAdmin(req, res, () => {})) {
       return res.status(403).json({ message: 'شما دسترسی لازم را ندارید' });
     }
 
