@@ -10,6 +10,7 @@
     "start:prod": "next start -p 3004",
     "lint": "next lint",
     "pm2:start": "pm2 start ecosystem.config.js --only meraj-admin",
+    "pm2:start:prod": "pm2 start ecosystem.config.js --only meraj-admin --env production",
     "pm2:stop": "pm2 stop meraj-admin",
     "pm2:restart": "pm2 restart meraj-admin",
     "pm2:reload": "pm2 reload meraj-admin",

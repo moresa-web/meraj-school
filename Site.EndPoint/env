@@ -35,3 +35,6 @@ VITE_CHAT_API_URL=https://api.merajfutureschool.ir/api/chat
 VITE_REGISTRATION_ENABLED=true
 VITE_NEWSLETTER_ENABLED=true
 VITE_SOCIAL_SHARE_ENABLED=true 
+
+# Production Environment Variables for Main Site
+VITE_NODE_ENV=production

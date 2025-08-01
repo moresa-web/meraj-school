@@ -13,6 +13,7 @@
     "logs:all": "pm2 logs",
     "monit": "pm2 monit",
     "deploy": "powershell -ExecutionPolicy Bypass -File deploy.ps1",
+    "deploy:prod": "npm run build:all && pm2 start ecosystem.config.js --env production",
     "deploy:build": "powershell -ExecutionPolicy Bypass -File deploy.ps1 -BuildOnly",
     "deploy:start": "powershell -ExecutionPolicy Bypass -File deploy.ps1 -StartOnly",
     "clean": "cd Api.EndPoint && npm run clean && cd ../Site.EndPoint && npm run clean",

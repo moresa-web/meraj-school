@@ -4,6 +4,8 @@
 # Environment files
 **/.env
 **/.env.local
+**/env.production
+**/env.example
 
 # Build directories
 **/dist/

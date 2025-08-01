@@ -21,6 +21,7 @@
     "add:content": "ts-node src/scripts/addMissingContent.ts",
     "update:seo": "ts-node src/scripts/updateSEO.ts",
     "pm2:start": "pm2 start ecosystem.config.js --only meraj-api",
+    "pm2:start:prod": "pm2 start ecosystem.config.js --only meraj-api --env production",
     "pm2:stop": "pm2 stop meraj-api",
     "pm2:restart": "pm2 restart meraj-api",
     "pm2:reload": "pm2 reload meraj-api",
