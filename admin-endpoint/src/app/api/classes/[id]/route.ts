@@ -6,8 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -19,7 +20,7 @@ export async function GET(
       );
     }
 
-    const response = await axios.get(`${API_URL}/api/classes/${params.id}`, {
+    const response = await axios.get(`${API_URL}/api/classes/${resolvedParams.id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -48,8 +49,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -77,7 +79,7 @@ export async function PUT(
       headers['Content-Type'] = 'multipart/form-data';
     }
 
-    const response = await axios.put(`${API_URL}/api/classes/${params.id}`, axiosData, {
+    const response = await axios.put(`${API_URL}/api/classes/${resolvedParams.id}`, axiosData, {
       headers
     });
 
@@ -105,8 +107,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -118,7 +121,7 @@ export async function DELETE(
       );
     }
 
-    const response = await axios.delete(`${API_URL}/api/classes/${params.id}`, {
+    const response = await axios.delete(`${API_URL}/api/classes/${resolvedParams.id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

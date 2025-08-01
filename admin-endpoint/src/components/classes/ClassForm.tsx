@@ -47,6 +47,7 @@ export default function ClassForm({ initialData = {}, onSubmit, loading, submitL
     level: 'مقدماتی',
     category: '',
     isActive: true,
+    image: '',
   });
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');

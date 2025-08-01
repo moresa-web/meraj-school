@@ -246,10 +246,10 @@ export default function SEOSettingsPage() {
     try {
       const seoData = {
         ...formData,
-        keywords: formData.keywords.map(k => k.trim()).filter(Boolean),
-        defaultKeywords: formData.defaultKeywords.map(k => k.trim()).filter(Boolean),
-        awards: formData.awards.map(a => a.trim()).filter(Boolean),
-        serviceTypes: formData.serviceTypes.map(s => s.trim()).filter(Boolean)
+        keywords: formData.keywords?.map(k => k.trim()).filter(Boolean) || [],
+        defaultKeywords: formData.defaultKeywords?.map(k => k.trim()).filter(Boolean) || [],
+        awards: formData.awards?.map(a => a.trim()).filter(Boolean) || [],
+        serviceTypes: formData.serviceTypes?.map(s => s.trim()).filter(Boolean) || []
       };
       
       if (seoList[0]?._id) {

@@ -6,8 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -20,7 +21,7 @@ export async function GET(
     }
 
     const response = await axios.get(
-      `${API_URL}/api/newsletter/${params.id}`,
+      `${API_URL}/api/newsletter/${resolvedParams.id}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -47,8 +48,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -63,7 +65,7 @@ export async function PUT(
     const body = await request.json();
 
     const response = await axios.put(
-      `${API_URL}/api/newsletter/${params.id}`,
+      `${API_URL}/api/newsletter/${resolvedParams.id}`,
       body,
       {
         headers: {
@@ -92,8 +94,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -106,7 +109,7 @@ export async function DELETE(
     }
 
     const response = await axios.delete(
-      `${API_URL}/api/newsletter/${params.id}`,
+      `${API_URL}/api/newsletter/${resolvedParams.id}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`

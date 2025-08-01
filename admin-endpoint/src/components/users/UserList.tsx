@@ -13,12 +13,10 @@ export default function UserList({ users, onEdit, onDelete }: UserListProps) {
   const [roleFilter, setRoleFilter] = useState('');
 
   const filteredUsers = users.filter((user) => {
-    const name = user.name || '';
     const fullName = user.fullName || '';
     const email = user.email || '';
     const phone = user.phone || '';
     const matchesSearch =
-      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       phone.toLowerCase().includes(searchTerm.toLowerCase());
@@ -72,7 +70,7 @@ export default function UserList({ users, onEdit, onDelete }: UserListProps) {
               filteredUsers.map((user) => (
                 <tr key={(user.id || user._id)?.toString() || ''}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.fullName || user.name || '---'}
+                    {user.fullName || '---'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.email || '---'}

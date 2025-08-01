@@ -6,7 +6,7 @@ const API_URL = process.env.API_URL;
 // به‌روزرسانی قالب
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -20,9 +20,10 @@ export async function PUT(
     }
 
     const body = await request.json();
+    const resolvedParams = await params;
 
     const response = await fetch(
-      `${API_URL}/api/email-templates/${params.id}`,
+      `${API_URL}/api/email-templates/${resolvedParams.id}`,
       {
         method: 'PUT',
         headers: {
@@ -50,7 +51,7 @@ export async function PUT(
 // حذف قالب
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -63,7 +64,8 @@ export async function DELETE(
       );
     }
 
-    const response = await fetch(`${API_URL}/api/email-templates/${params.id}`, {
+    const resolvedParams = await params;
+    const response = await fetch(`${API_URL}/api/email-templates/${resolvedParams.id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +89,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -101,7 +103,8 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const templateId = context.params.id;
+    const resolvedParams = await params;
+    const templateId = resolvedParams.id;
 
     if (!templateId) {
       return NextResponse.json(

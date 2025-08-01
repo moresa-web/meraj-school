@@ -20,6 +20,7 @@ export default function NewsletterForm({ newsletterId, initialData }: Newsletter
     title: '',
     subject: '',
     content: '',
+    sent: false,
   });
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function NewsletterForm({ newsletterId, initialData }: Newsletter
         title: initialData.title || '',
         subject: initialData.subject || '',
         content: initialData.content || '',
+        sent: initialData.sent || false,
       });
     }
   }, [initialData]);

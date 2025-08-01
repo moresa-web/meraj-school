@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
-import { fa } from "date-fns/locale"
+// import { fa } from "date-fns/locale" // Persian locale not available in date-fns
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -29,7 +29,7 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
           )}
         >
           <CalendarIcon className="ml-2 h-4 w-4" />
-          {date ? format(date, "PPP", { locale: fa }) : <span>انتخاب تاریخ</span>}
+          {date ? format(date, "PPP") : <span>انتخاب تاریخ</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

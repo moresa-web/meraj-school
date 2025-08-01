@@ -2,15 +2,16 @@ module.exports = {
   apps: [
     {
       name: 'meraj-api',
-      script: './Api.EndPoint/dist/app.js',
-      cwd: './Api.EndPoint',
+      script: 'ts-node',
+      args: 'src/app.ts',
+      cwd: './api',
       instances: 'max',
       exec_mode: 'cluster',
       env: {
         NODE_ENV: 'production',
         PORT: 5000
       },
-      env_file: './Api.EndPoint/env.production',
+      env_file: './env',
       error_file: './logs/api-error.log',
       out_file: './logs/api-out.log',
       log_file: './logs/api-combined.log',
@@ -27,16 +28,16 @@ module.exports = {
     },
     {
       name: 'meraj-admin',
-      script: 'npm',
-      args: 'start',
-      cwd: './admin-endpoint',
-      instances: 'max',
-      exec_mode: 'cluster',
+      script: 'node',
+      args: 'start-admin.js',
+      cwd: './admin',
+      instances: 1,
+      exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
         PORT: 3004
       },
-      env_file: './admin-endpoint/env.production',
+      env_file: './env',
       error_file: './logs/admin-error.log',
       out_file: './logs/admin-out.log',
       log_file: './logs/admin-combined.log',

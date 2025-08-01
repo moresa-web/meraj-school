@@ -6,8 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     const response = await axios.post(
-      `${API_URL}/api/newsletter/${params.id}/send`,
+      `${API_URL}/api/newsletter/${resolvedParams.id}/send`,
       {},
       {
         headers: {

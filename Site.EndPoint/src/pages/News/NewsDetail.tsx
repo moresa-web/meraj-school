@@ -271,7 +271,7 @@ const NewsDetail: React.FC = () => {
           <Breadcrumbs
             items={[
               { label: 'اخبار و اطلاعیه‌ها', path: '/news' },
-              { label: news.title }
+              { label: news.title, path: `/news/${news._id}` }
             ]}
           />
           

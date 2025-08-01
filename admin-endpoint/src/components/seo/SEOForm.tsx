@@ -17,25 +17,43 @@ export default function SEOForm({ seoId, initialData }: SEOFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    page: '',
     title: '',
     description: '',
     keywords: [] as string[],
+    image: '',
+    siteUrl: '',
+    schoolName: '',
+    address: '',
+    phone: '',
+    email: '',
+    socialMedia: {
+      instagram: '',
+      twitter: '',
+      telegram: '',
+      linkedin: '',
+    },
     ogImage: '',
-    ogTitle: '',
-    ogDescription: '',
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        page: initialData.page || '',
         title: initialData.title || '',
         description: initialData.description || '',
         keywords: initialData.keywords || [],
+        image: initialData.image || '',
+        siteUrl: initialData.siteUrl || '',
+        schoolName: initialData.schoolName || '',
+        address: initialData.address || '',
+        phone: initialData.phone || '',
+        email: initialData.email || '',
+        socialMedia: {
+          instagram: initialData.socialMedia?.instagram || '',
+          twitter: initialData.socialMedia?.twitter || '',
+          telegram: initialData.socialMedia?.telegram || '',
+          linkedin: initialData.socialMedia?.linkedin || '',
+        },
         ogImage: initialData.ogImage || '',
-        ogTitle: initialData.ogTitle || '',
-        ogDescription: initialData.ogDescription || '',
       });
     }
   }, [initialData]);
@@ -69,19 +87,6 @@ export default function SEOForm({ seoId, initialData }: SEOFormProps) {
       )}
 
       <div className="grid gap-6">
-        <div>
-          <label htmlFor="page" className="block text-sm font-medium text-gray-700 mb-1">
-            صفحه
-          </label>
-          <input
-            type="text"
-            id="page"
-            value={formData.page}
-            onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-            required
-          />
-        </div>
 
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
@@ -145,30 +150,162 @@ export default function SEOForm({ seoId, initialData }: SEOFormProps) {
         </div>
 
         <div>
-          <label htmlFor="ogTitle" className="block text-sm font-medium text-gray-700 mb-1">
-            عنوان Open Graph
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+            تصویر اصلی
           </label>
           <input
             type="text"
-            id="ogTitle"
-            value={formData.ogTitle}
-            onChange={(e) => setFormData({ ...formData, ogTitle: e.target.value })}
+            id="image"
+            value={formData.image}
+            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="آدرس تصویر"
           />
         </div>
 
         <div>
-          <label htmlFor="ogDescription" className="block text-sm font-medium text-gray-700 mb-1">
-            توضیحات Open Graph
+          <label htmlFor="siteUrl" className="block text-sm font-medium text-gray-700 mb-1">
+            آدرس سایت
           </label>
-          <textarea
-            id="ogDescription"
-            value={formData.ogDescription}
-            onChange={(e) => setFormData({ ...formData, ogDescription: e.target.value })}
-            rows={3}
+          <input
+            type="url"
+            id="siteUrl"
+            value={formData.siteUrl}
+            onChange={(e) => setFormData({ ...formData, siteUrl: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="https://example.com"
+            required
           />
         </div>
+
+        <div>
+          <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700 mb-1">
+            نام مدرسه
+          </label>
+          <input
+            type="text"
+            id="schoolName"
+            value={formData.schoolName}
+            onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            آدرس
+          </label>
+          <textarea
+            id="address"
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            rows={2}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            شماره تلفن
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            ایمیل
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">شبکه‌های اجتماعی</h3>
+          
+          <div>
+            <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+              اینستاگرام
+            </label>
+            <input
+              type="url"
+              id="instagram"
+              value={formData.socialMedia.instagram}
+              onChange={(e) => setFormData({
+                ...formData,
+                socialMedia: { ...formData.socialMedia, instagram: e.target.value }
+              })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="https://instagram.com/username"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">
+              توییتر
+            </label>
+            <input
+              type="url"
+              id="twitter"
+              value={formData.socialMedia.twitter}
+              onChange={(e) => setFormData({
+                ...formData,
+                socialMedia: { ...formData.socialMedia, twitter: e.target.value }
+              })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="https://twitter.com/username"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="telegram" className="block text-sm font-medium text-gray-700 mb-1">
+              تلگرام
+            </label>
+            <input
+              type="url"
+              id="telegram"
+              value={formData.socialMedia.telegram}
+              onChange={(e) => setFormData({
+                ...formData,
+                socialMedia: { ...formData.socialMedia, telegram: e.target.value }
+              })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="https://t.me/username"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">
+              لینکدین
+            </label>
+            <input
+              type="url"
+              id="linkedin"
+              value={formData.socialMedia.linkedin}
+              onChange={(e) => setFormData({
+                ...formData,
+                socialMedia: { ...formData.socialMedia, linkedin: e.target.value }
+              })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="https://linkedin.com/in/username"
+            />
+          </div>
+        </div>
+
       </div>
 
       <div className="flex justify-end gap-4">

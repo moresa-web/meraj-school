@@ -11,7 +11,7 @@ import { useClasses } from '@/hooks/useClasses';
 import { AcademicCapIcon, UserCircleIcon, PhotoIcon, TagIcon, CalendarIcon, CurrencyDollarIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import jalaali from 'jalaali-js';
 import { toast } from 'react-hot-toast';
-import { FiUpload, FiX } from 'react-icons/fi';
+import { Upload, X } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 

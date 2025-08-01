@@ -5,7 +5,8 @@ import { cookies } from 'next/headers';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 // دریافت یک خبر خاص
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -17,7 +18,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       );
     }
 
-    const response = await axios.get(`${API_URL}/api/news/${params.id}`, {
+    const response = await axios.get(`${API_URL}/api/news/${resolvedParams.id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -44,7 +45,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // ویرایش خبر
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -74,7 +76,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       headers['Content-Type'] = 'multipart/form-data';
     }
 
-    const response = await axios.put(`${API_URL}/api/news/${params.id}`, axiosData, {
+    const response = await axios.put(`${API_URL}/api/news/${resolvedParams.id}`, axiosData, {
       headers
     });
 
@@ -100,7 +102,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // حذف خبر
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -112,7 +115,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       );
     }
 
-    const response = await axios.delete(`${API_URL}/api/news/${params.id}`, {
+    const response = await axios.delete(`${API_URL}/api/news/${resolvedParams.id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

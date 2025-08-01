@@ -2,11 +2,13 @@ import React from 'react';
 import EditNewsClient from './EditNewsClient';
 
 interface EditNewsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  
+  }>;
 }
 
-export default function EditNewsPage({ params }: EditNewsPageProps) {
-  return <EditNewsClient id={params.id} />;
+export default async function EditNewsPage({ params }: EditNewsPageProps) {
+  const resolvedParams = await params;
+  return <EditNewsClient id={resolvedParams.id} />;
 } 

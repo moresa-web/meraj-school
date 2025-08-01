@@ -6,8 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params;
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
@@ -20,7 +21,7 @@ export async function PATCH(
     }
 
     const response = await axios.patch(
-      `${API_URL}/api/newsletter/subscribers/${params.id}/deactivate`,
+      `${API_URL}/api/newsletter/subscribers/${resolvedParams.id}/deactivate`,
       {},
       {
         headers: {

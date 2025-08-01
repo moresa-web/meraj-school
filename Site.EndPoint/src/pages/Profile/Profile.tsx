@@ -20,7 +20,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        fullName: user.fullName || '',
+        fullName: user.username || '',
         studentPhone: user.studentPhone || '',
         parentPhone: user.parentPhone || '',
         grade: user.grade || ''

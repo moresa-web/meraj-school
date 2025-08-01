@@ -208,7 +208,7 @@ const ClassDetail: React.FC = () => {
           <Breadcrumbs
             items={[
               { label: 'کلاس‌های تقویتی', path: '/classes' },
-              { label: classData.title }
+              { label: classData.title, path: `/classes/${classData._id}` }
             ]
           } />
           

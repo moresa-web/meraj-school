@@ -6,12 +6,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
-    const chatId = await params.id;
+    const resolvedParams = await params;
+    const chatId = resolvedParams.id;
 
     if (!token) {
       return NextResponse.json(
@@ -55,12 +56,13 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
-    const chatId = await params.id;
+    const resolvedParams = await params;
+    const chatId = resolvedParams.id;
 
     if (!token) {
       return NextResponse.json(

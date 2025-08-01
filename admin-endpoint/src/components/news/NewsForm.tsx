@@ -42,7 +42,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         content: initialData.content,
         category: initialData.category,
         description: initialData.description || '',
-        author: initialData.author || '',
+        author: typeof initialData.author === 'string' ? initialData.author : initialData.author?.fullName || '',
         tags: initialData.tags || [],
         isPublished: initialData.isPublished ?? false,
       });

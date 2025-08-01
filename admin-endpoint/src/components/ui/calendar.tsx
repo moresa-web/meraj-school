@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
-import { fa } from "date-fns/locale"
+// import { fa } from "date-fns/locale" // Persian locale not available in date-fns
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -52,11 +52,11 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-      }}
-      locale={fa}
+      // components={{
+      //   IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+      //   IconRight: () => <ChevronRight className="h-4 w-4" />,
+      // }}
+      // locale={fa} // Persian locale not available
       {...props}
     />
   )

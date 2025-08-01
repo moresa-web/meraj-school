@@ -1,7 +1,6 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { connectToDatabase } from './mongodb';
-import { compare } from 'bcryptjs';
+import axios from 'axios';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,25 +15,25 @@ export const authOptions: NextAuthOptions = {
           throw new Error('لطفا ایمیل و رمز عبور را وارد کنید');
         }
 
-        const { db } = await connectToDatabase();
-        const user = await db.collection('users').findOne({ email: credentials.email });
+        try {
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+            email: credentials.email,
+            password: credentials.password
+          });
 
-        if (!user) {
-          throw new Error('کاربری با این ایمیل یافت نشد');
+          if (response.data.success) {
+            return {
+              id: response.data.user._id,
+              email: response.data.user.email,
+              name: response.data.user.name,
+              role: response.data.user.role
+            };
+          } else {
+            throw new Error(response.data.message || 'خطا در ورود');
+          }
+        } catch (error: any) {
+          throw new Error(error.response?.data?.message || 'خطا در ورود');
         }
-
-        const isPasswordValid = await compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error('رمز عبور اشتباه است');
-        }
-
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role
-        };
       }
     })
   ],

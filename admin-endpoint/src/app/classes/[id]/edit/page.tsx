@@ -3,9 +3,10 @@ import EditClassClient from './EditClassClient';
 import { api } from '@/lib/api';
 
 interface EditClassPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  
+  }>;
 }
 
 async function getClassData(id: string) {
@@ -18,8 +19,11 @@ async function getClassData(id: string) {
   }
 }
 
-export default async function EditClassPage({ params }: EditClassPageProps) {
-  const classData = await getClassData(params.id);
+export default async function EditClassPage(
+  { params }: EditClassPageProps
+) {
+  const resolvedParams = await params;
+  const classData = await getClassData(resolvedParams.id);
   
   if (!classData) {
     return (
